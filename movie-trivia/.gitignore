@@ -1,0 +1,10 @@
+node_modules
+out
+.cache
+frames
+.env
+# media, audio and supplied files stay local (large, regenerable, or rights unchecked)
+public/media
+public/audio
+image
+bgm

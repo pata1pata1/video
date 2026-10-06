@@ -1,0 +1,137 @@
+{
+  "projectName": "youtube-test-04",
+  "generatedAt": "2026-09-28T21:29:14.717Z",
+  "overlays": [
+    {
+      "id": "plan-001",
+      "startTime": 0,
+      "endTime": 11.397,
+      "layout": "text-only",
+      "headline": "本日のニュース",
+      "subtext": "みなと坂市の商店街で看板が歩道に落下。けが人なし",
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-002",
+      "startTime": 11.397,
+      "endTime": 19.019,
+      "layout": "location-card",
+      "headline": "現場の状況",
+      "locationLines": [
+        {
+          "label": "場所",
+          "value": "みなと坂駅近くの商店街"
+        },
+        {
+          "label": "周辺",
+          "value": "ふだんから人通りの多い場所"
+        }
+      ],
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-003",
+      "startTime": 19.019,
+      "endTime": 21.914,
+      "layout": "text-only",
+      "headline": "なぜ看板は落ちたのか？",
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-004",
+      "startTime": 21.914,
+      "endTime": 26.785,
+      "layout": "findings-card",
+      "headline": "考えられること",
+      "findings": [
+        {
+          "label": "原因",
+          "value": "固定金具が強風で外れた",
+          "status": "inferred"
+        }
+      ],
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-005",
+      "startTime": 26.785,
+      "endTime": 31.699,
+      "layout": "findings-card",
+      "headline": "判明したこと",
+      "findings": [
+        {
+          "label": "経過年数",
+          "value": "設置から20年以上",
+          "status": "confirmed"
+        }
+      ],
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-006",
+      "startTime": 31.699,
+      "endTime": 38.742,
+      "layout": "timeline-card",
+      "headline": "警察の対応",
+      "timelineSteps": [
+        {
+          "label": "午後6時ごろ",
+          "value": "現場を確認"
+        },
+        {
+          "label": "その後",
+          "value": "管理会社から話を聞く"
+        }
+      ],
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-007",
+      "startTime": 38.742,
+      "endTime": 43.317,
+      "layout": "text-only",
+      "headline": "ほかの看板も点検へ",
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-008",
+      "startTime": 43.317,
+      "endTime": 47.072,
+      "layout": "text-only",
+      "headline": "原因の解明に注目",
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    }
+  ]
+}

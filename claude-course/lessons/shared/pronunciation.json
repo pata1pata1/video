@@ -1,0 +1,26 @@
+{
+  "_comment": "全Lesson共通の読み辞書。字幕（text）はそのまま、VOICEVOXに送る読みだけを置き換える。長い語から順に1回だけ適用する。regex=true はJavaScriptの正規表現（置換で$1等を使える）。engineReads は、VOICEVOX ENGINEが英字のままで自然に読むことを確認済みの語（カタカナにすると区切りがおかしくなるもの）。読みに英字が残る文は、engineReadsに無い限りエラーになる。",
+  "entries": [
+    { "from": "Claude Codeサポーター", "to": "クロードコードサポーター" },
+    { "from": "Claude Code", "to": "クロードコード" },
+    { "from": "CLAUDE.md", "to": "クロードエムディー" },
+    { "from": "Claude", "to": "クロード" },
+    { "from": "Anthropic", "to": "アンソロピック" },
+    { "from": "commit", "to": "コミット" },
+    { "from": "push", "to": "プッシュ" },
+    { "from": "Windows", "to": "ウィンドウズ" },
+    { "from": "Mac", "to": "マック" },
+    { "from": "Web", "to": "ウェブ" },
+    { "from": "API", "to": "エーピーアイ" },
+    { "from": "AI", "to": "エーアイ" },
+    { "from": "Lesson 0?(\\d+)", "to": "レッスン$1", "regex": true },
+    { "from": "Standard", "to": "スタンダード" },
+    { "from": "Premium", "to": "プレミアム" },
+    { "from": "Zoom", "to": "ズーム" },
+    { "from": "(?<![A-Za-z])X(?![A-Za-z])", "to": "エックス", "regex": true }
+  ],
+  "engineReads": [
+    "Git",
+    "ChatGPT"
+  ]
+}

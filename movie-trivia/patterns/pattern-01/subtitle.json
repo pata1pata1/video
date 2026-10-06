@@ -1,0 +1,18 @@
+{
+  "area": 170,
+  "bottom": 26,
+  "maxRowChars": 28,
+  "wrapAt": "、",
+  "wrapRule": "28字を超えたら中央に最も近い「、」で2行に分ける",
+  "manualBreak": "約31字を超えて3行になる文は、台本の line に caption（読み上げと同じ文で改行位置に \n）を書く",
+  "fontSize": 46,
+  "fontWeight": 700,
+  "lineHeight": 1.32,
+  "letterSpacing": "0.04em",
+  "color": "#FFFFFF",
+  "background": "rgba(24,26,31,0.82)",
+  "radius": 10,
+  "padding": "12px 40px 14px",
+  "maxWidth": 1640,
+  "dropTrailingPeriod": true
+}

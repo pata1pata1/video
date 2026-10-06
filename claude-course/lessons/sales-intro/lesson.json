@@ -1,0 +1,426 @@
+{
+  "schemaVersion": 1,
+  "id": "sales-intro",
+  "lesson": "sales-intro",
+  "course": "Claude Codeで始めるAI副業実践講座",
+  "title": "講座紹介動画（販売ページ）",
+  "voice": {
+    "speaker": 11
+  },
+  "timing": {
+    "leadInSeconds": 0.6,
+    "linePauseSeconds": 0.5,
+    "scenePauseSeconds": 1,
+    "tailOutSeconds": 2
+  },
+  "chapters": [
+    {
+      "id": "ch01",
+      "number": "01",
+      "title": "冒頭",
+      "scenes": [
+        {
+          "id": "s01-hook",
+          "layout": "recording",
+          "visual": {},
+          "lines": [
+            {
+              "id": "l001",
+              "text": "こんなホームページや、自分の仕事に合わせたツール。"
+            },
+            {
+              "id": "l002",
+              "text": "あなたも、自分で作ってみたいと思いませんか？"
+            }
+          ]
+        },
+        {
+          "id": "s02-catch",
+          "layout": "recording",
+          "visual": {},
+          "lines": [
+            {
+              "id": "l003",
+              "text": "つくる。効率化する。自動化する。"
+            },
+            {
+              "id": "l004",
+              "text": "Claude Codeを、あなたの道具に。"
+            }
+          ]
+        },
+        {
+          "id": "s03-course",
+          "layout": "recording",
+          "visual": {},
+          "lines": [
+            {
+              "id": "l005",
+              "text": "この講座では、Claude Codeの基本から、"
+            },
+            {
+              "id": "l006",
+              "text": "実際に手を動かして形にする方法まで、一つずつ学んでいきます。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ch02",
+      "number": "02",
+      "title": "サイト制作",
+      "scenes": [
+        {
+          "id": "s04-salon",
+          "layout": "recording",
+          "visual": {},
+          "lines": [
+            {
+              "id": "l007",
+              "text": "まずは、こちらをご覧下さい。"
+            },
+            {
+              "id": "l008",
+              "text": "架空の美容サロンのホームページです。"
+            }
+          ]
+        },
+        {
+          "id": "s05-request",
+          "layout": "recording",
+          "visual": {},
+          "lines": [
+            {
+              "id": "l009",
+              "text": "Claude Codeに、作りたいページの内容や、色、雰囲気を日本語で伝えて制作しました。"
+            }
+          ]
+        },
+        {
+          "id": "s06-fix",
+          "layout": "recording",
+          "visual": {},
+          "lines": [
+            {
+              "id": "l010",
+              "text": "出来上がったページを見て、"
+            },
+            {
+              "id": "l011",
+              "text": "店名をもう少し大きくしたい。"
+            },
+            {
+              "id": "l012",
+              "text": "ボタンの色を変えたい。"
+            },
+            {
+              "id": "l013",
+              "text": "そんな希望も、言葉で伝えて修正していきます。"
+            }
+          ]
+        },
+        {
+          "id": "s07-loop",
+          "layout": "flow",
+          "visual": {
+            "heading": "基本の流れ",
+            "steps": [
+              "作って",
+              "確認して",
+              "直す"
+            ],
+            "loop": true
+          },
+          "lines": [
+            {
+              "id": "l014",
+              "text": "作って、確認して、直す。"
+            },
+            {
+              "id": "l015",
+              "text": "この流れを繰り返しながら、自分のイメージに近づけていきます。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ch03",
+      "number": "03",
+      "title": "ツール制作",
+      "scenes": [
+        {
+          "id": "s08-not-only",
+          "layout": "recording",
+          "visual": {},
+          "lines": [
+            {
+              "id": "l016",
+              "text": "作れるものは、ホームページだけではありません。"
+            }
+          ]
+        },
+        {
+          "id": "s09-tool",
+          "layout": "recording",
+          "visual": {},
+          "lines": [
+            {
+              "id": "l017",
+              "text": "こちらは、Claude Codeを使って制作した、Xの記事作成を補助するツールです。"
+            }
+          ]
+        },
+        {
+          "id": "s10-tool-input",
+          "layout": "recording",
+          "visual": {},
+          "lines": [
+            {
+              "id": "l018",
+              "text": "テーマや、届けたい相手、文章のスタイルを選ぶと、記事の下書きを生成します。"
+            }
+          ]
+        },
+        {
+          "id": "s11-tool-check",
+          "layout": "recording",
+          "visual": {},
+          "lines": [
+            {
+              "id": "l019",
+              "text": "生成された内容を自分で確認し、整えて使う。"
+            },
+            {
+              "id": "l020",
+              "text": "こうした作業を助ける仕組みも、自分の用途に合わせて作っていけます。"
+            }
+          ]
+        },
+        {
+          "id": "s12-your-work",
+          "layout": "message",
+          "visual": {
+            "text": "繰り返している作業はありませんか？"
+          },
+          "lines": [
+            {
+              "id": "l021",
+              "text": "これは、活用方法の一例です。"
+            },
+            {
+              "id": "l022",
+              "text": "あなたの仕事にも、繰り返している作業や、もっと便利にしたい事はありませんか？"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ch04",
+      "number": "04",
+      "title": "学び方",
+      "scenes": [
+        {
+          "id": "s13-worry",
+          "layout": "message",
+          "visual": {
+            "text": "何から始めればいいか分からない？"
+          },
+          "lines": [
+            {
+              "id": "l023",
+              "text": "でも、興味はあっても、何から始めればいいか分からない。"
+            },
+            {
+              "id": "l024",
+              "text": "見慣れない画面や、専門用語に不安を感じるかもしれません。"
+            }
+          ]
+        },
+        {
+          "id": "s14-steps",
+          "layout": "recording",
+          "visual": {},
+          "lines": [
+            {
+              "id": "l025",
+              "text": "この講座では、環境の準備から、基本操作、"
+            },
+            {
+              "id": "l026",
+              "text": "指示の出し方、制作と修正まで、順番に進められるようにしています。"
+            }
+          ]
+        },
+        {
+          "id": "s15-platform",
+          "layout": "recording",
+          "visual": {},
+          "lines": [
+            {
+              "id": "l027",
+              "text": "MacとWindows、それぞれの操作に対応。"
+            },
+            {
+              "id": "l028",
+              "text": "教材の説明や指示文を使いながら、自分のパソコンで実際に手を動かして学びます。"
+            }
+          ]
+        },
+        {
+          "id": "s16-start-small",
+          "layout": "points",
+          "visual": {
+            "heading": "まずは１つ動かしてみる",
+            "items": [
+              "最初から全てを覚えなくて大丈夫",
+              "まずは１つ動かしてみる",
+              "分からない部分を確かめながら進める"
+            ]
+          },
+          "lines": [
+            {
+              "id": "l029",
+              "text": "最初から全てを覚える必要はありません。"
+            },
+            {
+              "id": "l030",
+              "text": "まずは一つ動かしてみる。"
+            },
+            {
+              "id": "l031",
+              "text": "そして、分からない部分を確かめながら進めていきましょう。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ch05",
+      "number": "05",
+      "title": "サポート",
+      "scenes": [
+        {
+          "id": "s17-supporter",
+          "layout": "recording",
+          "visual": {},
+          "lines": [
+            {
+              "id": "l032",
+              "text": "学習中の疑問には、Claude Codeサポーターを活用できます。"
+            },
+            {
+              "id": "l033",
+              "text": "操作が分からない時や、エラーが出た時に、状況を伝えて相談できるAIの学習サポートです。"
+            },
+            {
+              "id": "l034",
+              "text": "StandardとPremium、どちらのプランにも含まれています。"
+            }
+          ]
+        },
+        {
+          "id": "s18-zoom",
+          "layout": "recording",
+          "visual": {},
+          "lines": [
+            {
+              "id": "l035",
+              "text": "更に、個別に相談しながら進めたい方には、"
+            },
+            {
+              "id": "l036",
+              "text": "Zoomサポート付きのPremiumプランをご用意しています。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ch06",
+      "number": "06",
+      "title": "締め",
+      "scenes": [
+        {
+          "id": "s19-goal",
+          "layout": "message",
+          "visual": {
+            "text": "自分のやりたい事を形にする力"
+          },
+          "lines": [
+            {
+              "id": "l037",
+              "text": "目指すのは、自分のやりたい事を、Claude Codeと一緒に形にしていく力です。"
+            }
+          ]
+        },
+        {
+          "id": "s20-list",
+          "layout": "recording",
+          "visual": {},
+          "lines": [
+            {
+              "id": "l038",
+              "text": "ホームページを作る。"
+            },
+            {
+              "id": "l039",
+              "text": "仕事の手間を減らす。"
+            },
+            {
+              "id": "l040",
+              "text": "自分に必要なツールを作る。"
+            }
+          ]
+        },
+        {
+          "id": "s21-ideas",
+          "layout": "message",
+          "visual": {
+            "text": "諦めていたアイデアにも挑戦しやすく"
+          },
+          "lines": [
+            {
+              "id": "l041",
+              "text": "できる事が増えると、今まで諦めていたアイデアにも挑戦しやすくなります。"
+            }
+          ]
+        },
+        {
+          "id": "s22-side",
+          "layout": "message",
+          "visual": {
+            "text": "自分で形にできる側へ"
+          },
+          "lines": [
+            {
+              "id": "l042",
+              "text": "できる人に頼むだけだった側から、自分で形にできる側へ。"
+            }
+          ]
+        },
+        {
+          "id": "s23-cta",
+          "layout": "end",
+          "visual": {
+            "message": "一歩を踏み出してみませんか？",
+            "next": "詳しいレッスン内容・料金プランはこのページで",
+            "credit": "VOICEVOX:玄野武宏"
+          },
+          "lines": [
+            {
+              "id": "l043",
+              "text": "あなたも、Claude Codeを使う一歩を踏み出してみませんか？"
+            },
+            {
+              "id": "l044",
+              "text": "詳しいレッスン内容と料金プランは、このページでご確認下さい。"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

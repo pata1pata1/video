@@ -1,0 +1,35 @@
+{
+  "id": "pattern-01",
+  "name": "シンプル解説（映像＋図解）",
+  "basedOn": "fusion-magnet（2026-10-06 完成版）",
+  "video": { "width": 1920, "height": 1080, "fps": 30 },
+  "structure": {
+    "targetMinutes": [6, 8],
+    "chapters": "テーマと内容に応じて可変（章数は固定しない）",
+    "scenes": ["opening", "chapter × N", "ending"],
+    "openingSeconds": 30,
+    "openingRule": "冒頭は1文ごとに映像を替える。タイトル（title+footage）→ 数字カード（stat+footage）→ 映像…と、図解は使わない",
+    "chapterRule": "各章の1文目は章タイトル（scene.footage を背景に）。章の中は映像と図解を交互に",
+    "endingLines": 3,
+    "tooShort": "読み上げ時間が目安に足りないときは、一次情報で確認できる事実を文として足す（水増しの言い回しはしない）"
+  },
+  "pacing": {
+    "linesPerCaption": 1,
+    "footageLinesPerShot": [1, 3],
+    "diagramStepsPerDiagram": [2, 5],
+    "statPerLine": 1,
+    "pointsMax": 4
+  },
+  "transition": {
+    "visualLeadSeconds": 0.4,
+    "fadeFrames": 10,
+    "captionHoldSeconds": 0.5
+  },
+  "media": {
+    "fit": "全画面（cover）",
+    "loop": "pingpong",
+    "continueAcrossUses": true,
+    "sharedClipMaxSeconds": 20,
+    "credit": "右上に「映像：<出典名> / <作者>」"
+  }
+}

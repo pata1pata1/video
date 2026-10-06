@@ -1,0 +1,75 @@
+{
+  "projectName": "youtube-test-03",
+  "generatedAt": "2026-09-27T00:00:00.000Z",
+  "overlays": [
+    {
+      "id": "overlay-001",
+      "startTime": 0,
+      "endTime": 8.28,
+      "layout": "text-only",
+      "headline": "本日のニュース",
+      "subtext": "警察が詳しい状況を調べています",
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "overlay-002",
+      "startTime": 8.28,
+      "endTime": 14.76,
+      "layout": "location-card",
+      "headline": "現場は住宅街",
+      "locationLines": [
+        {
+          "label": "場所",
+          "value": "駅から徒歩数分の住宅街"
+        },
+        {
+          "label": "周辺",
+          "value": "住民から不安の声"
+        }
+      ],
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "overlay-003",
+      "startTime": 14.76,
+      "endTime": 17.83,
+      "layout": "text-only",
+      "headline": "なぜ事件が？",
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "overlay-004",
+      "startTime": 17.83,
+      "endTime": 24.07,
+      "layout": "timeline-card",
+      "headline": "捜査の状況",
+      "timelineSteps": [
+        {
+          "label": "防犯カメラ",
+          "value": "周辺の防犯カメラの映像を確認"
+        },
+        {
+          "label": "捜査継続",
+          "value": "警察が捜査を進めています"
+        }
+      ],
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    }
+  ]
+}

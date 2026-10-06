@@ -1,0 +1,17 @@
+{
+  "characterMode": "pattern2",
+  "genericVideo": "generic-character/monitor-01.mp4",
+  "genericVideoDurationSeconds": 19.5333,
+  "mouthMask": { "type": "none" },
+  "overlayBounds": { "left": 488, "top": 118, "right": 1808, "bottom": 828 },
+  "overlayScale": 1.2,
+  "hudTextSize": "large",
+  "subtitleStyle": "boxed",
+  "subtitleCharTiming": "youtube-video/youtube-test-05/audio/narration-char-timing.json",
+  "lipSync": {
+    "enabled": true,
+    "levels": "youtube-video/youtube-test-05/audio/narration-mouth.json",
+    "track": "generic-character/monitor-01.mouth-track.json",
+    "scale": 1.3
+  }
+}

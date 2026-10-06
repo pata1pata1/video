@@ -1,0 +1,498 @@
+{
+  "projectName": "youtube-test-05",
+  "generatedAt": "2026-09-29T23:29:44.915Z",
+  "overlays": [
+    {
+      "id": "plan-001",
+      "startTime": 0,
+      "endTime": 9.771,
+      "layout": "image-headline",
+      "media": {
+        "type": "image",
+        "file": "generated/plan-001-gen-01.png"
+      },
+      "headline": "タイムズカーで最大660万件流出",
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-002",
+      "startTime": 9.771,
+      "endTime": 16.996,
+      "layout": "text-only",
+      "headline": "本人確認書類も流出",
+      "subtext": "約160万件　免許証画像など",
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-003",
+      "startTime": 16.996,
+      "endTime": 24.41,
+      "layout": "text-only",
+      "headline": "何が起きたのか？",
+      "subtext": "経緯・流出情報・注意点",
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-004",
+      "startTime": 24.41,
+      "endTime": 41.86,
+      "layout": "timeline-card",
+      "headline": "発覚の経緯",
+      "timelineSteps": [
+        {
+          "label": "9月25日 午前9時7分",
+          "value": "不正アクセスを検知"
+        },
+        {
+          "label": "その後",
+          "value": "外部機関と調査、侵入を確認"
+        }
+      ],
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-005",
+      "startTime": 41.86,
+      "endTime": 55.796,
+      "layout": "timeline-card",
+      "headline": "遮断と公表",
+      "timelineSteps": [
+        {
+          "label": "9月26日 午前7時25分",
+          "value": "侵入経路と通信を遮断"
+        },
+        {
+          "label": "9月28日",
+          "value": "調査結果（第2報）を公表"
+        }
+      ],
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-006",
+      "startTime": 55.796,
+      "endTime": 73.524,
+      "layout": "findings-card",
+      "headline": "判明したこと",
+      "findings": [
+        {
+          "label": "流出",
+          "value": "約660万アカウント分",
+          "status": "confirmed"
+        },
+        {
+          "label": "本人確認書類",
+          "value": "約160万件（29日 第3報）",
+          "status": "confirmed"
+        }
+      ],
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-007",
+      "startTime": 73.524,
+      "endTime": 77.65,
+      "layout": "text-only",
+      "headline": "どんな情報が流出？",
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-008",
+      "startTime": 77.65,
+      "endTime": 91.029,
+      "layout": "text-only",
+      "headline": "現会員だけではない",
+      "subtext": "退会者・申込途中の人・法人会員も",
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-009",
+      "startTime": 91.029,
+      "endTime": 106.121,
+      "layout": "findings-card",
+      "headline": "流出した情報",
+      "findings": [
+        {
+          "label": "基本情報",
+          "value": "氏名・住所・生年月日・電話・メール",
+          "status": "confirmed"
+        },
+        {
+          "label": "そのほか",
+          "value": "免許情報・パスワード・連携ID 9件",
+          "status": "confirmed"
+        }
+      ],
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-010",
+      "startTime": 106.121,
+      "endTime": 119.448,
+      "layout": "findings-card",
+      "headline": "会社の説明",
+      "findings": [
+        {
+          "label": "パスワード",
+          "value": "元に戻せない形式で保管"
+        },
+        {
+          "label": "会社の見解",
+          "value": "不正利用のおそれはない"
+        }
+      ],
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-011",
+      "startTime": 119.448,
+      "endTime": 132.562,
+      "layout": "findings-card",
+      "headline": "流出した本人確認書類",
+      "findings": [
+        {
+          "label": "運転免許証",
+          "value": "画像",
+          "status": "confirmed"
+        },
+        {
+          "label": "そのほか",
+          "value": "住所確認書類・学生証など",
+          "status": "confirmed"
+        }
+      ],
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-012",
+      "startTime": 132.562,
+      "endTime": 145.543,
+      "layout": "findings-card",
+      "headline": "流出していないもの",
+      "findings": [
+        {
+          "label": "クレジットカード",
+          "value": "流出なし（会社が確認）",
+          "status": "confirmed"
+        },
+        {
+          "label": "不正利用",
+          "value": "現時点で確認されず"
+        }
+      ],
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-013",
+      "startTime": 145.543,
+      "endTime": 150.319,
+      "layout": "text-only",
+      "headline": "警察などに報告",
+      "subtext": "個人情報保護委員会・警察",
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-014",
+      "startTime": 150.319,
+      "endTime": 165.532,
+      "layout": "text-only",
+      "headline": "免許証画像の流出",
+      "subtext": "氏名・住所とそろうと影響大のおそれ",
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-015",
+      "startTime": 165.532,
+      "endTime": 180.635,
+      "layout": "findings-card",
+      "headline": "考えられるリスク",
+      "findings": [
+        {
+          "label": "なりすまし",
+          "value": "他人名義で登録・契約の可能性",
+          "status": "inferred"
+        }
+      ],
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-016",
+      "startTime": 180.635,
+      "endTime": 190.029,
+      "layout": "findings-card",
+      "headline": "考えられるリスク",
+      "findings": [
+        {
+          "label": "なりすまし",
+          "value": "他人名義で登録・契約の可能性",
+          "status": "inferred"
+        },
+        {
+          "label": "フィッシング",
+          "value": "会社を装うメール・SMS",
+          "status": "inferred"
+        }
+      ],
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-017",
+      "startTime": 190.029,
+      "endTime": 199.326,
+      "layout": "findings-card",
+      "headline": "考えられるリスク",
+      "findings": [
+        {
+          "label": "不審な連絡",
+          "value": "個人を狙った電話など",
+          "status": "inferred"
+        }
+      ],
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-018",
+      "startTime": 199.326,
+      "endTime": 208.077,
+      "layout": "text-only",
+      "headline": "被害は確認されていない",
+      "subtext": "いずれも考えられるリスク",
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-019",
+      "startTime": 208.077,
+      "endTime": 212.249,
+      "layout": "text-only",
+      "headline": "何に気をつける？",
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-020",
+      "startTime": 212.249,
+      "endTime": 221.281,
+      "layout": "image-headline",
+      "media": {
+        "type": "image",
+        "file": "generated/plan-020-gen-01.png"
+      },
+      "headline": "会社はパスワードを尋ねません",
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-021",
+      "startTime": 221.281,
+      "endTime": 233.893,
+      "layout": "findings-card",
+      "headline": "不審な連絡には",
+      "findings": [
+        {
+          "label": "リンク・添付",
+          "value": "開かない"
+        },
+        {
+          "label": "パスワード・認証コード",
+          "value": "入力しない"
+        }
+      ],
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-022",
+      "startTime": 233.893,
+      "endTime": 249.291,
+      "layout": "text-only",
+      "headline": "パスワードの使い回し",
+      "subtext": "同じなら念のため変更を",
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-023",
+      "startTime": 249.291,
+      "endTime": 263.212,
+      "layout": "timeline-card",
+      "headline": "会社からの案内",
+      "timelineSteps": [
+        {
+          "label": "9月29日から",
+          "value": "対象者へ個別メール"
+        },
+        {
+          "label": "2週間程度をめどに",
+          "value": "詳しい情報を案内"
+        }
+      ],
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-024",
+      "startTime": 263.212,
+      "endTime": 269.736,
+      "layout": "text-only",
+      "headline": "続報は公式サイトで",
+      "subtext": "メールのリンクから開かない",
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-025",
+      "startTime": 269.736,
+      "endTime": 278.129,
+      "layout": "x-post-card",
+      "headline": "X上の反応",
+      "media": {
+        "type": "image",
+        "file": "x/plan-025-x-01.png"
+      },
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-026",
+      "startTime": 278.129,
+      "endTime": 286.668,
+      "layout": "text-only",
+      "headline": "まとめ",
+      "subtext": "最大およそ660万件が流出",
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-027",
+      "startTime": 286.668,
+      "endTime": 300.38,
+      "layout": "findings-card",
+      "headline": "現時点で分かっていること",
+      "findings": [
+        {
+          "label": "本人確認書類",
+          "value": "約160万件",
+          "status": "confirmed"
+        },
+        {
+          "label": "不正利用",
+          "value": "現時点で確認されず"
+        }
+      ],
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    },
+    {
+      "id": "plan-028",
+      "startTime": 300.38,
+      "endTime": 315.5,
+      "layout": "text-only",
+      "headline": "原因と対策は続報へ",
+      "subtext": "不審な連絡に注意を",
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSeconds": 0.3
+      }
+    }
+  ]
+}

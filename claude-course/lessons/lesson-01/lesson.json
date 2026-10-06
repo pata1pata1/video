@@ -1,0 +1,452 @@
+{
+  "schemaVersion": 1,
+  "id": "lesson-01-intro",
+  "lesson": "01",
+  "course": "Claude Codeで始めるAI副業実践講座",
+  "title": "Lesson 01 導入動画",
+  "voice": {
+    "speaker": 11
+  },
+  "timing": {
+    "leadInSeconds": 0.6,
+    "linePauseSeconds": 0.5,
+    "scenePauseSeconds": 1,
+    "tailOutSeconds": 2
+  },
+  "chapters": [
+    {
+      "id": "ch01",
+      "number": "01",
+      "title": "オープニング",
+      "scenes": [
+        {
+          "id": "s01-title",
+          "layout": "title",
+          "visual": {
+            "title": "Claude Codeで始めるAI副業実践講座",
+            "subtitle": "Lesson 01 導入"
+          },
+          "lines": [
+            { "id": "l001", "text": "「Claude Codeで始めるAI副業実践講座」へようこそ。", "yomi": "クロードコードで始めるエーアイ副業実践講座へ、ようこそ。" },
+            { "id": "l002", "text": "この動画は、Lesson 01を始める前の導入動画です。" }
+          ]
+        },
+        {
+          "id": "s02-agenda",
+          "layout": "points",
+          "visual": {
+            "heading": "この動画でお話しする事",
+            "items": [
+              "Claude Codeとは何か",
+              "この講座の進め方",
+              "Claude Codeサポーターの使い方"
+            ]
+          },
+          "lines": [
+            { "id": "l003", "text": "この動画では、大きく三つのことをお話しします。" },
+            { "id": "l004", "text": "一つ目は、Claude Codeとは何か。" },
+            { "id": "l005", "text": "二つ目は、この講座をどう進めるのか。" },
+            { "id": "l006", "text": "三つ目は、Claude Codeサポーターの使い方です。" }
+          ]
+        },
+        {
+          "id": "s03-overview",
+          "layout": "message",
+          "visual": {
+            "text": "まずは全体像を掴めば大丈夫"
+          },
+          "lines": [
+            { "id": "l007", "text": "最初から、すべてを理解する必要はありません。" },
+            { "id": "l008", "text": "まずは、この講座の全体像をつかんでください。" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ch02",
+      "number": "02",
+      "title": "Claude Codeの概要",
+      "scenes": [
+        {
+          "id": "s04-chapter",
+          "layout": "chapter",
+          "durationSeconds": 3,
+          "lines": []
+        },
+        {
+          "id": "s05-what",
+          "layout": "points",
+          "visual": {
+            "heading": "Claude Codeとは",
+            "items": [
+              "Anthropic社が提供するAIツール",
+              "答えるだけのAIチャットとは違う"
+            ]
+          },
+          "lines": [
+            { "id": "l009", "text": "Claude Codeは、Anthropic社が提供するAIツールです。" },
+            { "id": "l010", "text": "質問に答えるだけの、一般的なAIチャットとは少し違います。" }
+          ]
+        },
+        {
+          "id": "s06-compare",
+          "layout": "compare",
+          "visual": {
+            "left": {
+              "title": "一般的なAIチャット",
+              "body": "答えを返す"
+            },
+            "right": {
+              "title": "Claude Code",
+              "body": "実際に作業する"
+            },
+            "actions": [
+              "ファイルを読む",
+              "ファイルを作る",
+              "修正する",
+              "コードを書く",
+              "作業を進める"
+            ]
+          },
+          "lines": [
+            { "id": "l011", "text": "Claude Codeは、パソコンの中のファイルを読むことができます。" },
+            { "id": "l012", "text": "新しいファイルを作ったり、今あるファイルを修正したりもできます。" },
+            { "id": "l013", "text": "さらに、コードを書き、作業そのものを進めてくれます。" }
+          ]
+        },
+        {
+          "id": "s07-examples",
+          "layout": "bubbles",
+          "visual": {
+            "heading": "日本語で頼める",
+            "items": [
+              "自己紹介用のWebページを作って",
+              "デザインを見やすくして",
+              "ファイルを整理して",
+              "繰り返し作業を自動化できない？"
+            ]
+          },
+          "lines": [
+            { "id": "l014", "text": "指示は、日本語で大丈夫です。" },
+            { "id": "l015", "text": "たとえば、「自己紹介用のWebページを作って」。" },
+            { "id": "l016", "text": "「デザインを見やすくして」。" },
+            { "id": "l017", "text": "「ファイルを整理して」。" },
+            { "id": "l018", "text": "「繰り返し作業を自動化できない？」" },
+            { "id": "l019", "text": "このように、普段の言葉で頼むことができます。" }
+          ]
+        },
+        {
+          "id": "s08-flow",
+          "layout": "flow",
+          "visual": {
+            "heading": "Claude Codeの使い方",
+            "steps": [
+              "何をしたいか伝える",
+              "結果を確認する",
+              "必要なら修正を頼む"
+            ]
+          },
+          "lines": [
+            { "id": "l020", "text": "この講座では、コードを全部自分で書くわけではありません。" },
+            { "id": "l021", "text": "まず、何をしたいかをClaude Codeに伝えます。" },
+            { "id": "l022", "text": "次に、できあがった結果を確認します。" },
+            { "id": "l023", "text": "そして必要なら、修正をお願いします。" },
+            { "id": "l024", "text": "これが、Claude Codeの基本的な使い方です。" }
+          ]
+        },
+        {
+          "id": "s09-loop",
+          "layout": "flow",
+          "visual": {
+            "heading": "身に付ける基本",
+            "steps": [
+              "頼む",
+              "確認する",
+              "直す"
+            ],
+            "loop": true,
+            "note": "AIは間違える事もある"
+          },
+          "lines": [
+            { "id": "l025", "text": "ただし、Claude CodeはAIなので、間違えることもあります。" },
+            { "id": "l026", "text": "だからこそ、任せきりにしないことが大切です。" },
+            { "id": "l027", "text": "頼む、確認する、必要なら直す。" },
+            { "id": "l028", "text": "この講座では、この基本の流れを身につけていきます。" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ch03",
+      "number": "03",
+      "title": "この講座の進め方",
+      "scenes": [
+        {
+          "id": "s10-chapter",
+          "layout": "chapter",
+          "durationSeconds": 3,
+          "lines": []
+        },
+        {
+          "id": "s11-lessons",
+          "layout": "screenshot",
+          "visual": {
+            "src": "lessons/lesson-01/screens/member-site/courses.png",
+            "heading": "全10レッスン",
+            "chips": [
+              "Claude Codeの基本",
+              "環境の準備",
+              "基本操作",
+              "安全な使い方",
+              "Web制作",
+              "コンテンツ制作",
+              "自動化",
+              "仕事への活かし方",
+              "Gitと納品の準備"
+            ]
+          },
+          "lines": [
+            { "id": "l029", "text": "この講座は、全10レッスンで構成されています。" },
+            { "id": "l030", "text": "Claude Codeの基本と、環境の準備から始めます。" },
+            { "id": "l031", "text": "次に、基本操作と、安全な使い方を学びます。" },
+            { "id": "l032", "text": "そのあと、Web制作、コンテンツ制作、自動化へと進みます。" },
+            { "id": "l033", "text": "最後に、仕事への活かし方や、Gitと納品の準備を学びます。" }
+          ]
+        },
+        {
+          "id": "s12-practice",
+          "layout": "screenshot",
+          "visual": {
+            "src": "lessons/lesson-01/screens/member-site/lesson01.png",
+            "heading": "実践形式で進める",
+            "steps": [
+              "教材を読む",
+              "Claude Codeへ指示する",
+              "結果を確認する",
+              "必要なら修正する"
+            ]
+          },
+          "lines": [
+            { "id": "l034", "text": "この講座は、教材を読むだけでは終わりません。" },
+            { "id": "l035", "text": "教材を読んだら、実際にClaude Codeへ指示を出します。" },
+            { "id": "l036", "text": "結果を確認して、必要なら修正を頼みます。" },
+            { "id": "l037", "text": "このように、手を動かす実践形式で進めていきます。" }
+          ]
+        },
+        {
+          "id": "s13-platform",
+          "layout": "screenshot",
+          "visual": {
+            "src": "lessons/lesson-01/screens/member-site/os-switch.png",
+            "heading": "Mac / Windowsを切り替え",
+            "highlight": "Mac / Windows切り替えボタン"
+          },
+          "lines": [
+            { "id": "l038", "text": "会員サイトでは、MacとWindowsの表示を切り替えられます。" },
+            { "id": "l039", "text": "自分のパソコンに合った手順を見ながら進められます。" }
+          ]
+        },
+        {
+          "id": "s14-copy",
+          "layout": "screenshot",
+          "visual": {
+            "src": "lessons/lesson-01/screens/member-site/prompt-copy.png",
+            "heading": "指示文はコピーして使える",
+            "highlight": "指示文のコピーボタン"
+          },
+          "lines": [
+            { "id": "l040", "text": "Claude Codeへの指示文は、コピーして使うことができます。" },
+            { "id": "l041", "text": "貼り付けるだけで、すぐに試せます。" }
+          ]
+        },
+        {
+          "id": "s15-glossary",
+          "layout": "screenshot",
+          "visual": {
+            "src": "lessons/lesson-01/screens/member-site/glossary.png",
+            "heading": "用語集",
+            "chips": [
+              "ターミナル",
+              "フォルダ",
+              "Git",
+              "CLAUDE.md",
+              "commit",
+              "push"
+            ]
+          },
+          "lines": [
+            { "id": "l042", "text": "分からない言葉が出てきたら、用語集で確認できます。" },
+            { "id": "l043", "text": "たとえば、ターミナル、フォルダ、Git、CLAUDE.mdなどです。" },
+            { "id": "l044", "text": "commitやpushなど、開発中によく出てくる言葉もまとめています。" }
+          ]
+        },
+        {
+          "id": "s16-noworry",
+          "layout": "message",
+          "visual": {
+            "text": "使いながら少しずつ慣れれば大丈夫"
+          },
+          "lines": [
+            { "id": "l045", "text": "最初から、全部を覚える必要はありません。" },
+            { "id": "l046", "text": "実際に使いながら、少しずつ慣れていけば大丈夫です。" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ch04",
+      "number": "04",
+      "title": "Claude Codeサポーター",
+      "scenes": [
+        {
+          "id": "s17-chapter",
+          "layout": "chapter",
+          "durationSeconds": 3,
+          "lines": []
+        },
+        {
+          "id": "s18-troubles",
+          "layout": "cards",
+          "visual": {
+            "heading": "こんな時に",
+            "items": [
+              "ここが分からない",
+              "エラーが出た",
+              "用語の意味が分からない",
+              "指示の出し方が分からない"
+            ]
+          },
+          "lines": [
+            { "id": "l047", "text": "学習を進めていると、分からないところが出てくると思います。" },
+            { "id": "l048", "text": "エラーが出たり、用語の意味が分からなかったりすることもあります。" },
+            { "id": "l049", "text": "Claude Codeに、どう指示すればいいか迷うこともあるでしょう。" },
+            { "id": "l050", "text": "そんなときに使えるのが、Claude Codeサポーターです。" }
+          ]
+        },
+        {
+          "id": "s19-supporter",
+          "layout": "screenshot",
+          "visual": {
+            "src": "lessons/lesson-01/screens/member-site/claude-supporter-page.png",
+            "heading": "Claude Codeサポーター",
+            "caption": "ChatGPTで使えるこの講座専用のAIサポーター"
+          },
+          "lines": [
+            { "id": "l051", "text": "Claude Codeサポーターは、ChatGPTで使える、この講座専用のAIサポーターです。" },
+            { "id": "l052", "text": "講座の内容に合わせて、質問に答えてくれます。" }
+          ]
+        },
+        {
+          "id": "s20-questions",
+          "layout": "bubbles",
+          "visual": {
+            "heading": "例えばこんな質問",
+            "items": [
+              "Lesson 05では何を作りますか？",
+              "Claude Codeでエラーが出ました",
+              "commitとpushの違いを教えて下さい",
+              "こういう物を作りたい時|Claude Codeには何と指示すればいい？"
+            ],
+            "recording": "lessons/lesson-01/recordings/claude-supporter-demo.mp4"
+          },
+          "lines": [
+            { "id": "l053", "text": "たとえば、「Lesson 05では何を作りますか？」と聞くことができます。" },
+            { "id": "l054", "text": "「Claude Codeでエラーが出ました」と相談することもできます。" },
+            { "id": "l055", "text": "「commitとpushの違いを教えてください」といった質問もできます。" },
+            { "id": "l056", "text": "「こういうものを作りたいとき、Claude Codeには何と指示すればいい？」" },
+            { "id": "l057", "text": "そんな相談にも使えます。" }
+          ]
+        },
+        {
+          "id": "s21-steps",
+          "layout": "screenshot",
+          "visual": {
+            "src": "lessons/lesson-01/recordings/claude-supporter-demo.mp4",
+            "heading": "初心者向けに１つずつ案内",
+            "highlight": "手順を分けた回答"
+          },
+          "lines": [
+            { "id": "l058", "text": "回答は初心者向けに、ひとつずつ順番に案内してくれます。" }
+          ]
+        },
+        {
+          "id": "s22-cautions",
+          "layout": "cautions",
+          "visual": {
+            "heading": "使う時の注意",
+            "items": [
+              "人による個別サポートではありません",
+              "回答が必ず正しいとは限りません",
+              "パスワードやAPIキーなどの秘密情報は貼らない"
+            ]
+          },
+          "lines": [
+            { "id": "l059", "text": "ただし、使うときに気をつけてほしいことがあります。" },
+            { "id": "l060", "text": "Claude Codeサポーターは、人による個別サポートではありません。" },
+            { "id": "l061", "text": "AIなので、回答が必ず正しいとは限りません。" },
+            { "id": "l062", "text": "おかしいと感じたら、教材の内容もあわせて確認してください。" },
+            { "id": "l063", "text": "また、パスワードやAPIキーなどの秘密情報は、貼り付けないでください。" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ch05",
+      "number": "05",
+      "title": "まとめ",
+      "scenes": [
+        {
+          "id": "s23-chapter",
+          "layout": "chapter",
+          "durationSeconds": 3,
+          "lines": []
+        },
+        {
+          "id": "s24-goal",
+          "layout": "flow",
+          "visual": {
+            "heading": "この講座の目的",
+            "steps": [
+              "使う",
+              "作る",
+              "確認する",
+              "自分の道具にする"
+            ]
+          },
+          "lines": [
+            { "id": "l064", "text": "この講座の目的は、Claude Codeを知ることだけではありません。" },
+            { "id": "l065", "text": "実際に使って、作って、確認する。" },
+            { "id": "l066", "text": "それを繰り返しながら、少しずつ自分の道具にしていくことです。" }
+          ]
+        },
+        {
+          "id": "s25-help",
+          "layout": "cards",
+          "visual": {
+            "heading": "分からない時は",
+            "items": [
+              "教材",
+              "用語集",
+              "Claude Codeサポーター"
+            ]
+          },
+          "lines": [
+            { "id": "l067", "text": "分からないことがあれば、教材、用語集、Claude Codeサポーターを使いながら進めてください。" }
+          ]
+        },
+        {
+          "id": "s26-end",
+          "layout": "end",
+          "visual": {
+            "message": "ここからLesson 01を始めましょう",
+            "next": "Lesson 01　Claude Codeとは何か",
+            "credit": "VOICEVOX:玄野武宏"
+          },
+          "lines": [
+            { "id": "l068", "text": "では、ここからLesson 01を進めていきましょう。" }
+          ]
+        }
+      ]
+    }
+  ]
+}

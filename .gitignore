@@ -1,0 +1,59 @@
+# Dependencies
+**/node_modules/
+
+# Build / cache / outputs
+**/.next/
+**/dist/
+**/build/
+**/out/
+**/frames/
+**/.cache/
+**/intermediate/
+
+# Generated / large media
+**/public/media/
+**/public/audio/
+**/public/audio-image-bgm/
+**/image/
+**/bgm/
+**/assets/
+**/audio/
+**/output/
+**/private/
+
+# Environment / secrets
+**/.env
+**/.env.*
+!**/.env.example
+
+# Logs
+**/*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Temp / backups
+**/*.tmp
+**/*.bak
+# Video / audio / image source files
+**/*.mp4
+**/*.mov
+**/*.m4v
+**/*.avi
+**/*.mkv
+**/*.webm
+**/*.wav
+**/*.mp3
+**/*.m4a
+**/*.aac
+**/*.flac
+
+# Large image / recording assets
+**/public/free-trial/
+**/public/lessons/*/recordings/
+**/public/lessons/*/screens/
+**/public/sales-intro/
+**/_shared/generic-character/*.mp4

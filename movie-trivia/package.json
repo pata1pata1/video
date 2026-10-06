@@ -1,0 +1,31 @@
+{
+  "name": "movie",
+  "version": "0.1.0",
+  "description": "YouTube向け雑学動画「日本の意外な雑学10選」",
+  "private": true,
+  "license": "UNLICENSED",
+  "type": "module",
+  "scripts": {
+    "dev": "remotion studio src/index.ts",
+    "lint": "eslint src && tsc",
+    "voice": "node scripts/build-narration.mjs",
+    "encode": "node scripts/encode-mp4.mjs"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.525",
+    "@remotion/google-fonts": "4.0.525",
+    "ffmpeg-static": "5.3.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "remotion": "4.0.525"
+  },
+  "allowScripts": {
+    "ffmpeg-static@5.3.0": true
+  },
+  "devDependencies": {
+    "@remotion/eslint-config-flat": "4.0.525",
+    "@types/react": "19.2.7",
+    "eslint": "9.19.0",
+    "typescript": "5.9.3"
+  }
+}

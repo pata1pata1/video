@@ -1,0 +1,53 @@
+{
+  "id": "__ID__",
+  "pattern": "pattern-01",
+  "title": "（YouTubeタイトル・エンディングにも表示）",
+  "titleTop": "（タイトル画面の小見出し）",
+  "titleMain": "（タイトル画面の大タイトル・1行で収まる長さ）",
+  "titleSub": "（タイトル画面のサブタイトル）",
+  "pronunciation": {},
+  "media": {
+    "hook1": { "query": "（冒頭1枚目の映像の検索語・英語）" },
+    "hook2": { "query": "（冒頭2枚目）" },
+    "hook3": { "query": "（冒頭3枚目）" }
+  },
+  "scenes": [
+    {
+      "id": "opening",
+      "kind": "opening",
+      "lines": [
+        { "id": "o1", "visual": { "title": true, "footage": "hook1" }, "text": "（つかみ：何が起きたか・何の話か）" },
+        { "id": "o2", "visual": { "stat": { "value": "0", "unit": "", "label": "（数字の説明）" }, "footage": "hook2" }, "text": "（いちばん印象的な数字）" },
+        { "id": "o3", "visual": { "footage": "hook3" }, "text": "（この動画で分かること）" }
+      ]
+    },
+    {
+      "id": "c1",
+      "kind": "chapter",
+      "number": 1,
+      "heading": "（章の見出し）",
+      "footage": "hook1",
+      "lines": [
+        { "id": "c1a", "text": "（章の導入。この文の間は章タイトルを表示）" },
+        { "id": "c1b", "visual": { "footage": "hook2" }, "text": "（映像で見せる文）" },
+        { "id": "c1c", "visual": { "diagram": "example", "step": 1 }, "text": "（図解の1段階目）" },
+        { "id": "c1d", "visual": { "diagram": "example", "step": 2 }, "text": "（図解の2段階目）" },
+        { "id": "c1e", "visual": { "points": { "title": "（箇条書きの見出し）", "items": ["（1）", "（2）", "（3）"] } }, "text": "（箇条書きで見せる文）" }
+      ]
+    },
+    {
+      "id": "ending",
+      "kind": "ending",
+      "lines": [
+        { "id": "e1", "text": "最後までご覧いただき、ありがとうございました。" },
+        { "id": "e2", "text": "（テーマ）について気になることがあれば、ぜひコメントで教えてください。" },
+        { "id": "e3", "text": "高評価とチャンネル登録も、よろしくお願いします。" }
+      ]
+    }
+  ],
+  "thumbnails": [
+    { "id": "A", "photo": "hook1", "ribbon": "（リボン）", "lines": ["（1行目）", "（2行目）"], "accent": "（強調語）", "small": "（補足）" },
+    { "id": "B", "photo": "hook2", "ribbon": "（リボン）", "lines": ["（1行目）", "（2行目）"], "accent": "（強調語）", "small": "（補足）" },
+    { "id": "C", "photo": "hook3", "ribbon": "（リボン）", "lines": ["（1行目）", "（2行目）"], "accent": "（強調語）", "small": "（補足）" }
+  ]
+}

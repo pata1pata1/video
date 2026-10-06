@@ -1,0 +1,48 @@
+{
+  "inherits": "design.json（配色・フォント）",
+  "size": {
+    "width": 1280,
+    "height": 720
+  },
+  "variants": [
+    "A",
+    "B",
+    "C"
+  ],
+  "layout": {
+    "image": {
+      "width": 760,
+      "videoFrame": 90,
+      "note": "右側に映像（動画素材なら連番の90コマ目）"
+    },
+    "panel": {
+      "width": 700,
+      "slantPercent": 84,
+      "note": "左側に淡いグレーの面。右端を斜めに切る"
+    },
+    "ribbon": {
+      "size": 40,
+      "left": 56,
+      "top": 52
+    },
+    "lines": {
+      "count": 2,
+      "size": 96
+    },
+    "accentWord": {
+      "size": 110,
+      "sizeIfLong": 84,
+      "longOver": 5
+    },
+    "small": {
+      "size": 34,
+      "bottom": 44,
+      "barWidth": 6
+    }
+  },
+  "rules": [
+    "文言は少なく大きく（2行＋強調語1つ）",
+    "根拠のない数字・あおりは使わない（common/production-rules.md）",
+    "映像の内容と文言で誤解を生まない組み合わせにする"
+  ]
+}
