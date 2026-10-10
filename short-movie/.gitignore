@@ -1,0 +1,14 @@
+# 動画・音声・画像などの大きいファイルは git 管理外
+samples/**/*.mp4
+samples/**/*.mov
+samples/**/*.webm
+samples/**/*.wav
+samples/**/*.mp3
+samples/**/*.m4a
+samples/**/*.png
+samples/**/*.jpg
+samples/**/*.jpeg
+samples/**/*.webp
+samples/**/*.psd
+samples/**/*.prproj
+analysis/**/frames/
