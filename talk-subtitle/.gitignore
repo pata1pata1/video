@@ -1,0 +1,7 @@
+# 動画1本ごとの案件（元動画・音声・文字起こし・固有名詞を含むため Git に入れない）
+projects/*
+!projects/.gitkeep
+
+# Python (faster-whisper) environment and downloaded models
+.venv/
+.local/

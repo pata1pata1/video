@@ -1,0 +1,3 @@
+# talk-subtitle faster-whisper backend (Windows standard). Installed into talk-subtitle/.venv by `npm run setup-faster-whisper`.
+# PyAV (pulled in by faster-whisper) is installed but never loaded; see python/fw_transcribe.py.
+faster-whisper==1.2.1

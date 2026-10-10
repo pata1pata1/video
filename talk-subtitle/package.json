@@ -1,0 +1,32 @@
+{
+  "name": "talk-subtitle",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "人間が喋る撮影動画を安全にカット・字幕入れするツール（remotion の共通基盤を利用）",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "doctor": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --disable-warning=ExperimentalWarning scripts/doctor.ts",
+    "new": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --disable-warning=ExperimentalWarning scripts/new-project.ts",
+    "status": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --disable-warning=ExperimentalWarning scripts/status.ts",
+    "glossary": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --disable-warning=ExperimentalWarning scripts/glossary.ts",
+    "analyze": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --disable-warning=ExperimentalWarning scripts/analyze.ts",
+    "transcribe": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --disable-warning=ExperimentalWarning scripts/transcribe.ts",
+    "terms": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --disable-warning=ExperimentalWarning scripts/terms.ts",
+    "candidates": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --disable-warning=ExperimentalWarning scripts/candidates.ts",
+    "review": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --disable-warning=ExperimentalWarning scripts/review.ts",
+    "decide": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --disable-warning=ExperimentalWarning scripts/decide.ts",
+    "phase1": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --disable-warning=ExperimentalWarning scripts/phase1.ts",
+    "typecheck": "node ../../remotion/node_modules/typescript/bin/tsc -p . && node ../../remotion/node_modules/typescript/bin/tsc -p remotion",
+    "setup-faster-whisper": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --disable-warning=ExperimentalWarning scripts/setup-faster-whisper.ts",
+    "lint": "node --check src/review/review-client.js && node --check src/review/subtitles-client.js && node scripts/lint-python.mjs",
+    "cut": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --disable-warning=ExperimentalWarning scripts/cut.ts",
+    "quotes": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --disable-warning=ExperimentalWarning scripts/quotes.ts",
+    "subtitles": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --disable-warning=ExperimentalWarning scripts/subtitles.ts",
+    "subtitle-stills": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --disable-warning=ExperimentalWarning scripts/subtitle-stills.ts",
+    "subtitle-clip": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --disable-warning=ExperimentalWarning scripts/subtitle-clip.ts",
+    "render": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --disable-warning=ExperimentalWarning scripts/render.ts"
+  }
+}

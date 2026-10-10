@@ -1,0 +1,70 @@
+# talk-subtitle
+
+人間が喋っている撮影動画を、安全にカット・字幕入れする専用ツール。設計は **`docs/design.md`**（必ず先に読む）。
+
+## 最重要ルール
+
+- **元動画は変更・削除しない**（`projects/<id>/input/` の動画は読み取りのみ。移動・上書き・属性変更もしない）
+- **いきなり自動でカットしない**。候補を出す → ユーザーが確認 → `input/decisions.json`（承認済み）→ 編集、の順
+- 承認ファイル（`input/decisions.json`・`input/glossary.json`）は **CLI 経由で書く**（`npm run decide`・`npm run glossary`）。JSON を直接書き換えない
+- ユーザーの明示的な指示が無い限り、候補を承認しない（「提案どおりでいい」と言われたら `--cut-suggested`）
+- `projects/` は Git 管理外（元動画・音声・固有名詞を含むため）
+- 最初から作り込まない。実動画で通して、良かった仕様を後から標準パターンとして固定する
+
+## 環境（Windows、2026-10-09）
+
+- remotion の共通基盤（`../../remotion/src/core/media`・`core/speech`）を `src/engine.ts` から import している。コピーしない
+- この PC は **Smart App Control（アプリ制御）が有効**で、署名のない exe はブロックされる（`0xC0E90002`／"An Application Control policy has blocked this file"）
+  - ffprobe：remotion 同梱版はブロックされる → winget の `Gyan.FFmpeg`（ユーザー領域）を入れ、ユーザー環境変数 **`FFPROBE_PATH`** で指定済み（新しく開いたターミナルから有効）
+  - whisper.cpp と PyAV の DLL もブロックされる → **Windows の文字起こしは faster-whisper**（`.venv`、`python/fw_transcribe.py`、PyAV は読み込まない。docs/design.md の11章）。**Smart App Control の設定は変更しない・提案しない**
+- 状態確認：`npm run doctor`
+
+## コマンド（`--project=<動画ID>`）
+
+| コマンド | 内容 |
+|---|---|
+| `npm run new -- --id=<id>` | 案件を作る（上書きしない） |
+| `npm run phase1 -- --project=<id>` | 解析 → 文字起こし → 固有名詞 → カット候補 → review.html を順に実行（済んだ文字起こしは省略） |
+| `npm run analyze` / `transcribe` / `terms` / `candidates` / `review` | 各工程を1つずつ |
+| `npm run status -- --project=<id>` | 工程・未承認の件数・次にやること |
+| `npm run decide -- --project=<id> …` | 承認（下記） |
+| `npm run glossary -- add|update|remove|list|prompt …` | 固有名詞辞書 |
+| `npm run transcribe -- --project=<id> [--backend=auto|whisper-cpp|faster-whisper] [--dry-run]` | 文字起こし（auto：Windows→faster-whisper、Mac→whisper.cpp） |
+| `npm run cut -- --project=<id> [--dry-run] [--final]` | Phase 2：承認済みカットを適用（既定は軽量プレビュー intermediate/cut-preview.mp4、`--final` で intermediate/cut.mp4）＋ timemap.json。**未決定があれば止まる。`--final` はユーザーがプレビューを確認してから** |
+| `npm run quotes -- add / list / decide / align --project=<id>` | 読み上げた投稿の本文（`input/quotes.json`）。投稿の表記が字幕の正解。違いは要確認として一覧（docs/design.md の13章） |
+| `npm run subtitles -- draft / show / edit / import / approve --project=<id>` | Phase 3：字幕案（intermediate/subtitles.draft.json）と確認画面 review/subtitles.html。修正は input/subtitles.json。**焼き込みはユーザーの承認後**（docs/design.md の14章） |
+| `npm run subtitle-stills -- --project=<id> [--cues=…] [--variant=<name>] [--out=<folder>]` | 字幕デザインの静止画・比較（review/subtitle-design/。docs/design.md の14.1） |
+| `npm run subtitle-clip -- --project=<id> [--from=秒 --to=秒]` | 承認済み字幕を焼き込んだ 10〜15 秒の確認動画（review/subtitle-clip-*.mp4。14.2）。全編の書き出しではない |
+| `npm run render -- --project=<id> [--force]` | 最終書き出し output/final.mp4（字幕の焼き込み・-14 LUFS・検証。14.3）。**字幕の承認と確認動画のチェックの後、ユーザーの指示で** |
+| `npm run setup-faster-whisper` | faster-whisper の環境（`.venv`）とモデルを用意（何度でも可） |
+| `npm run typecheck` / `npm run lint` | 型チェック（remotion の TypeScript）／client JS・Python の構文チェック |
+
+## 固有名詞を自然な文で渡されたとき
+
+例：「今回の人物名は北岡大樹。読みは、きたおか だいき。専門用語は Claude Code と Remotion。」
+
+1. 登録案を表で見せる（正式表記・種別・読み・別表記・誤認識されやすい形の案・案件／共通）
+2. **読みが書かれていない漢字の名前は、推測で確定しない**。読みを質問するか、`--reading-unconfirmed` 付きで登録する
+3. 確認が取れたら1語ずつ登録する：
+   `npm run glossary -- add --project=<id> --surface=北岡大樹 --kind=person --reading="きたおか だいき" --source=user-instruction`
+   英語の語：`--surface="Claude Code" --kind=term --reading="くろーど こーど"`（読みはかなで）
+4. 「毎回使う」と言われた語は `--shared`
+5. 文字起こしの後に辞書を変えたら `npm run terms`（prompt に反映するなら `npm run transcribe -- --force`。カット候補・承認は作り直しになる）
+
+## チャットでの承認
+
+| ユーザーの言い方 | コマンド |
+|---|---|
+| 「c3 と c7 は残す、それ以外はカット」 | `npm run decide -- --project=<id> --keep=c3,c7 --cut-rest` |
+| 「提案どおりカット、確認のみの候補は保留」 | `--cut-suggested` |
+| 「c4 は 12.3 秒から 13.1 秒だけ切る」 | `--range=c4:12.30-13.10` |
+| 「t1 は採用、t2 はそのまま」 | `--accept-term=t1 --reject-term=t2` |
+| 「t3 は Claude Code に直す」 | `--term-text=t3:Claude Code` |
+| HTML で書き出した | `--import=<ダウンロードしたJSON>` |
+| 一覧を見たい | `--show` |
+
+迷う指示は実行前に、どの ID をどうするかを確認する。まず `--dry-run` で変更内容を見せてもよい。
+
+## 未実装
+
+Phase 4（テロップ・高度な補正・複数人）
