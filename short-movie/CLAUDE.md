@@ -1,6 +1,6 @@
-# short-movie：完成動画から学ぶ場所
+# short-movie：縦型ショート動画の制作
 
-ユーザーが作った完成済みショート動画を見て、作風を言語化・蓄積するためのフォルダ。
+縦型ショート動画の制作用フォルダ。まずユーザーが作った完成済みショート動画を見て、作風を言語化・蓄積する（横型動画の制作は `../talk-subtitle`）。
 
 ## 動画の2種類
 - `ai-voice`：台本をAI音声で読み上げる方式
@@ -9,7 +9,7 @@
 ## 置き場所
 - `samples/<type>/<id>/final.mp4` … ユーザーの完成動画（git管理外）
 - `samples/<type>/<id>/materials/` … 制作素材（台本・音声・画像・BGM・編集プロジェクト等）
-- `samples/<type>/<id>/README.md` … 補足メモ（`_template` をコピー）
+- `samples/<type>/<id>/README.md` … 補足メモ（`samples/<type>/_template` をコピー）
 - `analysis/<id>/notes.md` … 1本ごとの分析（構成・尺・テロップ・カット割り・音声・フック等）
 - `analysis/<id>/frames/` … 抽出フレーム（git管理外）
 - `STYLE.md` … 全動画から抽出した作風ガイド（タイプ別）。分析のたびに更新する
