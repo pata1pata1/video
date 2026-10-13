@@ -46,8 +46,8 @@
     }
   ],
   "thumbnails": [
-    { "id": "A", "photo": "hook1", "ribbon": "（リボン）", "lines": ["（1行目）", "（2行目）"], "accent": "（強調語）", "small": "（補足）" },
-    { "id": "B", "photo": "hook2", "ribbon": "（リボン）", "lines": ["（1行目）", "（2行目）"], "accent": "（強調語）", "small": "（補足）" },
-    { "id": "C", "photo": "hook3", "ribbon": "（リボン）", "lines": ["（1行目）", "（2行目）"], "accent": "（強調語）", "small": "（補足）" }
+    { "id": "A", "photo": "hook1", "ribbon": "（リボン）", "lines": ["（1行目）", "（2行目）"], "accent": "（強調語）", "small": "（補足）", "badge": { "top": "（バッジ上）", "big": "（数字）", "bottom": "（バッジ下）" } },
+    { "id": "B", "photo": "hook2", "ribbon": "（リボン）", "lines": ["（1行目）", "（2行目）"], "accent": "（強調語）", "small": "（補足）", "badge": { "top": "（バッジ上）", "big": "（数字）", "bottom": "（バッジ下）" } },
+    { "id": "C", "photo": "hook3", "ribbon": "（リボン）", "lines": ["（1行目）", "（2行目）"], "accent": "（強調語）", "small": "（補足）", "badge": { "top": "（バッジ上）", "big": "（数字）", "bottom": "（バッジ下）" } }
   ]
 }

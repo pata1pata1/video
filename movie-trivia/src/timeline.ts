@@ -28,7 +28,20 @@ export type SceneDef = {
   footage?: string;
   lines: ScriptLine[];
 };
-export type ThumbnailDef = { id: string; photo: string; ribbon: string; lines: string[]; accent: string; small?: string };
+export type ThumbnailDef = {
+  id: string;
+  photo: string;
+  ribbon: string;
+  lines: string[];
+  accent: string;
+  small?: string;
+  /** Frame of a video source to use (default: the pattern's videoFrame). */
+  frame?: number;
+  /** CSS object-position of the footage. */
+  imagePosition?: string;
+  /** Round badge for a number (optional). */
+  badge?: { top: string; big: string; bottom?: string };
+};
 /** A media file recorded in public/media/<id>/sources.json. */
 export type MediaSource = { mediaType: "video" | "photo"; file: string; creator?: string; sourceName: string };
 export type Line = { id: string; sceneId: string; start: number; end: number; caption: string };

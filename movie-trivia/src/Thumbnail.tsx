@@ -2,62 +2,107 @@ import React from "react";
 import { AbsoluteFill, Img, staticFile } from "remotion";
 import { PATTERN } from "./pattern";
 import { mediaFor, SCRIPT, videoFrameFile } from "./timeline";
-import { color, font } from "./theme";
+import { font } from "./theme";
 
-/** Thumbnail layout (patterns/<pattern>/thumbnail.json); colors and font from the video's design. */
-const L = PATTERN.thumbnail.layout;
+/** Thumbnail colors and layout (patterns/<pattern>/thumbnail.json); font from the video's design. */
+const { color: C, layout: L } = PATTERN.thumbnail;
+
+/** Thick outline drawn behind the fill, plus a drop shadow. */
+const outlined = (size: number, fill: string, stroke: number): React.CSSProperties => ({
+  fontFamily: font.body,
+  fontWeight: 900,
+  fontSize: size,
+  color: fill,
+  WebkitTextStroke: `${stroke}px ${C.outline}`,
+  paintOrder: "stroke fill",
+  textShadow: "0 8px 18px rgba(0,0,0,0.6)",
+  whiteSpace: "nowrap",
+  lineHeight: 1.12,
+});
 
 /**
- * 1280x720 YouTube thumbnail from script.thumbnails[]: footage on the right,
- * a plain paper panel on the left with few, huge words and one orange accent.
+ * 1280x720 YouTube thumbnail from script.thumbnails[]: full-bleed footage
+ * darkened on the left, a red ribbon, outlined white lines, one huge yellow
+ * word, and an optional red badge for a number.
  * A video source uses a frame from its JPEG sequence.
  */
 export const Thumbnail: React.FC<{ variant: string }> = ({ variant }) => {
   const def = SCRIPT.thumbnails.find((t) => t.id === variant);
   if (!def) throw new Error(`no thumbnail "${variant}" in script.thumbnails`);
   const media = mediaFor(def.photo);
-  const src = media?.mediaType === "video" ? videoFrameFile(def.photo, L.image.videoFrame) : media?.file;
+  const src = media?.mediaType === "video" ? videoFrameFile(def.photo, def.frame ?? L.image.videoFrame) : media?.file;
+  const A = L.accentWord;
+  const B = L.badge;
   return (
-    <AbsoluteFill style={{ backgroundColor: color.bg }}>
-      {src ? <Img src={staticFile(src)} style={{ position: "absolute", right: 0, top: 0, width: L.image.width, height: "100%", objectFit: "cover" }} /> : null}
-      {/* paper panel with a slanted edge */}
-      <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: L.panel.width, background: color.bg, clipPath: `polygon(0 0, 100% 0, ${L.panel.slantPercent}% 100%, 0 100%)` }} />
-      <div style={{ position: "absolute", left: L.ribbon.left, top: L.ribbon.top }}>
+    <AbsoluteFill style={{ backgroundColor: "#111" }}>
+      {src ? <Img src={staticFile(src)} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: def.imagePosition ?? "center" }} /> : null}
+      <AbsoluteFill style={{ background: L.shade.gradient }} />
+      <div style={{ position: "absolute", left: L.left, top: L.ribbon.top }}>
         <div
           style={{
             display: "inline-block",
             fontFamily: font.body,
             fontWeight: 900,
             fontSize: L.ribbon.size,
-            color: "#FFFFFF",
-            background: color.accent,
-            padding: "4px 22px",
-            borderRadius: 8,
+            color: C.text,
+            background: C.red,
+            padding: "6px 26px",
+            transform: `rotate(${L.ribbon.rotate}deg)`,
+            boxShadow: "0 6px 14px rgba(0,0,0,0.5)",
           }}
         >
           {def.ribbon}
         </div>
-        <div style={{ marginTop: 22, fontFamily: font.body, fontWeight: 900, lineHeight: 1.12 }}>
+        <div style={{ marginTop: 26 }}>
           {def.lines.map((l) => (
-            <div key={l} style={{ fontSize: L.lines.size, color: color.ink, whiteSpace: "nowrap" }}>
+            <div key={l} style={outlined(L.lines.size, C.text, L.lines.outline)}>
               {l}
             </div>
           ))}
-          <div style={{ fontSize: def.accent.length > L.accentWord.longOver ? L.accentWord.sizeIfLong : L.accentWord.size, color: color.accent, whiteSpace: "nowrap", marginTop: 6 }}>{def.accent}</div>
+          <div style={{ ...outlined(def.accent.length > A.longOver ? A.sizeIfLong : A.size, C.yellow, A.outline), marginTop: 4 }}>{def.accent}</div>
         </div>
       </div>
+      {def.badge ? (
+        <div
+          style={{
+            position: "absolute",
+            right: B.right,
+            bottom: B.bottom,
+            width: B.size,
+            height: B.size,
+            borderRadius: "50%",
+            background: C.red,
+            border: `8px solid ${C.text}`,
+            boxShadow: "0 10px 24px rgba(0,0,0,0.55)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            transform: `rotate(${B.rotate}deg)`,
+            fontFamily: font.body,
+            fontWeight: 900,
+            color: C.text,
+            lineHeight: 1.05,
+          }}
+        >
+          <div style={{ fontSize: B.topSize }}>{def.badge.top}</div>
+          <div style={{ fontSize: def.badge.big.length > B.bigLongOver ? B.bigSizeIfLong : B.bigSize, color: C.yellow }}>{def.badge.big}</div>
+          {def.badge.bottom ? <div style={{ fontSize: B.bottomSize }}>{def.badge.bottom}</div> : null}
+        </div>
+      ) : null}
       {def.small ? (
         <div
           style={{
             position: "absolute",
-            left: L.ribbon.left,
+            left: L.left,
             bottom: L.small.bottom,
             fontFamily: font.body,
             fontWeight: 900,
             fontSize: L.small.size,
-            color: color.ink,
-            borderLeft: `${L.small.barWidth}px solid ${color.accent}`,
-            paddingLeft: 16,
+            color: C.text,
+            background: "rgba(0,0,0,0.75)",
+            padding: "6px 18px",
+            borderLeft: `${L.small.barWidth}px solid ${C.yellow}`,
           }}
         >
           {def.small}

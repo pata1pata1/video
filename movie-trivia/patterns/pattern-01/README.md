@@ -15,7 +15,7 @@ movie-trivia 全体の制作ルール（事実確認・出典・素材確認・�
 | `voice.json` | VOICEVOX 話者（青山龍星 ノーマル・ID 13）、速さ1.0、間の取り方 |
 | `bgm.json` | BGMなし・効果音なし（使う場合の書き方） |
 | `render.json` | 共通の書き出し基盤に渡す設定（JPEG画質、x264、-16 LUFS / -1.5 dBTP） |
-| `thumbnail.json` | サムネイルのデザイン（本編の配色を継承、レイアウトは別設定） |
+| `thumbnail.json` | サムネイルのデザイン（映像を全面に敷き、白の縁取り文字＋黄色の強調語＋赤い帯・丸バッジ。フォントは本編を継承） |
 | `script-template.json` | 台本の雛形（`node scripts/new-video.mjs` がこれをコピーする） |
 
 コードはこれらを読む：`src/pattern.ts`（デザイン・字幕・トランジション・声の名前）、`scripts/lib/video.mjs`（声・間・BGM・音量）。
