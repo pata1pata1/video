@@ -36,7 +36,7 @@ export type SubtitlePreset = {
   position: { anchor: "bottom" | "top"; marginRatio: number; maxWidthRatio: number; align: "center" | "left" };
   layout: {
     maxLines: number;
-    maxCharsPerLine: { landscape: number; portrait: number; square: number };
+    maxCharsPerLine: { landscape: number };
     minDisplaySeconds: number;
     maxDisplaySeconds: number;
     gapMergeSeconds: number;
@@ -401,7 +401,7 @@ export function buildDraft(input: {
 }): SubtitleDraft {
   const { corrected, raw, timemap, preset } = input;
   const orientation = input.probe.video?.orientation ?? "landscape";
-  const maxChars = preset.layout.maxCharsPerLine[orientation];
+  const maxChars = preset.layout.maxCharsPerLine.landscape;
   const maxLines = preset.layout.maxLines;
   const commaStyle = preset.layout.commaStyle ?? "space";
   const strongFillers = new Set(DEFAULT_SETTINGS.candidates.strongFillers);

@@ -8,6 +8,7 @@ import { currentCutDecisions, currentTermDecisions, cutSummary, loadDecisions } 
 import { loadMergedGlossary } from "./glossary.ts";
 import path from "node:path";
 import type { CutReport, Timemap } from "./cut.ts";
+import { STYLE_OBSERVATIONS_DIR } from "./paths.ts";
 import { readJsonIfExists, type Project } from "./project.ts";
 import { glossaryFingerprint } from "./steps.ts";
 import type { TranscriptFile } from "./transcript.ts";
@@ -35,6 +36,18 @@ export function printStatus(project: Project) {
   const exists = (f: string) => fs.existsSync(f);
   console.log(`案件: ${json.id}（${json.status}${json.locked ? "・locked" : ""}）  ${paths.root}`);
   console.log(`元動画: ${json.source ? `${json.source.file}（${mb(json.source.sizeBytes)}、sha256 ${json.source.sha256.slice(0, 12)}…）` : "未登録"}`);
+  if (json.kind === "reference") {
+    const ref = json.reference;
+    const mark = (b: boolean) => (b ? "✔" : "・");
+    console.log(`種類: reference（別のソフトで編集した動画。編集スタイルの学習用）`);
+    console.log(`完成動画: ${ref ? `${ref.final.file}（${mb(ref.final.sizeBytes)}）` : "未登録"}　SRT: ${ref?.srt ? ref.srt.file : "なし"}`);
+    console.log("\n工程:");
+    console.log(`  ${mark(fs.existsSync(paths.probe) && fs.existsSync(paths.finalWav))} 1. 解析（両方）        npm run reference -- analyze`);
+    console.log(`  ${mark(fs.existsSync(paths.transcript) && fs.existsSync(paths.finalTranscript))} 2. 文字起こし（両方）  npm run reference -- transcribe`);
+    console.log(`  ${mark(fs.existsSync(paths.reconstruction))} 3. カットの復元        npm run reference -- reconstruct`);
+    console.log(`  ${mark(fs.existsSync(path.join(STYLE_OBSERVATIONS_DIR, `${json.id}.json`)))} 4. 観察               npm run style -- observe`);
+    return;
+  }
 
   const entries = loadMergedGlossary(paths.glossary);
   console.log(`固有名詞辞書: 案件 ${entries.filter((e) => e.layer === "project").length}語・共通 ${entries.filter((e) => e.layer === "shared").length}語`);

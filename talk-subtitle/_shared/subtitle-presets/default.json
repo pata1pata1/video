@@ -2,7 +2,7 @@
   "version": 1,
   "name": "default",
   "status": "draft",
-  "note": "仮の default（Phase 3 の焼き込みで使う）。実動画で調整し、良かった形を pattern-01.json として固定する。サイズ・位置は画面の短辺（shortSide）に対する比率なので、16:9 と 9:16 で同じ設定が使える。",
+  "note": "仮の default（Phase 3 の焼き込みで使う）。実動画で調整し、良かった形を pattern-01.json として固定する。サイズ・位置は画面の短辺（shortSide）に対する比率。",
   "font": {
     "family": "Noto Sans JP",
     "weight": 800,
@@ -17,7 +17,7 @@
   "position": { "anchor": "bottom", "marginRatio": 0.08, "maxWidthRatio": 0.9, "align": "center" },
   "layout": {
     "maxLines": 2,
-    "maxCharsPerLine": { "landscape": 22, "portrait": 14, "square": 18 },
+    "maxCharsPerLine": { "landscape": 22 },
     "breakPreference": ["。", "、", "particle", "anywhere"],
     "minDisplaySeconds": 0.8,
     "maxDisplaySeconds": 6,

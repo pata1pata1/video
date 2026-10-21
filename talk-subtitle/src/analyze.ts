@@ -24,7 +24,7 @@ export type ProbeJson = {
     /** Size as stored in the file. */
     storedWidth: number;
     storedHeight: number;
-    /** Display rotation in degrees (0, 90, 180, 270). Phones often store portrait video as landscape + 90. */
+    /** Display rotation in degrees (0, 90, 180, 270). Phones often store video with a rotation tag. */
     rotation: number;
     /** Size as displayed (rotation applied). Use these, never the stored ones. */
     width: number;
@@ -81,6 +81,14 @@ function aspectLabel(w: number, h: number): string {
 const BROWSER_VIDEO_CODECS = ["h264", "vp8", "vp9", "av1"];
 const BROWSER_CONTAINERS = [".mp4", ".m4v", ".mov", ".webm"];
 
+/** talk-subtitle handles horizontal videos only: a vertical or square video stops here (before anything is recorded). */
+export function assertLandscape(probe: ProbeJson, label: string): void {
+  const v = probe.video;
+  if (v?.orientation === "landscape") return;
+  const what = !v ? "映像がありません" : `${v.orientation === "portrait" ? "縦型" : "正方形"}です（${v.width}×${v.height}${v.rotation ? `・回転${v.rotation}°` : ""}）`;
+  throw new UserError(`talk-subtitle は横長動画専用です。${label}が${what}。縦型ショートは別のプロジェクトで扱ってください。`);
+}
+
 export async function probeSource(file: string, sha256: string): Promise<ProbeJson> {
   const info = await probeMedia(file);
   let video: ProbeJson["video"] = null;
@@ -127,6 +135,9 @@ export async function registerSource(
   options: { source?: string; replace?: boolean },
 ): Promise<{ file: string; sha256: string; changed: boolean }> {
   const { paths, json } = project;
+  if (json.kind === "reference") {
+    throw new UserError(`案件 ${json.id} は reference（学習用）です。npm run reference -- analyze --project=${json.id} を使ってください。`);
+  }
   const videos = listInputVideos(paths);
   let name = options.source ? path.basename(options.source) : undefined;
   if (options.source && path.resolve(paths.input, name!) !== path.resolve(paths.input, options.source)) {
@@ -140,6 +151,7 @@ export async function registerSource(
   }
   const file = path.join(paths.input, name);
   if (!fs.existsSync(file)) throw new UserError(`元動画が見つかりません: ${file}`);
+  assertLandscape(await probeSource(file, ""), `元動画（${name}）`);
 
   process.stderr.write(`元動画のハッシュを計算中（読み取りのみ）: ${name}\n`);
   const sha256 = await sha256File(file);

@@ -32,7 +32,20 @@ export type ProjectJson = {
   status: "active" | "completed" | "archived";
   locked: boolean;
   source: SourceRecord | null;
+  /**
+   * production (default when absent): a video edited with this tool.
+   * reference: a video the user edited elsewhere, kept only to learn their editing style
+   * (input/reference/: source + final + optional SRT, all read-only; see docs/design.md §15).
+   */
+  kind?: ProjectKind;
+  /** reference projects: the registered files (source is also recorded in `source`). */
+  reference?: { source: SourceRecord; final: SourceRecord; srt: SourceRecord | null };
+  /** Kept out of the editing-style learning (a trial / check project): style observe refuses it. */
+  learning?: { exclude: true; reason: string };
 };
+
+export type ProjectKind = "production" | "reference";
+export const projectKind = (json: ProjectJson): ProjectKind => json.kind ?? "production";
 
 export type Project = { paths: ProjectPaths; json: ProjectJson };
 
@@ -89,13 +102,14 @@ export function sha256File(file: string): Promise<string> {
   });
 }
 
-export function createProject(id: string, options: { dryRun?: boolean } = {}): ProjectPaths {
+export function createProject(id: string, options: { dryRun?: boolean; kind?: ProjectKind } = {}): ProjectPaths {
   const paths = projectPaths(id);
   if (fs.existsSync(paths.root)) {
     throw new UserError(`案件 ${id} はすでにあります: ${paths.root}（上書きしません）`);
   }
   if (options.dryRun) return paths;
   for (const sub of PROJECT_SUBDIRS) fs.mkdirSync(path.join(paths.root, sub), { recursive: true });
+  if (options.kind === "reference") fs.mkdirSync(paths.referenceDir, { recursive: true });
   const json: ProjectJson = {
     version: 1,
     tool: "talk-subtitle",
@@ -105,6 +119,7 @@ export function createProject(id: string, options: { dryRun?: boolean } = {}): P
     status: "active",
     locked: false,
     source: null,
+    ...(options.kind === "reference" ? { kind: "reference" as const } : {}),
   };
   writeJsonAtomic(paths.projectJson, json);
   return paths;

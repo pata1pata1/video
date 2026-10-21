@@ -1,6 +1,6 @@
 // One subtitle in the preset's style (_shared/subtitle-presets/*.json).
-// Sizes are ratios of the frame's short side, so the same preset works for
-// 16:9 and 9:16. Used by the design stills now and by the final render later.
+// Sizes are ratios of the frame's short side. Used by the design stills and by
+// the final render.
 //
 // The outline is drawn as a separate layer behind the fill (a stroke on the
 // fill itself would eat half of each glyph's width).

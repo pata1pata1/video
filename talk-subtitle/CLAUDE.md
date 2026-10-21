@@ -1,8 +1,8 @@
 # talk-subtitle
 
-人間が喋っている撮影動画を、安全にカット・字幕入れする専用ツール。設計は **`docs/design.md`**（必ず先に読む）。
+横長の人物トーク動画の、カット・字幕・書き出し・編集スタイル学習を安全に行う専用ツール。設計は **`docs/design.md`**（必ず先に読む）。
 
-**このツールは横型動画の制作用**（縦型ショートは `../short-movie`）。縦型ショートの作風から横型でも参考になる編集の判断は docs/design.md の15章。
+**このツールは横長動画専用**。縦型・正方形の元動画は `npm run analyze`（`phase1`）・`npm run reference -- analyze` がエラーで止める。縦型ショートは別のプロジェクトで扱う。
 
 ## 最重要ルール
 
@@ -25,7 +25,7 @@
 
 | コマンド | 内容 |
 |---|---|
-| `npm run new -- --id=<id>` | 案件を作る（上書きしない） |
+| `npm run new -- --id=<id> [--kind=reference]` | 案件を作る（上書きしない）。reference は別のソフトで編集した横長の動画の学習用（`input/reference/` に source.*・final.*・任意の subtitles.srt） |
 | `npm run phase1 -- --project=<id>` | 解析 → 文字起こし → 固有名詞 → カット候補 → review.html を順に実行（済んだ文字起こしは省略） |
 | `npm run analyze` / `transcribe` / `terms` / `candidates` / `review` | 各工程を1つずつ |
 | `npm run status -- --project=<id>` | 工程・未承認の件数・次にやること |
@@ -38,6 +38,8 @@
 | `npm run subtitle-stills -- --project=<id> [--cues=…] [--variant=<name>] [--out=<folder>]` | 字幕デザインの静止画・比較（review/subtitle-design/。docs/design.md の14.1） |
 | `npm run subtitle-clip -- --project=<id> [--from=秒 --to=秒]` | 承認済み字幕を焼き込んだ 10〜15 秒の確認動画（review/subtitle-clip-*.mp4。14.2）。全編の書き出しではない |
 | `npm run render -- --project=<id> [--force]` | 最終書き出し output/final.mp4（字幕の焼き込み・-14 LUFS・検証。14.3）。**字幕の承認と確認動画のチェックの後、ユーザーの指示で** |
+| `npm run style -- observe / show --project=<id>` | 編集スタイルの学習 S1：案件の判断を `style-data/observations/<id>.json` に記録（観察だけ。何も適用しない。**横長の動画だけ**。docs/design.md の15章） |
+| `npm run reference -- analyze / transcribe / reconstruct / all / show --project=<id>` | 学習 S2：reference 案件の元動画と完成動画（**どちらも横長**）を比べて、残した区間・削った区間を復元（intermediate/reconstruction.json）。両方とも読み取りのみ |
 | `npm run setup-faster-whisper` | faster-whisper の環境（`.venv`）とモデルを用意（何度でも可） |
 | `npm run typecheck` / `npm run lint` | 型チェック（remotion の TypeScript）／client JS・Python の構文チェック |
 

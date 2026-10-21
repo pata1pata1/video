@@ -9,6 +9,9 @@ export const PROJECTS_DIR = path.join(TOOL_ROOT, "projects");
 export const SHARED_DIR = path.join(TOOL_ROOT, "_shared");
 export const SHARED_GLOSSARY = path.join(SHARED_DIR, "glossary.json");
 export const SUBTITLE_PRESETS_DIR = path.join(SHARED_DIR, "subtitle-presets");
+/** Editing-style learning data (outside Git: holds speech text of real projects). */
+export const STYLE_DATA_DIR = path.join(TOOL_ROOT, "style-data");
+export const STYLE_OBSERVATIONS_DIR = path.join(STYLE_DATA_DIR, "observations");
 
 export const PROJECT_SUBDIRS = ["input", "audio", "intermediate", "review", "output"] as const;
 
@@ -66,5 +69,12 @@ export function projectPaths(id: string) {
     /** Phase 3: the user's subtitle edits and approval (written via npm run subtitles). */
     subtitles: path.join(input, "subtitles.json"),
     subtitlesHtml: path.join(review, "subtitles.html"),
+    /** reference projects (a video the user edited elsewhere): source.* / final.* / subtitles.srt, read-only. */
+    referenceDir: path.join(input, "reference"),
+    finalWav: path.join(audio, "final-16k.wav"),
+    finalProbe: path.join(intermediate, "final.probe.json"),
+    finalTranscript: path.join(intermediate, "final.transcript.json"),
+    /** Kept / removed source ranges rebuilt from source vs final (same shape as timemap.json). */
+    reconstruction: path.join(intermediate, "reconstruction.json"),
   };
 }

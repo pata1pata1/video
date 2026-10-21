@@ -5,3 +5,6 @@ projects/*
 # Python (faster-whisper) environment and downloaded models
 .venv/
 .local/
+
+# 編集スタイル学習の観察データ（実案件の発話・人名・投稿本文を含むため Git に入れない）
+style-data/
