@@ -1,2 +1,2 @@
 // The current video's diagrams. `node scripts/new-video.mjs` rewrites this file.
-export { DIAGRAMS } from "./videos/gyudon-price/diagrams";
+export { DIAGRAMS } from "./videos/cat-abuse-law/diagrams";
