@@ -41,7 +41,9 @@ export function printStatus(project: Project) {
     const mark = (b: boolean) => (b ? "✔" : "・");
     console.log(`種類: reference（別のソフトで編集した動画。編集スタイルの学習用）`);
     console.log(`完成動画: ${ref ? `${ref.final.file}（${mb(ref.final.sizeBytes)}）` : "未登録"}　SRT: ${ref?.srt ? ref.srt.file : "なし"}`);
+    console.log(`素材: ${ref?.assets ? `${ref.assets.count}ファイル（${mb(ref.assets.totalBytes)}、一覧は intermediate/reference-assets.json）` : "未登録"}`);
     console.log("\n工程:");
+    console.log(`  ${mark(!!ref)} 0. 登録（sha256 のみ）  npm run reference -- register`);
     console.log(`  ${mark(fs.existsSync(paths.probe) && fs.existsSync(paths.finalWav))} 1. 解析（両方）        npm run reference -- analyze`);
     console.log(`  ${mark(fs.existsSync(paths.transcript) && fs.existsSync(paths.finalTranscript))} 2. 文字起こし（両方）  npm run reference -- transcribe`);
     console.log(`  ${mark(fs.existsSync(paths.reconstruction))} 3. カットの復元        npm run reference -- reconstruct`);

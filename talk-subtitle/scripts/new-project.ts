@@ -14,14 +14,15 @@ await runCli(async () => {
   if (kind !== "production" && kind !== "reference") throw new UserError("--kind は production か reference です。");
   const paths = createProject(id, { dryRun, kind });
   console.log(`${dryRun ? "[dry-run] 作成予定" : "作成しました"}: ${paths.root}${kind === "reference" ? "（reference：学習用）" : ""}`);
-  console.log(`  project.json, input/, audio/, intermediate/, review/, output/${kind === "reference" ? ", input/reference/" : ""}`);
+  console.log(`  project.json, input/, audio/, intermediate/, review/, output/${kind === "reference" ? ", input/reference/{source,assets,final}/" : ""}`);
   console.log(`\n次の手順:`);
   if (kind === "reference") {
-    console.log(`  1. ${paths.referenceDir} に置く（コピー。元のファイルは変更・削除しません）`);
-    console.log(`       source.<拡張子>  撮影した元動画（横長）`);
-    console.log(`       final.<拡張子>   編集した完成動画（横長）`);
-    console.log(`       subtitles.srt    字幕（任意）`);
-    console.log(`  2. npm run reference -- all --project=${id}`);
+    console.log(`  1. ${paths.referenceDir} の中に置く（コピー。元のファイルは変更・削除しません）`);
+    console.log(`       source/  撮影した元動画（横長）を1本`);
+    console.log(`       final/   編集した完成動画（横長）を1本。SRT があれば1つ`);
+    console.log(`       assets/  編集に使った画像・動画素材など（複数・サブフォルダ可。一覧と sha256 だけ記録）`);
+    console.log(`  2. npm run reference -- register --project=${id}（登録だけ）`);
+    console.log(`  3. npm run reference -- all --project=${id}（解析・文字起こし・復元・観察）`);
     return;
   }
   console.log(`  1. 元動画を ${path.join(paths.input, "<元動画>.mp4")} に置く（コピー。元動画は変更・削除しません）`);

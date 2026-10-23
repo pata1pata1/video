@@ -69,8 +69,13 @@ export function projectPaths(id: string) {
     /** Phase 3: the user's subtitle edits and approval (written via npm run subtitles). */
     subtitles: path.join(input, "subtitles.json"),
     subtitlesHtml: path.join(review, "subtitles.html"),
-    /** reference projects (a video the user edited elsewhere): source.* / final.* / subtitles.srt, read-only. */
+    /** reference projects (a video the user edited elsewhere), read-only: source/ final/ assets/ (or the older source.* / final.* / subtitles.srt). */
     referenceDir: path.join(input, "reference"),
+    referenceSourceDir: path.join(input, "reference", "source"),
+    referenceFinalDir: path.join(input, "reference", "final"),
+    referenceAssetsDir: path.join(input, "reference", "assets"),
+    /** List of input/reference/assets/ (path, size, sha256); the files themselves are not analyzed. */
+    referenceAssets: path.join(intermediate, "reference-assets.json"),
     finalWav: path.join(audio, "final-16k.wav"),
     finalProbe: path.join(intermediate, "final.probe.json"),
     finalTranscript: path.join(intermediate, "final.transcript.json"),

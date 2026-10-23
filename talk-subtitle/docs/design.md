@@ -415,24 +415,28 @@ S2 で、両方の案件に `cut-range`（削った区間1つずつ：秒数・�
 ### S2：別のソフトで編集した動画からカットを復元する（reference 案件）
 
 ```
-npm run new -- --id=<id> --kind=reference         project.json に kind: "reference"、input/reference/ を作る
-  input/reference/source.<拡張子>                  元動画（コピーを置く。読み取りのみ）
-  input/reference/final.<拡張子>                   完成動画（読み取りのみ）
-  input/reference/subtitles.srt                    任意（S2 では登録だけ。S3 で使う）
-npm run reference -- analyze --project=<id>        sha256 を project.json の reference に記録・ffprobe・両方の 16kHz 音声（audio/source-16k.wav・final-16k.wav）
+npm run new -- --id=<id> --kind=reference         project.json に kind: "reference"、input/reference/{source,assets,final}/ を作る
+  input/reference/source/                          元動画を1本（コピーを置く。読み取りのみ）
+  input/reference/final/                           完成動画を1本＋任意の SRT 1つ（S2 では登録だけ。S3 で使う）
+  input/reference/assets/                          編集に使った素材（画像・動画・音声など。複数・サブフォルダ可。一覧と sha256 だけ記録し、中身は解析しない）
+npm run reference -- register --project=<id>       登録だけ：sha256 を project.json の reference に、素材の一覧を intermediate/reference-assets.json に記録
+npm run reference -- analyze --project=<id>        register ＋ ffprobe・両方の 16kHz 音声（audio/source-16k.wav・final-16k.wav）
 npm run reference -- transcribe --project=<id>     両方を文字起こし（intermediate/transcript.json・final.transcript.json）
 npm run reference -- reconstruct --project=<id>    → intermediate/reconstruction.json（--list で削った区間と中の文字）
 npm run reference -- all --project=<id>             上の3つ＋observe
 ```
 
+- フォルダの決まり：`source/` と `final/` は動画1本ずつが必須（0本・2本以上・ほかのファイルがあると止まる。`final/` だけ SRT を1つ置ける）。OS が作る隠しファイル（`.` で始まるもの・desktop.ini・Thumbs.db）は無視する。素材は向きを問わない
+- 前の形（`input/reference/` 直下の `source.*`・`final.*`・`subtitles.srt`）も互換のため使える。フォルダと直下の両方に置いた時は止まる
 - reference 案件では `npm run analyze` などの production 用の工程は止まる（`registerSource` が案内を出す）。元動画は `project.json` の `source` にも記録するので、文字起こしと S1 の observe はそのまま使える
 - 復元の方法（`src/style/reconstruct.ts`）
   1. 文字：両方の文字起こしを1文字ずつ LCS で対応させ、おおまかな位置（元の時刻 − 完成の時刻）を出す。長い動画（表が 4,000万マスを超える時）は、両方に1回だけ出る 8文字の並びを目印にして、目印の間ごとに LCS をとる。同じ文を何度も撮っている時は、元動画の後ろの方に対応させる（後のテイクを残すことが多いため。最終的には音声で確かめる）
   2. 音声：完成動画を 1秒の窓（0.5秒ずつ）に分け、話し声のある窓を元動画の中で探す。正規化相互相関（2kHz で粗く → 16kHz でサンプル単位）。候補は「前の窓と同じ位置」→「文字の対応」→「元動画全体（FFT、1kHz）」の順。採用は相関 0.7 以上（全体検索は 0.6）
   3. 同じ位置（差 4ms 以内）の窓をまとめて「残した区間」にする。区間の境目（カット位置）は、5ms ごとの波形の誤差が片方の位置からもう片方の位置に切り替わる所。間の中ではどちらでも同じに聞こえるので、その幅を `boundaryUncertainty` に残す
-  4. どの区間とも合わない話し声（1秒の窓では拾えない短い残した部分）は、前後の区間の間の元動画を 0.4秒の窓で探し直す（相関 0.8 以上）
-  5. 再生速度：4秒以上の区間の両端で位置を測り直し、ずれ（速度を変えると位置がずれていく）から倍率を出す。±0.2% 以内なら「変更なし」
-  6. 完成動画の間は、完成動画の音声で測る（部屋の雑音 +6dB 未満が 0.1秒以上）。つなぎ目をまたぐかどうかも記録する。Whisper の語の時刻は間を測るには粗い
+  4. 完成動画に BGM などが入っていると部屋の雑音の基準が上がり、小さめの話し声が「話し声なし」として飛ばされる。そこで、雑音より 3dB 以上大きい窓のうち、今いる区間の位置で合わないものを探し直して加える（合わない窓は、その区間の中に見落としたカットがある印）
+  5. どの区間とも合わない話し声（1秒の窓では拾えない短い残した部分）は、前後の区間の間の元動画を 0.4秒の窓で探し直す（相関 0.8 以上）
+  6. 再生速度：4秒以上の区間の両端で位置を測り直し、ずれ（速度を変えると位置がずれていく）から倍率を出す。±0.2% 以内なら「変更なし」
+  7. 完成動画の間は、完成動画の音声で測る（部屋の雑音 +6dB 未満が 0.1秒以上）。つなぎ目をまたぐかどうかも記録する。Whisper の語の時刻は間を測るには粗い
 - `reconstruction.json` は timemap.json と同じ `segments`（srcStart／srcEnd／outStart／outEnd／frames）・`removed`（＋`seconds`・`speechSeconds`：中の声の秒数）を持ち、`srcToOut` などがそのまま使える。ほかに `offset`・`ncc`・`gain`・`unmatched`・`pauses`・`speed`・`quality`（話し声の何%を再現できたか）・`stats`（カット回数・1分あたり・削除時間・残した割合）
 - observe は reference 案件では reconstruction.json を timemap の代わりに使う（`origin: "reference"`、間の provenance はすべて user-choice）。削った区間が「間だけ」か「声を含む」かは、元動画の音声で決める（Whisper の語の時刻は間にはみ出すため）
 - 映像は使わない（完成動画は切り抜き・拡大・重ねた画像があり、元の映像と直接は比べられない）。音声を差し替えた・BGM を入れた完成動画では、相関が下がって復元できない所が増える

@@ -1,9 +1,11 @@
 // reference projects: a horizontal video the user edited in another editor, kept to learn
 // their editing style (docs/design.md §15). input/reference/ holds
-//   source.<ext>     the original recording
-//   final.<ext>      the user's finished video
-//   subtitles.srt    optional (registered only; subtitle learning is S3)
-// All three are only read. Analysis output goes to audio/ and intermediate/ as
+//   source/          the original recording (exactly one video)
+//   final/           the user's finished video (exactly one) + optional one .srt
+//   assets/          images, clips, music… used in the edit (any files, subfolders
+//                    allowed; only listed with sha256 — not analyzed)
+// or, the older flat layout, source.<ext> / final.<ext> / subtitles.srt.
+// Everything there is only read. Analysis output goes to audio/ and intermediate/ as
 // for production projects (the source side uses the same file names, so the
 // existing transcribe step and the S1 observer work unchanged).
 
@@ -13,7 +15,7 @@ import { assertLandscape, probeSource, type ProbeJson } from "./analyze.ts";
 import { UserError } from "./cli.ts";
 import { loadSettings } from "./config.ts";
 import { extractAudio } from "./engine.ts";
-import { assertWritable, saveProjectJson, sha256File, VIDEO_EXTENSIONS, writeJsonAtomic, type Project, type SourceRecord } from "./project.ts";
+import { assertWritable, fingerprint, readJsonIfExists, saveProjectJson, sha256File, VIDEO_EXTENSIONS, writeJsonAtomic, type Project, type SourceRecord } from "./project.ts";
 import { runTranscribe } from "./steps.ts";
 import { planTranscription, transcribeWav } from "./stt.ts";
 import type { TranscriptFile } from "./transcript.ts";
@@ -26,6 +28,9 @@ export function assertReference(project: Project): void {
   }
 }
 
+/** Files the OS or a sync tool drops into folders; never part of the material. */
+const isJunk = (name: string) => name.startsWith(".") || /^(desktop\.ini|thumbs\.db)$/i.test(name);
+
 function findOne(dir: string, base: string, exts: string[], required: boolean): string | null {
   const hits = fs.existsSync(dir)
     ? fs.readdirSync(dir).filter((f) => path.parse(f).name.toLowerCase() === base && exts.includes(path.extname(f).toLowerCase()) && fs.statSync(path.join(dir, f)).isFile())
@@ -35,11 +40,50 @@ function findOne(dir: string, base: string, exts: string[], required: boolean): 
   return hits[0] ?? null;
 }
 
-async function record(project: Project, name: string, prev: SourceRecord | undefined | null, replace: boolean, log: Log): Promise<{ rec: SourceRecord; changed: boolean }> {
-  const file = path.join(project.paths.referenceDir, name);
-  const rel = `input/reference/${name}`;
+const filesIn = (dir: string) => (fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => !isJunk(f) && fs.statSync(path.join(dir, f)).isFile()) : []);
+
+/**
+ * The video in source/ or final/: exactly one, and nothing else but (final/ only) one .srt.
+ * Returns paths relative to input/reference/.
+ */
+function folderVideo(dir: string, folder: "source" | "final"): { video: string; srt: string | null } {
+  const files = filesIn(dir);
+  const videos = files.filter((f) => VIDEO_EXTENSIONS.includes(path.extname(f).toLowerCase()));
+  const srts = files.filter((f) => path.extname(f).toLowerCase() === ".srt");
+  const label = folder === "source" ? "元動画" : "完成動画";
+  if (videos.length !== 1) {
+    throw new UserError(`input/reference/${folder}/ には${label}を1本だけ置いてください（今は ${videos.length}本${videos.length ? `：${videos.join("、")}` : ""}。動画の拡張子 ${VIDEO_EXTENSIONS.join(" ")}）。`);
+  }
+  if (folder === "final" && srts.length > 1) throw new UserError(`input/reference/final/ の SRT は1つにしてください（${srts.join("、")}）。`);
+  const other = files.filter((f) => f !== videos[0] && !(folder === "final" && f === srts[0]));
+  if (other.length) throw new UserError(`input/reference/${folder}/ に${label}${folder === "final" ? "と SRT " : ""}以外のファイルがあります（${other.join("、")}）。素材は input/reference/assets/ に置いてください。`);
+  return { video: `${folder}/${videos[0]}`, srt: folder === "final" && srts[0] ? `final/${srts[0]}` : null };
+}
+
+/** Where the source / final / srt are: the folder layout (standard) or the older flat files. Paths relative to input/reference/. */
+function locateReference(project: Project): { source: string; final: string; srt: string | null; layout: "folders" | "flat" } {
+  const p = project.paths;
+  const flatSource = findOne(p.referenceDir, "source", VIDEO_EXTENSIONS, false);
+  const flatFinal = findOne(p.referenceDir, "final", VIDEO_EXTENSIONS, false);
+  const folderUsed = filesIn(p.referenceSourceDir).length > 0 || filesIn(p.referenceFinalDir).length > 0;
+  if (folderUsed && (flatSource || flatFinal)) {
+    throw new UserError("input/reference/ に、フォルダ（source/・final/）と直下のファイル（source.*・final.*）の両方があります。どちらか一方にしてください（標準はフォルダ）。");
+  }
+  if (!folderUsed && (flatSource || flatFinal)) {
+    if (!flatSource || !flatFinal) throw new UserError(`input/reference/ に ${flatSource ? "final" : "source"}.<動画の拡張子> がありません。`);
+    return { source: flatSource, final: flatFinal, srt: findOne(p.referenceDir, "subtitles", [".srt"], false), layout: "flat" };
+  }
+  const source = folderVideo(p.referenceSourceDir, "source");
+  const final = folderVideo(p.referenceFinalDir, "final");
+  return { source: source.video, final: final.video, srt: final.srt, layout: "folders" };
+}
+
+/** rel: path inside input/reference/ (forward slashes). */
+async function record(project: Project, relInRef: string, prev: SourceRecord | undefined | null, replace: boolean, log: Log): Promise<{ rec: SourceRecord; changed: boolean }> {
+  const file = path.join(project.paths.referenceDir, ...relInRef.split("/"));
+  const rel = `input/reference/${relInRef}`;
   const st = fs.statSync(file);
-  // Same file, same size and mtime: reuse the recorded hash (a full re-hash is done with --verify).
+  // Same file, same size and mtime: reuse the recorded hash.
   if (prev && prev.file === rel && prev.sizeBytes === st.size && Math.round(prev.mtimeMs) === Math.round(st.mtimeMs)) return { rec: prev, changed: false };
   log(`ハッシュを計算中（読み取りのみ）: ${rel}`);
   const sha256 = await sha256File(file);
@@ -50,26 +94,84 @@ async function record(project: Project, name: string, prev: SourceRecord | undef
   return { rec: { file: rel, sizeBytes: st.size, mtimeMs: st.mtimeMs, sha256, registeredAt: changed ? new Date().toISOString() : prev!.registeredAt }, changed };
 }
 
-/** Registers source / final / srt in project.json (sha256). */
+export type AssetKind = "image" | "video" | "audio" | "subtitle" | "document" | "other";
+export type AssetRecord = { file: string; kind: AssetKind; sizeBytes: number; mtimeMs: number; sha256: string };
+export type ReferenceAssetsJson = { version: 1; updatedAt: string; root: "input/reference/assets"; count: number; totalBytes: number; items: AssetRecord[] };
+
+const ASSET_KINDS: [AssetKind, string[]][] = [
+  ["image", [".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".tif", ".tiff", ".heic", ".svg", ".psd", ".ai"]],
+  ["video", VIDEO_EXTENSIONS],
+  ["audio", [".mp3", ".wav", ".m4a", ".aac", ".flac", ".ogg", ".aif", ".aiff"]],
+  ["subtitle", [".srt", ".vtt", ".ass"]],
+  ["document", [".txt", ".md", ".pdf", ".docx", ".xlsx", ".csv", ".json"]],
+];
+const assetKind = (f: string): AssetKind => ASSET_KINDS.find(([, exts]) => exts.includes(path.extname(f).toLowerCase()))?.[0] ?? "other";
+
+/** Every file under assets/ (subfolders too), relative with forward slashes. Symlinks are not followed. */
+function walkAssets(root: string, sub = ""): string[] {
+  const dir = path.join(root, sub);
+  if (!fs.existsSync(dir)) return [];
+  const out: string[] = [];
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (isJunk(e.name)) continue;
+    const rel = sub ? `${sub}/${e.name}` : e.name;
+    if (e.isDirectory()) out.push(...walkAssets(root, rel));
+    else if (e.isFile()) out.push(rel);
+  }
+  return out.sort();
+}
+
+/** Lists input/reference/assets/ with sha256 (unchanged size + mtime reuse the previous hash). The files are not analyzed. */
+async function registerAssets(project: Project, log: Log): Promise<ReferenceAssetsJson> {
+  const { paths } = project;
+  const prev = new Map((readJsonIfExists<ReferenceAssetsJson>(paths.referenceAssets)?.items ?? []).map((a) => [a.file, a]));
+  const items: AssetRecord[] = [];
+  for (const rel of walkAssets(paths.referenceAssetsDir)) {
+    const st = fs.statSync(path.join(paths.referenceAssetsDir, ...rel.split("/")));
+    const p = prev.get(rel);
+    if (p && p.sizeBytes === st.size && Math.round(p.mtimeMs) === Math.round(st.mtimeMs)) {
+      items.push(p);
+      continue;
+    }
+    log(`素材のハッシュを計算中（読み取りのみ）: assets/${rel}`);
+    items.push({ file: rel, kind: assetKind(rel), sizeBytes: st.size, mtimeMs: st.mtimeMs, sha256: await sha256File(path.join(paths.referenceAssetsDir, ...rel.split("/"))) });
+  }
+  const json: ReferenceAssetsJson = {
+    version: 1,
+    updatedAt: new Date().toISOString(),
+    root: "input/reference/assets",
+    count: items.length,
+    totalBytes: items.reduce((n, a) => n + a.sizeBytes, 0),
+    items,
+  };
+  writeJsonAtomic(paths.referenceAssets, json);
+  return json;
+}
+
+/** Registers source / final / srt in project.json and lists assets/ (sha256 only; nothing is analyzed). */
 export async function registerReference(project: Project, options: { replace?: boolean; log?: Log } = {}) {
   assertReference(project);
   assertWritable(project);
   const log = options.log ?? (() => {});
-  const dir = project.paths.referenceDir;
-  const sourceName = findOne(dir, "source", VIDEO_EXTENSIONS, true)!;
-  const finalName = findOne(dir, "final", VIDEO_EXTENSIONS, true)!;
-  const srtName = findOne(dir, "subtitles", [".srt"], false);
+  const { paths } = project;
+  const where = locateReference(project);
   // Horizontal only: both videos are checked before anything is recorded.
-  assertLandscape(await probeSource(path.join(dir, sourceName), ""), `元動画（input/reference/${sourceName}）`);
-  assertLandscape(await probeSource(path.join(dir, finalName), ""), `完成動画（input/reference/${finalName}）`);
+  assertLandscape(await probeSource(path.join(paths.referenceDir, ...where.source.split("/")), ""), `元動画（input/reference/${where.source}）`);
+  assertLandscape(await probeSource(path.join(paths.referenceDir, ...where.final.split("/")), ""), `完成動画（input/reference/${where.final}）`);
   const prev = project.json.reference;
-  const source = await record(project, sourceName, prev?.source, !!options.replace, log);
-  const final = await record(project, finalName, prev?.final, !!options.replace, log);
-  const srt = srtName ? await record(project, srtName, prev?.srt, !!options.replace, log) : null;
-  project.json.reference = { source: source.rec, final: final.rec, srt: srt?.rec ?? null };
+  const source = await record(project, where.source, prev?.source, !!options.replace, log);
+  const final = await record(project, where.final, prev?.final, !!options.replace, log);
+  const srt = where.srt ? await record(project, where.srt, prev?.srt, !!options.replace, log) : null;
+  const assets = fs.existsSync(paths.referenceAssetsDir) ? await registerAssets(project, log) : null;
+  project.json.reference = {
+    source: source.rec,
+    final: final.rec,
+    srt: srt?.rec ?? null,
+    assets: assets ? { count: assets.count, totalBytes: assets.totalBytes, fingerprint: fingerprint(assets.items.map((a) => [a.file, a.sha256])) } : null,
+  };
   project.json.source = source.rec;
   saveProjectJson(project);
-  return { sourceChanged: source.changed, finalChanged: final.changed, srt: !!srt };
+  return { sourceChanged: source.changed, finalChanged: final.changed, srt: !!srt, layout: where.layout, assets };
 }
 
 /** ffprobe + 16 kHz mono WAV for both videos. */

@@ -39,7 +39,13 @@ export type ProjectJson = {
    */
   kind?: ProjectKind;
   /** reference projects: the registered files (source is also recorded in `source`). */
-  reference?: { source: SourceRecord; final: SourceRecord; srt: SourceRecord | null };
+  reference?: {
+    source: SourceRecord;
+    final: SourceRecord;
+    srt: SourceRecord | null;
+    /** input/reference/assets/ in short (the full list is intermediate/reference-assets.json). */
+    assets?: { count: number; totalBytes: number; fingerprint: string } | null;
+  };
   /** Kept out of the editing-style learning (a trial / check project): style observe refuses it. */
   learning?: { exclude: true; reason: string };
 };
@@ -109,7 +115,7 @@ export function createProject(id: string, options: { dryRun?: boolean; kind?: Pr
   }
   if (options.dryRun) return paths;
   for (const sub of PROJECT_SUBDIRS) fs.mkdirSync(path.join(paths.root, sub), { recursive: true });
-  if (options.kind === "reference") fs.mkdirSync(paths.referenceDir, { recursive: true });
+  if (options.kind === "reference") for (const d of [paths.referenceSourceDir, paths.referenceAssetsDir, paths.referenceFinalDir]) fs.mkdirSync(d, { recursive: true });
   const json: ProjectJson = {
     version: 1,
     tool: "talk-subtitle",

@@ -33,6 +33,8 @@ const HOP = 0.5;
 /** A window counts as speech when this share of its 50 ms frames is this far above the room tone. */
 const VOICED_SHARE = 0.3;
 const VOICED_ABOVE_FLOOR_DB = 12;
+/** Quieter windows (above the room tone by this much) are checked against their segment afterwards. */
+const RECHECK_ABOVE_FLOOR_DB = 3;
 const ACCEPT_NCC = 0.7;
 const ACCEPT_GLOBAL_NCC = 0.6;
 /** Second pass for short kept pieces: shorter windows, stricter acceptance. */
@@ -258,19 +260,18 @@ export function reconstructCuts(project: Project, log: (s: string) => void = () 
   // 2. windows
   const frameDb = M.finalFrameDb(0.05);
   const floor = [...frameDb].sort((a, b) => a - b)[Math.floor(frameDb.length * 0.1)] ?? -90;
-  const voicedFrame = (i: number) => frameDb[i] >= floor + VOICED_ABOVE_FLOOR_DB;
   const windows: Window[] = [];
   let total = 0;
   let voiced = 0;
-  let prev: Match | null = null;
-  for (let t = 0; t + WINDOW <= M.finalSeconds + 1e-9; t += HOP) {
-    total++;
+  const shareAbove = (t: number, db: number) => {
     const f0 = Math.floor(t / 0.05);
     const f1 = Math.floor((t + WINDOW) / 0.05);
     let v = 0;
-    for (let i = f0; i < f1; i++) if (voicedFrame(i)) v++;
-    if (v / Math.max(1, f1 - f0) < VOICED_SHARE) continue;
-    voiced++;
+    for (let i = f0; i < f1; i++) if (frameDb[i] >= floor + db) v++;
+    return v / Math.max(1, f1 - f0);
+  };
+  /** Places the 1 s window at t: the previous offset, then the text offsets, then the whole source. */
+  const place = (t: number, prevOffset: number | null): Window | null => {
     const near = anchors.filter((a) => a.outT >= t - 0.5 && a.outT <= t + WINDOW + 0.5).map((a) => a.srcT - a.outT);
     const textCands = [...new Set(near.map((d) => Math.round(d * 10) / 10))].slice(0, 6);
     let best: Window | null = null;
@@ -278,14 +279,22 @@ export function reconstructCuts(project: Project, log: (s: string) => void = () 
       const m = M.local(t, WINDOW, center, 0.35);
       if (m && (!best || m.ncc > best.match.ncc)) best = { outStart: t, seconds: WINDOW, match: m, via };
     };
-    if (prev) tryCand(prev.offset, "previous");
+    if (prevOffset !== null) tryCand(prevOffset, "previous");
     if (!best || (best as Window).match.ncc < ACCEPT_NCC) for (const c of textCands) tryCand(c, "text");
     if (!best || (best as Window).match.ncc < ACCEPT_NCC) {
       const g = M.global(t, WINDOW);
       if (g && g.ncc >= ACCEPT_GLOBAL_NCC && (!best || g.ncc > (best as Window).match.ncc)) best = { outStart: t, seconds: WINDOW, match: g, via: "global" };
     }
     const b = best as Window | null;
-    if (b && b.match.ncc >= (b.via === "global" ? ACCEPT_GLOBAL_NCC : ACCEPT_NCC)) {
+    return b && b.match.ncc >= (b.via === "global" ? ACCEPT_GLOBAL_NCC : ACCEPT_NCC) ? b : null;
+  };
+  let prev: Match | null = null;
+  for (let t = 0; t + WINDOW <= M.finalSeconds + 1e-9; t += HOP) {
+    total++;
+    if (shareAbove(t, VOICED_ABOVE_FLOOR_DB) < VOICED_SHARE) continue;
+    voiced++;
+    const b = place(t, prev?.offset ?? null);
+    if (b) {
       windows.push(b);
       prev = b.match;
     }
@@ -426,6 +435,27 @@ export function reconstructCuts(project: Project, log: (s: string) => void = () 
   };
 
   let built = assemble(windows);
+  // 5a. a window left out as "not speech" can still carry speech when music or noise in the
+  // finished video raises its room tone. If such a window does not match the segment it lies
+  // in, the segment hides a cut: place the window too and assemble again.
+  const searched = new Set(windows.map((w) => Math.round(w.outStart / HOP)));
+  const hidden: Window[] = [];
+  for (let k = 0; k * HOP + WINDOW <= finalSeconds + 1e-9; k++) {
+    const t = k * HOP;
+    if (searched.has(k) || shareAbove(t, RECHECK_ABOVE_FLOOR_DB) < VOICED_SHARE) continue;
+    const s = built.segments.find((x) => t >= x.outStart && t + WINDOW <= x.outEnd);
+    if (!s) continue;
+    const here = M.refine(t, WINDOW, s.offset, 1);
+    if (here && here.ncc >= ACCEPT_NCC) continue;
+    const w = place(t, s.offset);
+    if (w) hidden.push(w);
+  }
+  if (hidden.length) {
+    const before = built.segments.length;
+    windows.push(...hidden);
+    built = assemble(windows);
+    log(`静かな窓の再確認: ${hidden.length}窓を追加（残した区間 ${before} → ${built.segments.length}）`);
+  }
   // 5b. speech that matches no segment is often a short kept piece (< 1 s) that no 1 s window
   // covered cleanly: search it with short windows in the source between the neighbouring segments.
   const extra: Window[] = [];
