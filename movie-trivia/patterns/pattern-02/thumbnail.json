@@ -1,0 +1,72 @@
+{
+  "inherits": "design.json（フォント）。レイアウトは pattern-01 と同じで、色をネオン（マゼンタ・シアン）にしたもの",
+  "size": {
+    "width": 1280,
+    "height": 720
+  },
+  "variants": [
+    "A",
+    "B",
+    "C"
+  ],
+  "color": {
+    "red": "#E8178A",
+    "yellow": "#3DF0FF",
+    "text": "#FFFFFF",
+    "outline": "#04121F"
+  },
+  "layout": {
+    "image": {
+      "videoFrame": 90,
+      "note": "映像を全面に敷く（動画素材なら連番の90コマ目。台本の frame で変更、imagePosition で位置調整）"
+    },
+    "shade": {
+      "gradient": "linear-gradient(90deg, rgba(4,10,28,0.9) 0%, rgba(4,10,28,0.7) 42%, rgba(4,10,28,0) 72%)",
+      "note": "文字の側（左）だけ暗くする"
+    },
+    "left": 52,
+    "ribbon": {
+      "size": 50,
+      "top": 44,
+      "rotate": -2,
+      "note": "マゼンタの帯に白文字（例：「TOP10」「ランキング」）"
+    },
+    "lines": {
+      "size": 112,
+      "outline": 16,
+      "note": "白文字に濃い縁取り。1〜2行"
+    },
+    "accentWord": {
+      "size": 168,
+      "sizeIfLong": 130,
+      "longOver": 6,
+      "outline": 20,
+      "note": "シアンで特大（キーは yellow のまま）"
+    },
+    "badge": {
+      "size": 300,
+      "right": 40,
+      "bottom": 40,
+      "rotate": 6,
+      "topSize": 40,
+      "bigSize": 96,
+      "bigSizeIfLong": 76,
+      "bigLongOver": 4,
+      "bottomSize": 34,
+      "note": "右下のマゼンタの丸。「第1位は？」など（任意）"
+    },
+    "small": {
+      "size": 36,
+      "bottom": 44,
+      "barWidth": 8,
+      "note": "左下に黒地の補足（任意）"
+    }
+  },
+  "rules": [
+    "文言は少なく大きく（1〜2行＋シアンの強調語1つ＋バッジ）",
+    "1位の答えをサムネイルで明かさない（本編を見る理由がなくなる）",
+    "根拠のない数字・あおりは使わない（common/production-rules.md）。順位の根拠（出典のランキング・統計）があるものだけを「ランキング」と呼ぶ",
+    "映像の内容と文言で誤解を生まない組み合わせにする",
+    "目安・推計の数字には「約」や「（目安）」を付ける"
+  ]
+}

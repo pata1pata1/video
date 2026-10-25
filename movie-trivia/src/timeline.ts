@@ -17,6 +17,10 @@ export type Visual = {
   step?: number;
   stat?: Stat;
   points?: Points;
+  /** The ranking board (pattern-02): every rank, with the ones already introduced opened. */
+  board?: boolean;
+  /** Glowing keywords over the footage (pattern-03); without `footage`, over the footage already on screen. */
+  words?: string[];
 };
 export type ScriptLine = { id: string; text: string; visual?: Visual };
 export type SceneDef = {
@@ -102,20 +106,31 @@ export const lineStart = (id: string) => {
 export type Shown =
   | { kind: "title"; footage?: string }
   | { kind: "chapter"; scene: SceneDef; footage?: string }
-  | { kind: "footage"; key: string }
+  | { kind: "footage"; key: string; words?: string[] }
   | { kind: "diagram"; name: string }
   | { kind: "stat"; stat: Stat; footage?: string }
   | { kind: "points"; points: Points }
+  | { kind: "board"; opened: number }
   | { kind: "ending" };
 /** Seconds (from the segment start) at which each diagram step begins. */
 export type Segment = { shown: Shown; from: number; to: number; steps: { at: number; step: number }[]; chapter?: SceneDef };
 
+/** Chapters (ranks) before this scene: the ones the board shows opened. */
+const openedBefore = (scene: SceneDef) => SCRIPT.scenes.slice(0, SCRIPT.scenes.indexOf(scene)).filter((s) => s.kind === "chapter").length;
+
 function shownOf(scene: SceneDef, line: ScriptLine, index: number, prev: Shown | undefined): Shown {
   const v = line.visual;
+  // the board opens the ranks of earlier scenes, and this scene's once it has been named
+  if (v?.board) return { kind: "board", opened: openedBefore(scene) + (scene.kind === "chapter" && index > 0 ? 1 : 0) };
   if (scene.kind === "ending") return { kind: "ending" };
   // title and stat can sit on footage (visual.footage is then their background)
   if (v?.title) return { kind: "title", footage: v.footage };
   if (v?.stat) return { kind: "stat", stat: v.stat, footage: v.footage };
+  if (v?.words) {
+    const key = v.footage ?? (prev && "footage" in prev ? prev.footage : prev?.kind === "footage" ? prev.key : undefined);
+    if (!key) throw new Error(`${line.id}: visual.words needs footage`);
+    return { kind: "footage", key, words: v.words };
+  }
   if (v?.footage) return { kind: "footage", key: v.footage };
   if (v?.diagram) return { kind: "diagram", name: v.diagram };
   if (v?.points) return { kind: "points", points: v.points };

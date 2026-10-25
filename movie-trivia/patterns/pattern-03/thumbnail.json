@@ -1,0 +1,80 @@
+{
+  "inherits": "design.json（フォント：太い明朝）。レイアウトは pattern-01 と同じで、事件解説向けに暗く・赤くしたもの",
+  "size": {
+    "width": 1280,
+    "height": 720
+  },
+  "variants": [
+    "A",
+    "B",
+    "C"
+  ],
+  "color": {
+    "red": "#B80F14",
+    "yellow": "#FF2424",
+    "text": "#FFFFFF",
+    "outline": "#0A0000",
+    "accentWord": "#FF2424",
+    "badgeBig": "#FFFFFF"
+  },
+  "layout": {
+    "image": {
+      "videoFrame": 90,
+      "note": "映像を全面に敷く（動画素材なら連番の90コマ目。台本の frame で変更、imagePosition で位置調整）"
+    },
+    "shade": {
+      "gradient": "radial-gradient(ellipse at 62% 45%, rgba(0,0,0,0) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.8) 100%), linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 45%, rgba(0,0,0,0) 70%)",
+      "note": "全体を暗くし、四隅と文字の側（左）をさらに暗くする"
+    },
+    "left": 52,
+    "ribbon": {
+      "size": 50,
+      "top": 44,
+      "rotate": -2,
+      "note": "暗い赤の帯に白文字（例：「未解決」「実話」「判決」）"
+    },
+    "lines": {
+      "size": 112,
+      "outline": 16,
+      "note": "白文字に黒の太縁取り。1〜2行"
+    },
+    "accentWord": {
+      "size": 168,
+      "sizeIfLong": 130,
+      "longOver": 6,
+      "outline": 20,
+      "note": "赤い特大の文字＋赤い光（色は color.accentWord）"
+    },
+    "badge": {
+      "size": 300,
+      "right": 40,
+      "bottom": 40,
+      "rotate": 6,
+      "topSize": 40,
+      "bigSize": 96,
+      "bigSizeIfLong": 76,
+      "bigLongOver": 4,
+      "bottomSize": 34,
+      "note": "右下の暗い赤の丸。「懲役」「〇年」など（任意）"
+    },
+    "small": {
+      "size": 36,
+      "bottom": 44,
+      "barWidth": 8,
+      "note": "左下に黒地の補足（任意）"
+    },
+    "textGlow": "0 0 18px rgba(255,20,20,0.85), 0 0 42px rgba(200,0,0,0.6)",
+    "splatter": {
+      "count": 46,
+      "color": "#C3080D",
+      "note": "四隅に散る小さな赤い点（血しぶき風。画面の中央と文字には重ねない）"
+    }
+  },
+  "rules": [
+    "文言は少なく大きく（1〜2行＋赤い強調語1つ＋バッジ）",
+    "実在の人物を侮辱・断定する言葉は使わない（「お前が一番怖い」のような評価の言葉より、判決で認められた事実や本人の発言を出典つきで使う）",
+    "裁判中・無罪を主張している人を犯人と断定しない。確定判決があるかを先に確かめる",
+    "本人・被害者の写真は、使ってよいかを動画ごとにユーザーと決める（報道映像の静止画は権利の申し立てのリスクがある）",
+    "映像の内容と文言で誤解を生まない組み合わせにする"
+  ]
+}

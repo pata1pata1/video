@@ -1,0 +1,68 @@
+{
+  "id": "__ID__",
+  "pattern": "pattern-03",
+  "title": "（YouTubeタイトル・エンディングにも表示）",
+  "titleTop": "（タイトル画面の小見出し。例：〇〇年 〇〇県）",
+  "titleMain": "（タイトル画面の大タイトル・1行で収まる長さ。例：〇〇事件）",
+  "titleSub": "（タイトル画面のサブタイトル。謎の一言）",
+  "pronunciation": {},
+  "media": {
+    "hook1": { "query": "（冒頭1枚目の映像の検索語・英語。暗い・夜・雨など）" },
+    "hook2": { "query": "（結末の映像。法廷・手錠・ガベルなど）" },
+    "hook3": { "query": "（謎を示す映像）" },
+    "c1": { "query": "（第1章の映像）" },
+    "c2": { "query": "（第2章の映像）" }
+  },
+  "scenes": [
+    {
+      "id": "opening",
+      "kind": "opening",
+      "lines": [
+        { "id": "o1", "visual": { "title": true, "footage": "hook1" }, "text": "（つかみ：もし〜だったら？／いつ・どこで何が起きたか）" },
+        { "id": "o2", "visual": { "stat": { "value": "0", "unit": "年", "label": "（判決の内容。例：〇〇地裁の判決）" }, "footage": "hook2" }, "text": "（結末：判決・刑の重さ。確定しているかも言う）" },
+        { "id": "o3", "visual": { "footage": "hook3", "words": ["（キーワード1）", "（キーワード2）"] }, "text": "（謎：なぜそうなったのか）" },
+        { "id": "o4", "text": "（事件の始まりから、順番にたどっていきます）" }
+      ]
+    },
+    {
+      "id": "c1",
+      "kind": "chapter",
+      "number": 1,
+      "heading": "（章の見出し。例：家族の中の孤立）",
+      "footage": "c1",
+      "lines": [
+        { "id": "c1a", "text": "（章の1文目。この文の間は章タイトルを表示）" },
+        { "id": "c1b", "visual": { "footage": "c1" }, "text": "（映像で見せる文）" },
+        { "id": "c1c", "visual": { "words": ["（キーワード）"] }, "text": "（キーワードを重ねる文。映像は前の文のまま）" },
+        { "id": "c1d", "visual": { "diagram": "example", "step": 1 }, "text": "（人物関係・時系列の図解の1段階目）" },
+        { "id": "c1e", "visual": { "diagram": "example", "step": 2 }, "text": "（図解の2段階目）" }
+      ]
+    },
+    {
+      "id": "c2",
+      "kind": "chapter",
+      "number": 2,
+      "heading": "（章の見出し。例：判決）",
+      "footage": "c2",
+      "lines": [
+        { "id": "c2a", "text": "（章の1文目）" },
+        { "id": "c2b", "visual": { "footage": "c2", "words": ["（キーワード1）", "（キーワード2）", "（キーワード3）"] }, "text": "（キーワードを3つまで重ねる文）" },
+        { "id": "c2c", "visual": { "points": { "title": "（箇条書きの見出し。例：判決が認めた事実）", "items": ["（1）", "（2）", "（3）"] } }, "text": "（判決・資料で確認できたこと）" }
+      ]
+    },
+    {
+      "id": "ending",
+      "kind": "ending",
+      "lines": [
+        { "id": "e1", "text": "（事件を一文で振り返る。判決と、そこから分かること）" },
+        { "id": "e2", "text": "（この事件について、あなたはどう考えますか？コメントで教えてください）" },
+        { "id": "e3", "text": "高評価とチャンネル登録も、よろしくお願いします。" }
+      ]
+    }
+  ],
+  "thumbnails": [
+    { "id": "A", "photo": "hook1", "ribbon": "（帯。例：実話）", "lines": ["（1行目）"], "accent": "（赤い強調語）", "small": "（補足。例：〇〇年 〇〇県）" },
+    { "id": "B", "photo": "hook2", "ribbon": "（帯）", "lines": ["（1行目）", "（2行目）"], "accent": "（強調語）", "badge": { "top": "（例：懲役）", "big": "（例：20年）", "bottom": "" } },
+    { "id": "C", "photo": "hook3", "ribbon": "（帯）", "lines": ["（1行目）"], "accent": "（強調語）" }
+  ]
+}

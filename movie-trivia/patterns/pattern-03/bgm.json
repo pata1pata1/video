@@ -1,0 +1,7 @@
+{
+  "bgm": { "file": "bgm/pattern-03-dark.mp3" },
+  "bgmNote": "暗いBGMを bgm/pattern-03-dark.mp3 に置く（ユーザーが用意。Git管理外）。置くまで書き出しは「BGM not found」で止まる。曲を変えるときは台本に \"bgm\": { \"file\": \"bgm/<name>.mp3\" }、なしにするときは \"bgm\": null。クレジットが必要な曲は投稿メモの説明文に入れる",
+  "belowVoiceDb": 20,
+  "sfx": null,
+  "sfxNote": "効果音なし"
+}

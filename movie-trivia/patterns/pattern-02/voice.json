@@ -1,0 +1,10 @@
+{
+  "engine": "VOICEVOX",
+  "engineUrl": "http://127.0.0.1:50021",
+  "speaker": 8,
+  "speakerName": "春日部つむぎ",
+  "style": "ノーマル",
+  "speedScale": 1.0,
+  "timing": { "leadIn": 0.6, "linePause": 0.35, "scenePause": 0.9, "tailOut": 2.0 },
+  "credit": "VOICEVOX:春日部つむぎ（エンディング画面と説明文に入れる）"
+}

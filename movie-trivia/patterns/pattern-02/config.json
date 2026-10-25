@@ -1,0 +1,38 @@
+{
+  "id": "pattern-02",
+  "name": "ランキング・カウントダウン（近未来HUD）",
+  "basedOn": "pattern-01 の書き出し・映像の出し方を引き継ぎ、構成と見た目をランキング用にしたもの（2026-10-23 作成）",
+  "video": { "width": 1920, "height": 1080, "fps": 30 },
+  "structure": {
+    "targetMinutes": [6, 8],
+    "chapters": "順位の数（scene.kind=chapter、number=順位）。10位〜1位が基本で、テーマに合わせて5・7位からでもよい。台本には大きい順位から書く",
+    "scenes": ["opening", "chapter（順位）× N", "ending"],
+    "openingSeconds": 30,
+    "openingRule": "タイトル（title+footage）→ 印象的な数字か映像 → ランキング表（board、まだ全部？？？）→「第1位は最後に」で引っ張る。図解は使わない",
+    "chapterRule": "各順位の1文目は順位カード（順位と見出し。scene.footage を背景に）。中は映像・数字カード・箇条書き・図解で4〜7文（約30〜40秒）。最後の文で次の順位へつなぐ",
+    "boardRule": "ランキング表（visual.board）はオープニングと、1位の直前（2位の最後）に出す。それまでに紹介した順位だけ見出しが開く",
+    "endingLines": 3,
+    "endingRule": "1文目で1〜N位を振り返る（ランキング表を出す）→ コメント → 高評価・チャンネル登録",
+    "tooShort": "読み上げ時間が目安に足りないときは、一次情報で確認できる事実を文として足す（水増しの言い回しはしない）"
+  },
+  "pacing": {
+    "linesPerCaption": 1,
+    "linesPerRank": [4, 7],
+    "footageLinesPerShot": [1, 3],
+    "diagramStepsPerDiagram": [2, 5],
+    "statPerLine": 1,
+    "pointsMax": 4
+  },
+  "transition": {
+    "visualLeadSeconds": 0.4,
+    "fadeFrames": 10,
+    "captionHoldSeconds": 0.5
+  },
+  "media": {
+    "fit": "全画面（cover）",
+    "loop": "pingpong",
+    "continueAcrossUses": true,
+    "sharedClipMaxSeconds": 20,
+    "credit": "右上に「映像：<出典名> / <作者>」"
+  }
+}

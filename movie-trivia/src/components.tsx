@@ -2,7 +2,7 @@ import React from "react";
 import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { PATTERN } from "./pattern";
 import { captionCues } from "./timeline";
-import { color, font, SUBTITLE_AREA } from "./theme";
+import { color, font, onAccent, rankColor, SUBTITLE_AREA } from "./theme";
 
 /** Spring from 0 to 1 that starts at `startFrame`. */
 export function usePop(startFrame: number, damping = 20) {
@@ -65,6 +65,8 @@ export const Subtitle: React.FC = () => {
           lineHeight: SUB.lineHeight,
           padding: SUB.padding,
           borderRadius: SUB.radius,
+          border: SUB.border,
+          boxShadow: SUB.shadow,
           textAlign: "center",
           maxWidth: SUB.maxWidth,
           lineBreak: "strict",
@@ -90,6 +92,8 @@ export const StatValue: React.FC<{ value: string; progress: number }> = ({ value
   return <>{`${m[1]}${m[2].includes(",") ? n.toLocaleString("en-US") : n}${m[3]}`}</>;
 };
 
+const TAG = PATTERN.design.chapterTag;
+
 /** Small chapter label, top-left (number badge + heading). `onDark` for footage. */
 export const ChapterTag: React.FC<{ number: number; heading: string; onDark: boolean }> = ({ number, heading, onDark }) => (
   <div
@@ -109,11 +113,13 @@ export const ChapterTag: React.FC<{ number: number; heading: string; onDark: boo
   >
     <div
       style={{
-        width: 46,
+        minWidth: 46,
         height: 46,
+        padding: TAG.format ? "0 14px" : undefined,
+        boxSizing: "border-box",
         borderRadius: 23,
-        background: color.accent,
-        color: "#FFFFFF",
+        background: rankColor(number),
+        color: onAccent,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -122,7 +128,7 @@ export const ChapterTag: React.FC<{ number: number; heading: string; onDark: boo
         textShadow: "none",
       }}
     >
-      {number}
+      {TAG.format ? TAG.format.replace("{n}", String(number)) : number}
     </div>
     {heading}
   </div>

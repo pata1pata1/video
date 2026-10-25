@@ -1,11 +1,14 @@
 import React from "react";
 import { AbsoluteFill, Audio, interpolate, Sequence, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { ChapterTag, Subtitle } from "./components";
+import { BrushTag, Words } from "./film";
 import { DIAGRAMS } from "./current-diagrams";
 import { PATTERN } from "./pattern";
-import { ChapterCard, Ending, Footage, Points, StatCard, Title } from "./scenes";
+import { Board, ChapterCard, Ending, Footage, Points, StatCard, Title } from "./scenes";
 import { AUDIO_SRC, lineStart, SCRIPT, Segment, segments, Shown } from "./timeline";
 import { color } from "./theme";
+
+const TAG = PATTERN.design.chapterTag;
 
 /** The footage a segment shows (full frame, or behind a card). */
 const footageOf = (s: Shown): string | undefined =>
@@ -31,7 +34,12 @@ const SegmentView: React.FC<{ seg: Segment; startFrame: number; footageFrom: num
       body = <ChapterCard scene={s.scene} bg={bg} />;
       break;
     case "footage":
-      body = <Footage mediaKey={s.key} startFrame={footageFrom} />;
+      body = (
+        <>
+          <Footage mediaKey={s.key} startFrame={footageFrom} />
+          {s.words ? <Words words={s.words} /> : null}
+        </>
+      );
       break;
     case "diagram": {
       const Diagram = DIAGRAMS[s.name];
@@ -45,17 +53,26 @@ const SegmentView: React.FC<{ seg: Segment; startFrame: number; footageFrom: num
     case "points":
       body = <Points points={s.points} />;
       break;
+    case "board":
+      body = <Board opened={s.opened} />;
+      break;
     case "ending": {
       const ending = SCRIPT.scenes[SCRIPT.scenes.length - 1];
       body = <Ending lineFrames={ending.lines.map((l) => Math.round((lineStart(l.id) - seg.from) * fps))} />;
       break;
     }
   }
-  const tag = seg.chapter && s.kind !== "chapter";
+  const tag = seg.chapter && s.kind !== "chapter" && s.kind !== "board";
   return (
     <AbsoluteFill style={{ opacity }}>
       {body}
-      {tag ? <ChapterTag number={seg.chapter!.number!} heading={seg.chapter!.heading!} onDark={!!key} /> : null}
+      {tag ? (
+        TAG.style === "brush" ? (
+          <BrushTag heading={seg.chapter!.heading!} color={color.accent} />
+        ) : (
+          <ChapterTag number={seg.chapter!.number!} heading={seg.chapter!.heading!} onDark={!!key} />
+        )
+      ) : null}
     </AbsoluteFill>
   );
 };

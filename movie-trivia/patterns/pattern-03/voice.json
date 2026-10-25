@@ -1,0 +1,10 @@
+{
+  "engine": "VOICEVOX",
+  "engineUrl": "http://127.0.0.1:50021",
+  "speaker": 13,
+  "speakerName": "青山龍星",
+  "style": "ノーマル",
+  "speedScale": 0.95,
+  "timing": { "leadIn": 0.8, "linePause": 0.45, "scenePause": 1.2, "tailOut": 2.5 },
+  "credit": "VOICEVOX:青山龍星（エンディング画面と説明文に入れる）"
+}

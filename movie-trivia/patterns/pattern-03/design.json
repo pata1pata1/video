@@ -1,0 +1,126 @@
+{
+  "style": "case-dark",
+  "hud": false,
+  "decorations": [
+    "フォント：本文も字幕も Zen Old Mincho（太い明朝）",
+    "映像：暗くぼかし、粒子・縦の傷・ちらつき・周辺減光を重ねた古いフィルム調（film）。写真はぼかした同じ写真の上に枠付きで全体を見せる",
+    "キーワード：映像の上に赤・紫・水色の光る明朝体で1〜3語が順に浮かぶ（words）",
+    "章見出し：右上に赤い筆の線と白い明朝体（chapterTag.style brush）",
+    "タイトル・章タイトル・数字：赤く光る（glow）"
+  ],
+  "noDecorations": [
+    "血・凶器などの直接的な描写（血しぶき風の赤い点はサムネイルだけ）",
+    "グリッチで文字を崩す演出"
+  ],
+  "font": {
+    "family": "ZenOldMincho",
+    "weights": [
+      "500",
+      "700",
+      "900"
+    ]
+  },
+  "color": {
+    "bg": "#0A090B",
+    "card": "#141215",
+    "ink": "#F2EEEA",
+    "inkSoft": "#A8A0A0",
+    "inkFaint": "#5C5458",
+    "line": "#3A2E32",
+    "accent": "#E01E1E",
+    "accentSoft": "#3D0D0F",
+    "accentOnDark": "#FF3B3B",
+    "cool": "#A65CFF",
+    "coolSoft": "#2A1840",
+    "onAccent": "#FFFFFF"
+  },
+  "paper": {
+    "glow": "radial-gradient(ellipse at 50% 40%, rgba(120,10,16,0.28) 0%, rgba(10,9,11,0) 60%), radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.7) 100%)"
+  },
+  "glow": { "blur": 16 },
+  "film": {
+    "blur": 3,
+    "saturate": 0.55,
+    "grain": 0.22,
+    "scratches": 2,
+    "flicker": 0.08,
+    "vignette": 0.75
+  },
+  "words": {
+    "colors": ["#FF2A2A", "#B66BFF", "#5BE7FF"],
+    "size": 112,
+    "staggerFrames": 14
+  },
+  "dim": {
+    "title": 0.55,
+    "chapter": 0.65,
+    "stat": 0.6
+  },
+  "title": {
+    "topSize": 50,
+    "mainSize": 104,
+    "subSize": 44,
+    "left": 140,
+    "top": 300,
+    "barWidth": 300,
+    "accentDiscWhenNoFootage": false,
+    "accentDiscHighlight": "#FF5A5A",
+    "mainColor": "#FF2A2A"
+  },
+  "chapterCard": {
+    "labelFormat": "第{n}章",
+    "labelSize": 44,
+    "headingSize": 110,
+    "barWidth": 240,
+    "progressDots": true
+  },
+  "chapterTag": {
+    "left": 72,
+    "top": 56,
+    "size": 30,
+    "badge": 46,
+    "style": "brush"
+  },
+  "statCard": {
+    "valueSize": 260,
+    "unitSize": 96,
+    "labelSize": 46,
+    "countUpSeconds": 1
+  },
+  "pointsCard": {
+    "titleSize": 60,
+    "itemSize": 48,
+    "width": 1240,
+    "staggerFrames": 12
+  },
+  "footageCredit": {
+    "size": 22,
+    "right": 72,
+    "top": 62,
+    "left": 72,
+    "label": "映像："
+  },
+  "ending": {
+    "title": "ご視聴ありがとうございました",
+    "titleSize": 96,
+    "buttons": [
+      {
+        "icon": "💬",
+        "label": "コメント",
+        "atLine": 2
+      },
+      {
+        "icon": "👍",
+        "label": "高評価",
+        "atLine": 3
+      },
+      {
+        "icon": "🔔",
+        "label": "チャンネル登録",
+        "atLine": 3,
+        "accent": true
+      }
+    ],
+    "voiceCredit": "VOICEVOX:{speakerName}"
+  }
+}

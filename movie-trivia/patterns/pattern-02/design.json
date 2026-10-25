@@ -1,0 +1,125 @@
+{
+  "style": "future",
+  "hud": true,
+  "decorations": [
+    "背景：濃紺に細いグリッドと中央の青い光（paper）",
+    "ネオンの発光（glow）：順位・数字・強調の線",
+    "パネル：角を斜めに切ったカードと四隅のブラケット（panel）",
+    "タイトル画面：回転するリング・目盛り・走査線（title.hud）",
+    "順位カード：回転するリングの中に順位（1〜3位は金・銀・銅。chapterCard.medals）"
+  ],
+  "noDecorations": [
+    "動画全体にかかる走査線・ノイズ（字幕と映像が読みにくくなる）",
+    "グリッチで文字を崩す演出"
+  ],
+  "font": {
+    "family": "ZenKakuGothicNew",
+    "weights": [
+      "500",
+      "700",
+      "900"
+    ],
+    "display": "Orbitron"
+  },
+  "color": {
+    "bg": "#060B1B",
+    "card": "#0D1A33",
+    "ink": "#EAF4FF",
+    "inkSoft": "#8EA3C2",
+    "inkFaint": "#4D6283",
+    "line": "#1E3557",
+    "accent": "#29E3FF",
+    "accentSoft": "#0F3A52",
+    "accentOnDark": "#29E3FF",
+    "cool": "#FF3DBE",
+    "coolSoft": "#4A1240",
+    "onAccent": "#04121F"
+  },
+  "paper": {
+    "grid": { "color": "rgba(41,227,255,0.07)", "size": 64 },
+    "glow": "radial-gradient(ellipse at 50% 42%, rgba(41,140,255,0.22) 0%, rgba(6,11,27,0) 62%)"
+  },
+  "glow": { "blur": 14 },
+  "panel": { "cut": 22, "fill": "#0B1730" },
+  "dim": {
+    "title": 0.6,
+    "chapter": 0.65,
+    "stat": 0.6
+  },
+  "title": {
+    "topSize": 50,
+    "mainSize": 104,
+    "subSize": 44,
+    "left": 140,
+    "top": 300,
+    "barWidth": 300,
+    "accentDiscWhenNoFootage": false,
+    "accentDiscHighlight": "#FFB25B",
+    "hud": true,
+    "tag": "RANKING"
+  },
+  "chapterCard": {
+    "style": "rank",
+    "labelFormat": "第{n}位",
+    "labelSize": 44,
+    "headingSize": 100,
+    "barWidth": 240,
+    "progressDots": true,
+    "badgeSize": 360,
+    "badgeLabel": "RANK",
+    "medals": { "1": "#FFD23F", "2": "#C8D6EA", "3": "#FF9A4D" }
+  },
+  "chapterTag": {
+    "left": 72,
+    "top": 56,
+    "size": 30,
+    "badge": 46,
+    "format": "{n}位"
+  },
+  "statCard": {
+    "valueSize": 260,
+    "unitSize": 96,
+    "labelSize": 46,
+    "countUpSeconds": 1
+  },
+  "pointsCard": {
+    "titleSize": 60,
+    "itemSize": 48,
+    "width": 1240,
+    "staggerFrames": 12
+  },
+  "board": {
+    "title": "RANKING",
+    "hidden": "？？？",
+    "rowSize": 42
+  },
+  "footageCredit": {
+    "size": 22,
+    "right": 72,
+    "top": 62,
+    "label": "映像："
+  },
+  "ending": {
+    "title": "ご視聴ありがとうございました",
+    "titleSize": 96,
+    "buttons": [
+      {
+        "icon": "💬",
+        "label": "コメント",
+        "atLine": 2
+      },
+      {
+        "icon": "👍",
+        "label": "高評価",
+        "atLine": 3
+      },
+      {
+        "icon": "🔔",
+        "label": "チャンネル登録",
+        "atLine": 3,
+        "accent": true
+      }
+    ],
+    "voiceCredit": "VOICEVOX:{speakerName}"
+  }
+}

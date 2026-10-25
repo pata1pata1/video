@@ -1,0 +1,7 @@
+{
+  "bgm": null,
+  "bgmNote": "BGMなし。使う場合は台本に \"bgm\": { \"file\": \"bgm/<name>.mp3\", \"belowVoiceDb\": 18 } を書けば共通の書き出し処理が混ぜる",
+  "belowVoiceDb": 18,
+  "sfx": null,
+  "sfxNote": "効果音なし"
+}

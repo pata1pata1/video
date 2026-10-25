@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, Img, staticFile } from "remotion";
+import { AbsoluteFill, Img, random, staticFile } from "remotion";
 import { PATTERN } from "./pattern";
 import { mediaFor, SCRIPT, videoFrameFile } from "./timeline";
 import { font } from "./theme";
@@ -15,7 +15,7 @@ const outlined = (size: number, fill: string, stroke: number): React.CSSProperti
   color: fill,
   WebkitTextStroke: `${stroke}px ${C.outline}`,
   paintOrder: "stroke fill",
-  textShadow: "0 8px 18px rgba(0,0,0,0.6)",
+  textShadow: L.textGlow ? `${L.textGlow}, 0 8px 18px rgba(0,0,0,0.6)` : "0 8px 18px rgba(0,0,0,0.6)",
   whiteSpace: "nowrap",
   lineHeight: 1.12,
 });
@@ -37,6 +37,7 @@ export const Thumbnail: React.FC<{ variant: string }> = ({ variant }) => {
     <AbsoluteFill style={{ backgroundColor: "#111" }}>
       {src ? <Img src={staticFile(src)} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: def.imagePosition ?? "center" }} /> : null}
       <AbsoluteFill style={{ background: L.shade.gradient }} />
+      {L.splatter ? <Splatter count={L.splatter.count} color={L.splatter.color} /> : null}
       <div style={{ position: "absolute", left: L.left, top: L.ribbon.top }}>
         <div
           style={{
@@ -59,7 +60,7 @@ export const Thumbnail: React.FC<{ variant: string }> = ({ variant }) => {
               {l}
             </div>
           ))}
-          <div style={{ ...outlined(def.accent.length > A.longOver ? A.sizeIfLong : A.size, C.yellow, A.outline), marginTop: 4 }}>{def.accent}</div>
+          <div style={{ ...outlined(def.accent.length > A.longOver ? A.sizeIfLong : A.size, C.accentWord ?? C.yellow, A.outline), marginTop: 4 }}>{def.accent}</div>
         </div>
       </div>
       {def.badge ? (
@@ -86,7 +87,7 @@ export const Thumbnail: React.FC<{ variant: string }> = ({ variant }) => {
           }}
         >
           <div style={{ fontSize: B.topSize }}>{def.badge.top}</div>
-          <div style={{ fontSize: def.badge.big.length > B.bigLongOver ? B.bigSizeIfLong : B.bigSize, color: C.yellow }}>{def.badge.big}</div>
+          <div style={{ fontSize: def.badge.big.length > B.bigLongOver ? B.bigSizeIfLong : B.bigSize, color: C.badgeBig ?? C.yellow }}>{def.badge.big}</div>
           {def.badge.bottom ? <div style={{ fontSize: B.bottomSize }}>{def.badge.bottom}</div> : null}
         </div>
       ) : null}
@@ -111,3 +112,32 @@ export const Thumbnail: React.FC<{ variant: string }> = ({ variant }) => {
     </AbsoluteFill>
   );
 };
+
+/** Small red specks scattered near the edges (never over the middle, where the text and the face are). */
+const Splatter: React.FC<{ count: number; color: string }> = ({ count, color }) => (
+  <AbsoluteFill>
+    {Array.from({ length: count }, (_, i) => {
+      const edge = random(`e${i}`);
+      const along = random(`a${i}`) * 100;
+      const depth = random(`d${i}`) * 14;
+      // left, right, top or bottom band
+      const pos = edge < 0.3 ? { left: `${depth}%`, top: `${along}%` } : edge < 0.6 ? { right: `${depth}%`, top: `${along}%` } : edge < 0.8 ? { top: `${depth}%`, left: `${along}%` } : { bottom: `${depth}%`, left: `${along}%` };
+      const size = 3 + random(`s${i}`) ** 3 * 22;
+      return (
+        <div
+          key={i}
+          style={{
+            position: "absolute",
+            ...pos,
+            width: size,
+            height: size * (0.7 + random(`h${i}`) * 0.6),
+            borderRadius: "50%",
+            background: color,
+            opacity: 0.55 + random(`o${i}`) * 0.4,
+            filter: size > 12 ? "blur(0.6px)" : undefined,
+          }}
+        />
+      );
+    })}
+  </AbsoluteFill>
+);

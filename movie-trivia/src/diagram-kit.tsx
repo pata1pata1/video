@@ -1,6 +1,6 @@
 import React from "react";
 import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
-import { color, font, SUBTITLE_AREA, VIDEO } from "./theme";
+import { color, font, paper, SUBTITLE_AREA, VIDEO } from "./theme";
 
 /**
  * Shared parts for a video's explanatory diagrams (src/videos/<id>/diagrams.tsx),
@@ -38,7 +38,7 @@ export function useSteps(steps: StepFrames) {
 }
 
 export const Svg: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <AbsoluteFill style={{ backgroundColor: color.bg }}>
+  <AbsoluteFill style={paper}>
     <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ position: "absolute", left: 0, top: 0 }}>
       {children}
     </svg>
