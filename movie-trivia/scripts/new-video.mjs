@@ -125,6 +125,8 @@ create(
 映像（Pexels）
 ・
 
+（ハッシュタグ5〜8個。最初の3つがタイトルの上に出る）
+
 ## 確認待ち
 - Pexels素材の rightsStatus はすべて \`unknown\`（人が元ページを確認する）
 
