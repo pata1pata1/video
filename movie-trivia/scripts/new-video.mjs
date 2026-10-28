@@ -1,6 +1,6 @@
 // Starts a new video from a pattern, or switches src/ back to an existing one.
 //
-//   node scripts/new-video.mjs --id=<id> --pattern=pattern-01
+//   node scripts/new-video.mjs --id=<id> --pattern=pattern-03
 //     script/<id>.json            from patterns/<pattern>/script-template.json
 //     public/media/<id>/          sources.json {} and frames.json {}
 //     public/audio/<id>/          narration.json placeholder (build-narration.mjs replaces it)
@@ -68,9 +68,9 @@ if (switchId) {
 }
 
 const id = opt("id");
-const pattern = opt("pattern") ?? "pattern-01";
+const pattern = opt("pattern") ?? "pattern-03";
 if (!id || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(id)) {
-  console.error("Usage: node scripts/new-video.mjs --id=<id: lowercase-with-hyphens> [--pattern=pattern-01]\n       node scripts/new-video.mjs --switch=<id>");
+  console.error("Usage: node scripts/new-video.mjs --id=<id: lowercase-with-hyphens> [--pattern=pattern-03]\n       node scripts/new-video.mjs --switch=<id>");
   process.exit(1);
 }
 const patternDir = path.join(ROOT, "patterns", pattern);

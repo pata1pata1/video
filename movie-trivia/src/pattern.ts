@@ -1,11 +1,6 @@
 // The look, pacing and voice credit fixed by the script's pattern
 // (patterns/<pattern>/*.json). Add an entry here when a new pattern is made.
 import { script } from "./current";
-import config01 from "../patterns/pattern-01/config.json";
-import design01 from "../patterns/pattern-01/design.json";
-import subtitle01 from "../patterns/pattern-01/subtitle.json";
-import thumbnail01 from "../patterns/pattern-01/thumbnail.json";
-import voice01 from "../patterns/pattern-01/voice.json";
 import config02 from "../patterns/pattern-02/config.json";
 import design02 from "../patterns/pattern-02/design.json";
 import subtitle02 from "../patterns/pattern-02/subtitle.json";
@@ -17,8 +12,11 @@ import subtitle03 from "../patterns/pattern-03/subtitle.json";
 import thumbnail03 from "../patterns/pattern-03/thumbnail.json";
 import voice03 from "../patterns/pattern-03/voice.json";
 
-/** Settings only some patterns have (pattern-01 has none of them). */
-type Design = typeof design01 & {
+/** The settings every pattern has: keys found in both A and B, nested. */
+type Common<A, B> = A extends readonly unknown[] ? A : A extends object ? (B extends object ? { [K in keyof A & keyof B]: Common<A[K], B[K]> } : A) : A;
+
+/** Settings only some patterns have. */
+type Design = Common<typeof design02, typeof design03> & {
   /** Text on accent fills (dark for bright neon colors). */
   color: { onAccent?: string };
   /** Font for numbers and Latin labels (Orbitron). */
@@ -45,21 +43,20 @@ type Design = typeof design01 & {
   board?: { title: string; hidden: string; rowSize: number };
 };
 type Pattern = {
-  config: typeof config01;
+  config: Common<typeof config02, typeof config03>;
   design: Design;
-  subtitle: typeof subtitle01 & { border?: string; shadow?: string };
-  thumbnail: typeof thumbnail01 & {
+  subtitle: Common<typeof subtitle02, typeof subtitle03> & { border?: string; shadow?: string };
+  thumbnail: Common<typeof thumbnail02, typeof thumbnail03> & {
     /** Accent word and badge number colors (yellow if not set); a glow on the text; red specks. */
     color: { accentWord?: string; badgeBig?: string };
     layout: { textGlow?: string; splatter?: { count: number; color: string } };
   };
-  voice: typeof voice01;
+  voice: Common<typeof voice02, typeof voice03>;
 };
 
 const PATTERNS: Record<string, Pattern> = {
-  "pattern-01": { config: config01, design: design01, subtitle: subtitle01, thumbnail: thumbnail01, voice: voice01 },
-  "pattern-02": { config: config02 as Pattern["config"], design: design02, subtitle: subtitle02, thumbnail: thumbnail02, voice: voice02 },
-  "pattern-03": { config: config03 as Pattern["config"], design: design03, subtitle: subtitle03, thumbnail: thumbnail03, voice: voice03 },
+  "pattern-02": { config: config02, design: design02, subtitle: subtitle02, thumbnail: thumbnail02, voice: voice02 },
+  "pattern-03": { config: config03, design: design03, subtitle: subtitle03, thumbnail: thumbnail03, voice: voice03 },
 };
 
 const id = (script as { pattern?: string }).pattern;

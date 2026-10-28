@@ -12,7 +12,7 @@ const readJson = (file) => JSON.parse(fs.readFileSync(file, "utf8"));
 
 export function loadVideo(scriptId) {
   const script = readJson(path.join(ROOT, "script", `${scriptId}.json`));
-  if (!script.pattern) throw new Error(`script/${scriptId}.json has no "pattern" (e.g. "pattern-01")`);
+  if (!script.pattern) throw new Error(`script/${scriptId}.json has no "pattern" (e.g. "pattern-03")`);
   const dir = path.join(ROOT, "patterns", script.pattern);
   if (!fs.existsSync(dir)) throw new Error(`unknown pattern ${script.pattern} (no ${path.relative(ROOT, dir)})`);
   const voiceDef = readJson(path.join(dir, "voice.json"));
