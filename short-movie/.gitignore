@@ -12,3 +12,14 @@ samples/**/*.webp
 samples/**/*.psd
 samples/**/*.prproj
 analysis/**/frames/
+
+# こちらで制作する動画・テンプレート：生成物と共用 node_modules（ジャンクション）は git 管理外
+node_modules
+productions/**/public/images/
+productions/**/public/audio/
+productions/**/frames/
+productions/**/out/
+templates/**/public/images/
+templates/**/public/audio/
+templates/**/frames/
+templates/**/out/

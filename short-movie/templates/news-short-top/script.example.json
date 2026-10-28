@@ -1,0 +1,22 @@
+{
+  "id": "<案件ID>",
+  "voice": { "speaker": 13, "name": "青山龍星（ノーマル）", "speedScale": 1.12 },
+  "sentenceGap": 0.4,
+  "captionColor": "#c8102e",
+  "pronunciation": {
+    "GMO": "ジーエムオー"
+  },
+  "sentences": [
+    { "cards": [
+      { "text": "最初の文の前半、", "image": "01.png" },
+      { "text": "後半です。" }
+    ]},
+    { "cards": [
+      { "text": "2つ目の文で画像を替える、", "image": "02.png" },
+      { "text": "長いテロップは手で改行する。", "caption": "長いテロップは\n手で改行する" }
+    ]}
+  ],
+  "motion": {
+    "01.png": { "zoom": [1.0, 1.04], "panX": [0, 0] }
+  }
+}
