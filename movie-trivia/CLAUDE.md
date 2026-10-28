@@ -12,12 +12,14 @@ YouTube向け解説・雑学動画（横1920×1080・30fps、VOICEVOXナレー�
 - 5本目「松屋の牛めし480円の中身を分解」（`gyudon-price`）：2026-10-13にYouTubeへ投稿済み。専用ファイルは削除済み（台本・投稿メモ・図解はコミット `c1b02aa` に残っている）。pattern-01、トレンドニュースを身近な疑問の解説にした初の動画。この動画で作ったサムネイルのデザイン（映像を全面に敷き、白の縁取り文字＋黄色の強調語＋赤い帯・丸バッジ）が pattern-01 の標準になった。
 - 6本目「猫13匹虐待事件と動物愛護法」（`cat-abuse-law`）：2026-10-22にYouTubeへ投稿済み。専用ファイルは削除済み（台本・投稿メモ・図解・専用サムネイルはコミット `5c6d434` に残っている）。pattern-01。Evaの傍聴記をもとに、警察庁・検察の統計と法改正を一次情報で確認した。実名と逮捕時の報道映像の静止画（クレジット「報道映像より」）を使った（ユーザーがリスクを承知で判断）。ユーザー提供のうち、判決後の別名とされる名前や確認できない主張が書かれた画像は使わなかった。サムネイルは pattern-01 のA〜Cに加え、動画専用の別デザイン3案（D 報道・ドキュメンタリー風／E シンプル・数字／F 猫が主役）を `src/videos/cat-abuse-law/thumbs.tsx` に独自のエントリーで作った（共通の Root は変えない）。`src/current.ts` はこの動画を指したままなので、次の動画を `new-video.mjs` で作るまで Studio・lint は動かない
 - 7本目「積水ハウス地面師詐欺事件」（`sekisui-jimenshi`）：2026-10-26にYouTubeへ投稿済み。pattern-03 の最初の動画。事実は積水ハウスの開示資料（2017・2018年）と総括検証報告書（2020年）で確認し、実名はウィキペディアの記事にある社長・会長だけを使った。専用ファイルは削除済み（台本・投稿メモ・図解はコミット `4aaf7ff` に残っている）
-- 8本目「福田和子事件（松山ホステス殺害事件）」（`fukuda-kazuko`）：2026-10-27にYouTubeへ投稿済み。pattern-03。事実は判決の報道（毎日新聞）・警察白書で確認し、実名はウィキペディアの記事にある本人だけを使った。本人の写真（手配カード・当時の新聞・報道映像）をネットから取得して使った（ユーザーがリスクを承知で判断）。専用ファイルは削除済み（台本・投稿メモ・図解はコミット `2fa8db5` に残っている）。`src/current.ts` はこの動画を指したままなので、次の動画を `new-video.mjs` で作るまで Studio・lint は動かない
-- パターン：`pattern-01`（シンプル解説・青山龍星）、`pattern-02`（ランキング・カウントダウン、近未来HUD・春日部つむぎ・BGMなし。2026-10-23作成）、`pattern-03`（事件解説・ダーク、結末→経緯、明朝と赤・古いフィルム調・光るキーワード、青山龍星。2026-10-25作成。暗いBGM `bgm/pattern-03-dark.mp3` は「空っぽのベビーベッド」written by ゆうり(Yuli Audio Craft)、OpenTracks（旧DOVA-SYNDROME））。pattern-02 で作った動画はまだない
+- 8本目「福田和子事件（松山ホステス殺害事件）」（`fukuda-kazuko`）：2026-10-27にYouTubeへ投稿済み。pattern-03。事実は判決の報道（毎日新聞）・警察白書で確認し、実名はウィキペディアの記事にある本人だけを使った。本人の写真（手配カード・当時の新聞・報道映像）をネットから取得して使った（ユーザーがリスクを承知で判断）。専用ファイルは削除済み（台本・投稿メモ・図解はコミット `2fa8db5` に残っている）
+- 9本目「GMO不正アクセス事件（お名前.com デスクトップクラウド）」（`gmo-desktop-cloud`）：2026-10-28にYouTubeへ投稿済み。pattern-03（最初は pattern-01 で作ったが、事件風で作り直した）。進行中の事件で判決がないため、10月28日朝時点の内容とし、事実はGMOの公式発表（第1〜12報）と代表のブログで確認した。実名は代表の熊谷正寿だけ。専用ファイルは削除済み（台本・投稿メモ・図解はコミット `a6b14d0` に残っている）。`src/current.ts` はこの動画を指したままなので、次の動画を `new-video.mjs` で作るまで Studio・lint は動かない
+- パターン：`pattern-02`（ランキング・カウントダウン、近未来HUD・春日部つむぎ・BGMなし。2026-10-23作成）、`pattern-03`（事件解説・ダーク、結末→経緯、明朝と赤・古いフィルム調・光るキーワード、青山龍星。2026-10-25作成。暗いBGM `bgm/pattern-03-dark.mp3` は「空っぽのベビーベッド」written by ゆうり(Yuli Audio Craft)、OpenTracks（旧DOVA-SYNDROME））。pattern-02 で作った動画はまだない
+- `pattern-01`（シンプル解説・青山龍星。3〜6本目で使用）は2026-10-28に削除した（ユーザー判断。「もうダメ」）。型のファイルは削除前のコミット（`06ab86c`）に残っている
 - `image/taiyo.mp4`（ユーザー提供・BEST建設現場の空撮）は元ファイルとして残している（Git管理外）
 - `bgm/パステルハウス.mp3` は残している（台本の`bgm`で指定すれば使える。クレジット「パステルハウス written by かずち」）
 
-## 新しい動画の作り方（「pattern-0Nを使用。テーマは〇〇。動画IDは〇〇。」と言われたら）
+## 新しい動画の作り方（「pattern-0Nを使用。テーマは〇〇。動画IDは〇〇。」と言われたら。パターンの指定がないニュース・事件のテーマは pattern-03）
 1. `node scripts/new-video.mjs --id=<id> --pattern=pattern-0N`（台本の雛形・素材フォルダ・図解ファイル・投稿メモを作り、`src/` をその動画に切り替える）
 2. テーマを一次情報で調べる（`common/production-rules.md`）。pattern-02 は順位を決める指標と出典、pattern-03 は確定判決の有無と実名・写真を使うか（ユーザーに確認）を最初に確かめる
 3. `patterns/<pattern>/README.md` の型に沿って `script/<id>.json` を書く（章・順位の数はテーマに合わせて決める。尺の目安は6〜8分）
@@ -46,7 +48,7 @@ frames/                     連番JPEG（中間ファイル、消してよい）
 ```
 
 ## コマンド（<id> は動画のキー）
-- 新しい動画：`node scripts/new-video.mjs --id=<id> --pattern=pattern-01`／既存の動画に戻す：`node scripts/new-video.mjs --switch=<id>`
+- 新しい動画：`node scripts/new-video.mjs --id=<id> --pattern=pattern-03`／既存の動画に戻す：`node scripts/new-video.mjs --switch=<id>`
 - 音声：VOICEVOXアプリを起動（`http://127.0.0.1:50021`）→ `node scripts/build-narration.mjs --script=<id> --dry-run`（読みの確認）→ `--dry-run` なしで生成（文ごとにキャッシュ）
 - Pexels：`node scripts/pexels.mjs candidates --script=<id> [--scene=<キー>] [--kind=video|photo] [--query="..."] [--per=9]` → `out/<id>/candidates/<キー>-<kind>.png`。採用は `node scripts/pexels.mjs pick --script=<id> --scene=<キー> --video=<pexels id>`（差し替えは `--force`）。動画は横長で長辺1280px以下の最大のファイル
 - 連番化：`node scripts/prepare-media.mjs --script=<id>`（往復ループ。台本の media キーの素材は最大20秒分）
