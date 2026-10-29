@@ -23,3 +23,5 @@ templates/**/public/images/
 templates/**/public/audio/
 templates/**/frames/
 templates/**/out/
+productions/**/public/video/
+productions/**/materials/

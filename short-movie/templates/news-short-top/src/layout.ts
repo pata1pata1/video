@@ -22,3 +22,10 @@ export const PANEL = { left: 110, top: 344, width: 860, height: 1512 };
 
 /** ズームの上限。これ以上は画像内の文字が切れやすい。 */
 export const MAX_ZOOM = 1.04;
+
+/**
+ * 映像パネル型（script.json に "clips" があるとき）：画像の代わりに素材動画を流す。
+ * 完成画像の枠（字幕枠・画像パネル）をコードで描く。STYLE.md の画像枠と同じ値（ai-live-20261029）。
+ */
+export const VIDEO_BAND_BOX = { left: 44, top: 45, width: 992, height: 250 };
+export const VIDEO_PANEL = { left: 107, top: 330, width: 866, height: 1545 };

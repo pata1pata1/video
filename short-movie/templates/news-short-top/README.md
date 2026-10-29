@@ -19,6 +19,18 @@
 - 画像パネル（字幕帯の下の枠）の内側がズームする範囲。パネルの端から 20px 以内に文字を置かない（ズーム 1.04倍で切れる）
 - パネルの位置が gmo-20261028 と違うときは、`script.json` に `"panel": {"left":…, "top":…, "width":…, "height":…}` を書く
 
+## 映像パネル型（素材が動画のとき）
+画像の代わりに素材動画をパネルの中で流す（最初の動画：ai-live-20261029、AIライブ配信の現場、2026-10-29）。
+`script.json` に `clips` を書くとこの形になり、字幕枠・パネルの枠・下の説明文（`footer`）はコードで描く（値は `src/layout.ts` の `VIDEO_*`）。
+- 素材は H.264 に変換して `public/video/` に置く（HEVC はそのままでは再生できない。元の音は消す）：
+  `ffmpeg -i 素材.mp4 -an -c:v libx264 -crf 14 -pix_fmt yuv420p -g 30 public/video/source.mp4`
+- `"video": {"src": "source.mp4", "width": 素材の幅, "height": 素材の高さ}`（パネルの高さに合わせて拡大し、左右を切る）
+- 札の `"image"` には `clips` の名前を書く。`clips` の1つ＝1場面：
+  - `{"from": 7.2, "to": 8.9, "x": 50}` … 素材の 7.2〜8.9 秒を場面の長さに合わせて再生（スロー／早送りは自動）。`x` は左右の切り位置（%）
+  - `{"still": "live-386.jpg", "zoom": [1.0, 1.7], "origin": [60, 26]}` … 止め画（`public/video/`）を `origin`（素材の横・縦 %）に向かってズーム。数字などを見せるとき
+  - `zoom` を書かなければ 1.00〜1.04倍のゆっくりズーム
+- 素材より台本が長いときは、スロー（0.4倍くらいまで）と同じ区間の使い回しで合わせる。ピンぼけ・カメラ移動中の区間は避ける
+
 ## 新しい動画の作り方
 1. コピー：`cp -r templates/news-short-top productions/<id>`（`public/` の中身・`node_modules` はコピーしない）
 2. Remotion を使えるようにする（movie-trivia の node_modules を共用。movie-trivia 側は変更しない）：
@@ -35,7 +47,7 @@
 ## ファイル
 ```
 src/layout.ts        字幕帯・字幕中心・パネル・ズーム上限（標準値）
-src/Short.tsx        画像（パネル内だけズーム・クロスフェード）＋テロップ（上部固定・最大2行・ポップイン）
+src/Short.tsx        画像（パネル内だけズーム・クロスフェード）／映像パネル型（clips）＋テロップ（上部固定・最大2行・ポップイン）
 scripts/build-narration.mjs  VOICEVOX で文ごとに合成、テロップの開始時刻をモーラ長から計算 → public/audio/
 scripts/encode.sh    連番JPEG＋ナレーション → out/<フォルダ名>.mp4
 script.example.json  台本の雛形
