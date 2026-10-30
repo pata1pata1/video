@@ -28,9 +28,9 @@
 - 画像は制作時点から上部の字幕帯（上から60〜300px）を空けて作る。字幕は全カット X=540・Y=175 に固定し、画像ごとに動かさない
 - 画像の文字・数字・日付は公式発表などの一次情報と照らし、事実と違えば報告する。攻撃者・犯人側の主張と確認済みの事実を混同しない
 - テンプレート自体は案件の都合で直さない。型を変えるときは `STYLE.md` とテンプレートを一緒に直す
-- Remotion は今 `../movie-trivia/node_modules` をジャンクションで共用している（movie-trivia のファイルは変更しない）。**この依存は解消する（2026-10-30決定）**：最終形は `short-movie → engine.mjs → 共通remotion（../../remotion のNode API／実行環境）`。自前でRemotionをインストールしない
-  - **制作中の `productions/robot-ai-20261030` には触らず、今の方式（ジャンクション）のまま完成させる**
-  - 共通remotion側の準備ができるまでは、新しい production も今の方式で作る
+- Remotion は **共通remotionの実行環境**を使う（2026-10-30、Phase 2-0）：`short-movie → scripts/lib/engine.mjs → 共通remotion（../../remotion のNode API／実行環境）`。描画は `node scripts/render.mjs --production=<id>`（連番）／`--still=<png> --frame=N`（代表コマ）。自前でRemotionをインストールしない。**新しい production に `node_modules` を作らない・`../movie-trivia/node_modules` へのジャンクションを張らない**
+  - **例外：制作中の `productions/robot-ai-20261030` には触らず、今の方式（ジャンクション）のまま完成させる**（`render.mjs` は `node_modules` がある production を拒否する）。この案件の cleanup でジャンクションを外す（リンクだけを外し、中身は消さない）までは、movie-trivia の `node_modules` を消せない
+  - `sm-engine-test` はジャンクションを外し、共通remotionで描画して Phase 0 と241コマ・MP4ともバイト一致
 
 ## 共通remotionとの関係（2026-10-30決定、恒久方針）
 - `../../remotion` を共通の動画制作エンジンとして使う（`../../remotion/docs/video-platform-architecture.md` の13章）。VOICEVOX・WAV・FFmpeg/ffprobe・音量・字幕・project管理・cleanup・書き出し基盤は remotion の core を使い、このフォルダで新しく独自実装しない。移行計画は `../../remotion/docs/video-migration-plan.md` の **Phase 3**

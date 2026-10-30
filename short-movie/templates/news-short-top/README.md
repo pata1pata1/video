@@ -32,16 +32,16 @@
 - 素材より台本が長いときは、スロー（0.4倍くらいまで）と同じ区間の使い回しで合わせる。ピンぼけ・カメラ移動中の区間は避ける
 
 ## 新しい動画の作り方
-1. コピー：`cp -r templates/news-short-top productions/<id>`（`public/` の中身・`node_modules` はコピーしない）
-2. Remotion を使えるようにする（movie-trivia の node_modules を共用。movie-trivia 側は変更しない）：
-   PowerShell（short-movie で実行）：`New-Item -ItemType Junction -Path productions\<id>\node_modules -Target C:\Users\info\Projects\video\movie-trivia\node_modules`
+1. コピー：`cp -r templates/news-short-top productions/<id>`（`public/` の中身はコピーしない）
+2. Remotion は共通remotion（`../../remotion`）の実行環境を、short-movie 直下の `scripts/render.mjs` から使う（2026-10-30〜）。production に `node_modules` を作らない・movie-trivia へのジャンクションを張らない
 3. 画像を `public/images/` に置く（ファイル名は自由。`01.png` など）
 4. `script.example.json` を `script.json` にして台本を書く：文ごとに `cards`（テロップ1枚＝1フレーズ）、画像を替える札に `"image"`、
    読み替えは `pronunciation`、2行にしたいテロップは `"caption"` に `\n` で改行（「、」「。」は自動で消える）
 5. VOICEVOX を起動 → `node scripts/build-narration.mjs --dry-run`（読みの確認）→ `node scripts/build-narration.mjs`
-6. 代表コマの確認：`node_modules/.bin/remotion still src/index.ts Short <png> --frame=N`（画像ごとに最大ズームのコマと2行テロップのコマ）
-7. 書き出し：`node_modules/.bin/remotion render src/index.ts Short frames --sequence --muted --image-format=jpeg --jpeg-quality=95`
-   → `bash scripts/encode.sh`（`out/<id>.mp4`、声のみ・-14 LUFS）
+6. 代表コマの確認（short-movie で実行）：`node scripts/render.mjs --production=<id> --still=<png> --frame=N [--frame=M …]`（画像ごとに最大ズームのコマと2行テロップのコマ）
+7. 書き出し（short-movie で実行）：`node scripts/render.mjs --production=<id>`（無音の連番JPEG → `productions/<id>/frames/`。作り直しは `--force`）
+   → `bash productions/<id>/scripts/encode.sh`（`out/<id>.mp4`、声のみ・-14 LUFS）
+   - Studio（`npm run dev`）は production に Remotion が無いので使えない。確認は手順6の静止画で行う
 8. 確認：全場面のコマを抜き出して字幕位置・文字切れを見る／faster-whisper で字幕と声のズレを測る／尺・音量
 
 ## ファイル

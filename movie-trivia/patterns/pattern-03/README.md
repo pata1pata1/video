@@ -48,7 +48,7 @@ movie-trivia 全体の制作ルール（事実確認・出典・素材確認・�
 | `{ "title": true, "footage": "<キー>" }` | タイトル画面 |
 | `{ "footage": "<キー>" }` | 映像を全画面表示（クレジット付き） |
 | `{ "stat": { "value", "unit", "label" }, "footage": "<キー>" }` | 数字カード（footage があれば映像に重ねる） |
-| `{ "diagram": "<名前>", "step": n }` | 図解（`src/videos/<id>/diagrams.tsx` に動画ごとに作る） |
+| `{ "diagram": "<名前>", "step": n }` | 図解（`<id>/input/diagrams.tsx` に動画ごとに作る） |
 | `{ "points": { "title": "...", "items": [...] } }` | 箇条書きカード |
 
 加えて：
@@ -67,7 +67,7 @@ movie-trivia 全体の制作ルール（事実確認・出典・素材確認・�
 
 ## 図解の作り方
 
-図解の中身は動画ごとに `src/videos/<id>/diagrams.tsx` に書く（共通の部品は `src/diagram-kit.tsx`：`useSteps`・`Svg`・`T`・`Card`）。背景は黒に赤い光、文字は白の明朝。配色は `color.accent`（赤）と `color.cool`（紫）だけを使う。時系列（日付と出来事）と人物関係の図が向いている。
+図解の中身は動画ごとに `<id>/input/diagrams.tsx` に書く（共通の部品は `src/diagram-kit.tsx`：`useSteps`・`Svg`・`T`・`Card`）。背景は黒に赤い光、文字は白の明朝。配色は `color.accent`（赤）と `color.cool`（紫）だけを使う。時系列（日付と出来事）と人物関係の図が向いている。
 
 ## 動画ごとに決めること（パターンでは決めない）
 

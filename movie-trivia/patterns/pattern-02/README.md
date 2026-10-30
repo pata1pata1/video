@@ -47,7 +47,7 @@ movie-trivia 全体の制作ルール（事実確認・出典・素材確認・�
 | `{ "title": true, "footage": "<キー>" }` | タイトル画面 |
 | `{ "footage": "<キー>" }` | 映像を全画面表示（クレジット付き） |
 | `{ "stat": { "value", "unit", "label" }, "footage": "<キー>" }` | 数字カード（footage があれば映像に重ねる） |
-| `{ "diagram": "<名前>", "step": n }` | 図解（`src/videos/<id>/diagrams.tsx` に動画ごとに作る） |
+| `{ "diagram": "<名前>", "step": n }` | 図解（`<id>/input/diagrams.tsx` に動画ごとに作る） |
 | `{ "points": { "title": "...", "items": [...] } }` | 箇条書きカード |
 
 加えて：
@@ -64,11 +64,11 @@ HUDの部品は `src/hud.tsx`（`Box`＝角を切ったパネル、`Brackets`、
 
 ## 図解の作り方
 
-図解の中身は動画ごとに `src/videos/<id>/diagrams.tsx` に書く（共通の部品は `src/diagram-kit.tsx`：`useSteps`・`Svg`・`T`・`Card`）。背景は濃紺のグリッドになり、`Card` は濃紺、文字は白になる。配色は `color.accent`（シアン）と `color.cool`（マゼンタ）だけを使う。
+図解の中身は動画ごとに `<id>/input/diagrams.tsx` に書く（共通の部品は `src/diagram-kit.tsx`：`useSteps`・`Svg`・`T`・`Card`）。背景は濃紺のグリッドになり、`Card` は濃紺、文字は白になる。配色は `color.accent`（シアン）と `color.cool`（マゼンタ）だけを使う。
 
 ## チャプター
 
-`node scripts/chapters.mjs --script=<id>` は「第10位 見出し」の形で出す。
+`node scripts/mt.mjs chapters --project=<id>` は「第10位 見出し」の形で出す。
 
 ## 動画ごとに決めること（パターンでは決めない）
 

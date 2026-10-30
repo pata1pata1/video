@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "type": "movie-trivia",
+  "name": "mt-engine-test",
+  "created": "2026-10-30T10:28:23.897Z",
+  "status": "active",
+  "locked": false,
+  "published": false
+}

@@ -1,0 +1,44 @@
+{
+  "id": "mt-engine-test",
+  "pattern": "pattern-03",
+  "title": "共通エンジン移行テスト",
+  "titleTop": "移行テスト",
+  "titleMain": "エンジン移行テスト",
+  "titleSub": "基準を記録する短い動画",
+  "pronunciation": {},
+  "media": {
+    "hook1": { "query": "city night rain" },
+    "c1": { "query": "old typewriter" }
+  },
+  "scenes": [
+    {
+      "id": "opening",
+      "kind": "opening",
+      "lines": [
+        { "id": "o1", "visual": { "title": true, "footage": "hook1" }, "text": "これは共通エンジンへの移行を確かめるための、短いテスト動画です。" },
+        { "id": "o2", "visual": { "footage": "hook1", "words": ["移行テスト", "基準の記録"] }, "text": "今の手順で作った結果を、基準として記録します。" }
+      ]
+    },
+    {
+      "id": "c1",
+      "kind": "chapter",
+      "number": 1,
+      "heading": "比べる項目",
+      "footage": "c1",
+      "lines": [
+        { "id": "c1a", "text": "最初に、音声と字幕の時刻を比べます。" },
+        { "id": "c1b", "visual": { "footage": "c1", "words": ["音声", "連番画像", "音量"] }, "text": "次に、連番画像と完成した動画の音量を比べます。" }
+      ]
+    },
+    {
+      "id": "ending",
+      "kind": "ending",
+      "lines": [
+        { "id": "e1", "text": "テストは以上です。" }
+      ]
+    }
+  ],
+  "thumbnails": [
+    { "id": "A", "photo": "hook1", "ribbon": "テスト", "lines": ["移行テスト"], "accent": "基準", "small": "公開しない動画" }
+  ]
+}

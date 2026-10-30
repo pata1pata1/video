@@ -7,10 +7,10 @@
 
 ## 作り直す手順（今の方式）
 
-1. `node_modules` を `../../../movie-trivia/node_modules` へのジャンクションにする（今の方式。Phase 3 で共通remotionへ移す）
+1. `node_modules` は作らない（2026-10-30 の Phase 2-0 でジャンクションを外し、共通remotionの実行環境に移した）
 2. 画像（1080×1920 のテストパターン）：
    - `ffmpeg -f lavfi -i "testsrc2=s=1080x1920:d=1" -frames:v 1 public/images/01.png`
    - `ffmpeg -f lavfi -i "smptehdbars=s=1080x1920:d=1" -frames:v 1 public/images/02.png`
 3. VOICEVOX ENGINE（0.25.2）を起動して `node scripts/build-narration.mjs`
-4. `node_modules/.bin/remotion render src/index.ts Short frames --sequence --muted --image-format=jpeg --jpeg-quality=95`
+4. short-movie で `node scripts/render.mjs --production=sm-engine-test --force`（共通remotionのNode API。Phase 0 の CLI 出力と241コマ・MP4ともバイト一致を確認済み）
 5. `bash scripts/encode.sh` → `out/sm-engine-test.mp4`
