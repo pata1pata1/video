@@ -6,7 +6,7 @@
 
 ## 最重要ルール
 
-- **元動画は変更・削除しない**（`projects/<id>/input/` の動画は読み取りのみ。移動・上書き・属性変更もしない）
+- **制作中は元動画を変更・削除しない**（`projects/<id>/input/` の動画は読み取りのみ。移動・上書き・属性変更もしない）。削除してよいのは、公開後のcleanup（下記）でユーザーが承認したときだけ
 - **いきなり自動でカットしない**。候補を出す → ユーザーが確認 → `input/decisions.json`（承認済み）→ 編集、の順
 - 承認ファイル（`input/decisions.json`・`input/glossary.json`）は **CLI 経由で書く**（`npm run decide`・`npm run glossary`）。JSON を直接書き換えない
 - ユーザーの明示的な指示が無い限り、候補を承認しない（「提案どおりでいい」と言われたら `--cut-suggested`）
@@ -15,7 +15,23 @@
 
 ## 環境（Windows、2026-10-09）
 
-- remotion の共通基盤（`../../remotion/src/core/media`・`core/speech`）を `src/engine.ts` から import している。コピーしない
+- remotion の共通基盤（`../../remotion/src/core/media`・`core/speech`）を `src/engine.ts` から import している。コピーしない。Remotion の描画（字幕PNG）も `../../remotion/node_modules` を Node API で使う（自前でインストールしない）
+
+## 共通remotionとの関係（2026-10-30決定、恒久方針）
+
+- `../../remotion` は全動画プロジェクト共通の動画制作エンジン（`../../remotion/docs/video-platform-architecture.md` の13章）。ffmpeg/ffprobe・音量・STT・Remotionの描画・project管理（lifecycle・cleanup）は core を使い、ここで新しく独自実装しない。remotion への入口は `src/engine.ts`（と `src/render.ts`）だけ
+- 移行計画は `../../remotion/docs/video-migration-plan.md` の **Phase 5**（render の Node API・2パスの音量・faster-whisper を core 側へ、published・cleanup を core の lifecycle へ）。**それまでは今のまま使う**
+- **このツール固有として残す（安易に共通化しない）**：文字起こし後のカット候補・承認（`decisions.json`）・固有名詞辞書・quotes・字幕案と承認・焼き込みの判断・編集スタイルの学習（`style-data/`・reference）
+- **type名**：正式名は **`talk-subtitle`**。既存の `project.json` にある `"type": "human-video-editor"` は旧名称（互換alias）。いきなり書き換えない。Phase 5 でフォルダ名・プロジェクト名・type名を `talk-subtitle` にそろえる
+- このツールは**横長専用**。縦型ショート（`../short-movie`）とは混ぜない
+- 移行の基準データ（`talking-test-01` の字幕静止画など）は `../../remotion/docs/migration/phase0-baselines.md`。`review/subtitle-design/phase0-baseline/` はその元データ
+
+## 公開後のcleanup（全動画プロジェクト共通、2026-10-30）
+
+- video配下を完成動画の保存庫にしない。アップロードと再生確認が終わったら、その動画固有の制作物（`projects/<id>/` の元動画・音声・中間生成物・確認用動画・完成MP4・その案件の承認ファイルや固有名詞辞書など）を毎回削除する
+- 手順：①削除対象の一覧 → ②削除後に残るもの → ③ユーザー確認 → ④承認後に削除（自動で即削除しない）
+- 残すもの：コード・`docs/`・`python/`・`remotion/`・共通辞書（`_shared/glossary.json`）・字幕プリセット（`_shared/subtitle-presets`）・学習データ（`style-data/`）・CLAUDE.md。学習に使う案件は、`npm run style -- observe` や reference の結果を `style-data/` に記録してから消す
+- 共通の対象一覧は `../../remotion/docs/video-migration-plan.md` の「cleanupの対象」。`talking-test-01` は Phase 5 の移行確認の入力にもなるので、cleanup する前に Phase 5 まで残すかを決める
 - この PC は **Smart App Control（アプリ制御）が有効**で、署名のない exe はブロックされる（`0xC0E90002`／"An Application Control policy has blocked this file"）
   - ffprobe：remotion 同梱版はブロックされる → winget の `Gyan.FFmpeg`（ユーザー領域）を入れ、ユーザー環境変数 **`FFPROBE_PATH`** で指定済み（新しく開いたターミナルから有効）
   - whisper.cpp と PyAV の DLL もブロックされる → **Windows の文字起こしは faster-whisper**（`.venv`、`python/fw_transcribe.py`、PyAV は読み込まない。docs/design.md の11章）。**Smart App Control の設定は変更しない・提案しない**

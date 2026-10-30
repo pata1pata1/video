@@ -1,0 +1,20 @@
+{
+  "id": "sm-engine-test",
+  "voice": { "speaker": 13, "name": "青山龍星（ノーマル）", "speedScale": 1.12 },
+  "sentenceGap": 0.4,
+  "captionColor": "#c8102e",
+  "pronunciation": {},
+  "sentences": [
+    { "cards": [
+      { "text": "これは共通エンジンへの移行を確かめる、", "image": "01.png" },
+      { "text": "短いテスト動画です。" }
+    ]},
+    { "cards": [
+      { "text": "今の手順で作った結果を、", "image": "02.png" },
+      { "text": "基準として記録します。", "caption": "基準として\n記録します" }
+    ]}
+  ],
+  "motion": {
+    "01.png": { "zoom": [1.0, 1.04], "panX": [0, 0] }
+  }
+}

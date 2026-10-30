@@ -28,10 +28,20 @@
 - 画像は制作時点から上部の字幕帯（上から60〜300px）を空けて作る。字幕は全カット X=540・Y=175 に固定し、画像ごとに動かさない
 - 画像の文字・数字・日付は公式発表などの一次情報と照らし、事実と違えば報告する。攻撃者・犯人側の主張と確認済みの事実を混同しない
 - テンプレート自体は案件の都合で直さない。型を変えるときは `STYLE.md` とテンプレートを一緒に直す
-- Remotion は `../movie-trivia/node_modules` をジャンクションで共用する（movie-trivia のファイルは変更しない）
+- Remotion は今 `../movie-trivia/node_modules` をジャンクションで共用している（movie-trivia のファイルは変更しない）。**この依存は解消する（2026-10-30決定）**：最終形は `short-movie → engine.mjs → 共通remotion（../../remotion のNode API／実行環境）`。自前でRemotionをインストールしない
+  - **制作中の `productions/robot-ai-20261030` には触らず、今の方式（ジャンクション）のまま完成させる**
+  - 共通remotion側の準備ができるまでは、新しい production も今の方式で作る
+
+## 共通remotionとの関係（2026-10-30決定、恒久方針）
+- `../../remotion` を共通の動画制作エンジンとして使う（`../../remotion/docs/video-platform-architecture.md` の13章）。VOICEVOX・WAV・FFmpeg/ffprobe・音量・字幕・project管理・cleanup・書き出し基盤は remotion の core を使い、このフォルダで新しく独自実装しない。移行計画は `../../remotion/docs/video-migration-plan.md` の **Phase 3**
+- type名は **`short-movie`**（縦型ショート専用。1080×1920）。横長の movie-trivia・talk-subtitle・claude-course・character-news と混ぜない（adapter・設定・テンプレートを共有しない。共有するのは remotion の core の関数だけ）
+- このフォルダに残すもの：縦型レイアウト（`templates/` の `Short.tsx`・`layout.ts`）、cards とモーラ長からのテロップ時刻、`STYLE.md`、作風の学習（`samples/`・`analysis/`）
+- 移行用テスト動画 `productions/sm-engine-test`（2026-10-30、**公開しない**。テンプレートを今の手順でコピーし、テストパターン画像2枚で作った8秒の動画）。**移行が終わるまで削除しない**（cleanupの対象外）。基準データは `../../remotion/docs/migration/phase0-baselines.md`
 
 ## 完成後のファイル管理（アップロード後の整理）
 **制作中**：画像・音声・字幕・連番画像などのレンダリングデータは全部残し、いつでも修正・再書き出しできる状態にしておく。
+
+**全動画プロジェクト共通の方針（2026-10-30）**：video配下を完成動画の保存庫にしない。アップロードと再生確認が終わったら、その動画固有の制作物（その動画専用の画像・映像素材・音声・BGM/SE・中間生成物・キャッシュ・連番・一時ファイル・完成MP4・出典メモなど、`productions/<id>/` の中身すべて）を毎回削除する。自動で即削除せず、下の手順で承認を得てから消す。共通の対象一覧は `../../remotion/docs/video-migration-plan.md` の「cleanupの対象」
 
 **アップロード後**（この順で進める）：
 1. ユーザーからアップロード完了の報告を受ける
@@ -44,7 +54,8 @@
 
 **注意**
 - アップロード前に素材を消さない。ユーザーの承認なしに消さない
-- 完成MP4（`out/<id>.mp4`）を消すかどうかは、ほかのファイルとは別にユーザーに確認する
+- 完成MP4（`out/<id>.mp4`）も削除対象（2026-10-30の共通方針）。一覧に含めて、承認を得てから消す
+- 移行用テスト動画 `productions/sm-engine-test` は移行が終わるまで対象外
 - 他の動画やテンプレートから参照されているファイルは消さない
 - 他のプロジェクト（`../movie-trivia` など。`node_modules` はジャンクションなので、消すときはリンクだけを外し、中身を消さない）に影響を与えない
 - 消した後も、テンプレートから新しい動画を作れる状態を保つ

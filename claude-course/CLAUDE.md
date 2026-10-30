@@ -6,8 +6,11 @@
 
 ## 他プロジェクトとの関係
 
-- `../../remotion`（ニュース動画。旧`remotion-project`）とは完全に別プロジェクト。**importしない・変更しない**。VOICEVOXの音声生成ロジックだけを参考にし、このプロジェクト内に独立したコード（`scripts/voicevox/`）として持つ
-- remotion（旧remotion-project）から持ち込まないもの：ニュース動画用component、HUD／overlay計画、キャラクター構成・口パク、`youtube-test-*`の構成、ニュース動画固有の素材、Git履歴
+- **`../../remotion`は全動画プロジェクト共通の動画制作エンジン。このプロジェクトも共通remotionへ移す（2026-10-30決定、恒久方針。`../../remotion/docs/video-platform-architecture.md`の13章）**。移行計画は`../../remotion/docs/video-migration-plan.md`の**Phase 4**（VOICEVOX・WAV・SRT／VTT・ffmpeg・音量・連番→MP4・project管理・cleanup・renderをcoreに置き換え、remotionへの入口は`engine.mjs`の1ファイルにする）
+  - **Phase 4までは今の手順（`scripts/voicevox/`・`scripts/video/encode-mp4.mjs`・自前のRemotion）で制作する。ただしcoreで賄える処理（上の一覧）を新しく独自実装しない**
+  - このプロジェクトに残すもの：`lesson.json`の形式、cues・shots（`registry.ts`）、`captionLayout.ts`と表記ルール、デザイン（`tokens.ts`・components・scenes）、文・シーン・末尾の間の値
+- remotionの**character-news固有のもの**は持ち込まない：ニュース動画用component、HUD／overlay計画、キャラクター構成・口パク、`youtube-test-*`の構成、ニュース動画固有の素材
+- 移行の基準データ（L01・free-trial・sales-introの音声・静止画・音量）は`../../remotion/docs/migration/phase0-baselines.md`（2026-10-30取得）
 - `../../web-project`（会員サイト）は変更しない。完成MP4は`out/lesson-XX/`に書き出すところまでがこのプロジェクトの担当。**web-projectの`public/`には動画を置かない**（ログイン不要で誰でも取得できるため）。配信先（Supabase Storage／動画配信サービス）は未決定で、制作中はホスティング方式を前提にしない
 
 ## 現在の状態（2026-10-02）
@@ -26,7 +29,9 @@
   - 済（2026-10-02）：冒頭2場面の修正と全編の見出し帯（講座名・章ラベル）の削除を反映して全編を再レンダリング。確認用MP4 `out/sales-intro/sales-intro-preview.mp4`を上書き（3:06.37、-16.2 LUFS／True Peak -1.6 dBTP）。確認用PNGは`out/sales-intro/review/`
   - 済（2026-10-02）：ユーザー確認で修正なし。確認用MP4を再レンダリングせずそのまま`sales-intro-final.mp4`としてコピー（内容は`sales-intro-preview.mp4`と同一）
   - 未着手：販売ページへの埋め込み（配信先は未決定）
-- Git未初期化（初期化・commit・pushは指示があるまで行わない）
+- Git：親フォルダ`Projects/video`のリポジトリ（GitHub `pata1pata1/video`）で管理されている（コード・台本・設定。素材・音声・`out/`は`video/.gitignore`で管理外）。commit・pushは指示があるまで行わない
+- **cleanup（全動画プロジェクト共通、2026-10-30）**：アップロードと再生確認が終わったら、その動画固有の制作物（録画・スクショ等の専用素材、音声、中間生成物、キャッシュ、連番、完成MP4、専用の出典台帳・メモ等）を毎回削除する。手順は「①削除対象の一覧 → ②削除後に残るもの → ③ユーザー確認 → ④承認後に削除」。残すのは共通コード・デザイン・共通の読み辞書（`lessons/shared/`）・CLAUDE.md・共通設定など次回以降も使うもの。詳細は`../../remotion/docs/video-migration-plan.md`の「cleanupの対象」。3本（L01・free-trial・sales-intro）はまだ配信先が未決定で、アップロード前なので対象外
+  - 注意：この3本はPhase 4の移行確認の入力にもなる。アップロード後にcleanupする前に、Phase 4まで残すかを決める（同計画の「要確認」）
 
 ## フォルダ
 

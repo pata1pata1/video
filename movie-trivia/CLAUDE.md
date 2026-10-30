@@ -14,7 +14,8 @@ YouTube向け解説・雑学動画（横1920×1080・30fps、VOICEVOXナレー�
 - 7本目「積水ハウス地面師詐欺事件」（`sekisui-jimenshi`）：2026-10-26にYouTubeへ投稿済み。pattern-03 の最初の動画。事実は積水ハウスの開示資料（2017・2018年）と総括検証報告書（2020年）で確認し、実名はウィキペディアの記事にある社長・会長だけを使った。専用ファイルは削除済み（台本・投稿メモ・図解はコミット `4aaf7ff` に残っている）
 - 8本目「福田和子事件（松山ホステス殺害事件）」（`fukuda-kazuko`）：2026-10-27にYouTubeへ投稿済み。pattern-03。事実は判決の報道（毎日新聞）・警察白書で確認し、実名はウィキペディアの記事にある本人だけを使った。本人の写真（手配カード・当時の新聞・報道映像）をネットから取得して使った（ユーザーがリスクを承知で判断）。専用ファイルは削除済み（台本・投稿メモ・図解はコミット `2fa8db5` に残っている）
 - 9本目「GMO不正アクセス事件（お名前.com デスクトップクラウド）」（`gmo-desktop-cloud`）：2026-10-28にYouTubeへ投稿済み。pattern-03（最初は pattern-01 で作ったが、事件風で作り直した）。進行中の事件で判決がないため、10月28日朝時点の内容とし、事実はGMOの公式発表（第1〜12報）と代表のブログで確認した。実名は代表の熊谷正寿だけ。専用ファイルは削除済み（台本・投稿メモ・図解はコミット `a6b14d0` に残っている）
-- 10本目「ブレイキングダウンsakkki騒動」（`sakkki-dispute`）：2026-10-30にYouTubeへ投稿済み。pattern-03。判決も警察・運営の発表もない騒動を、ユーザーの判断で「主張がぶつかっている騒動」として作った（事実と主張を分け、どちらが正しいかは言わない。10月29日時点）。事実は本人（@sakkki34）と告発した側（かじやん）のXの投稿、運営の中止告知で確認。実名ルールの例外として「sakkki」「かじやん」を使った（ユーザーがリスクを承知で判断）。告発の投稿動画から、暴行の瞬間でないコマを静止画で引用し、人物をぼかして本編とサムネイルに使った（ユーザーの指示）。専用ファイルは削除済み（台本・投稿メモ・図解はコミット `82101ab` に残っている）。`src/current.ts` はこの動画を指したままなので、次の動画を `new-video.mjs` で作るまで Studio・lint は動かない
+- 10本目「ブレイキングダウンsakkki騒動」（`sakkki-dispute`）：2026-10-30にYouTubeへ投稿済み。pattern-03。判決も警察・運営の発表もない騒動を、ユーザーの判断で「主張がぶつかっている騒動」として作った（事実と主張を分け、どちらが正しいかは言わない。10月29日時点）。事実は本人（@sakkki34）と告発した側（かじやん）のXの投稿、運営の中止告知で確認。実名ルールの例外として「sakkki」「かじやん」を使った（ユーザーがリスクを承知で判断）。告発の投稿動画から、暴行の瞬間でないコマを静止画で引用し、人物をぼかして本編とサムネイルに使った（ユーザーの指示）。専用ファイルは削除済み（台本・投稿メモ・図解はコミット `82101ab` に残っている）
+- 移行用テスト動画 `mt-engine-test`（2026-10-30、**公開しない**）：共通remotionへの移行（下の「方針」）の基準を取るために、今の手順どおり作った24.7秒の動画（pattern-03、Pexels 6470925・2750099、BGMあり）。`src/current.ts` は今この動画を指している。**移行が終わるまで削除しない**（cleanupの対象外）。基準データは `../../remotion/docs/migration/phase0-baselines.md`
 - パターン：`pattern-02`（ランキング・カウントダウン、近未来HUD・春日部つむぎ・BGMなし。2026-10-23作成）、`pattern-03`（事件解説・ダーク、結末→経緯、明朝と赤・古いフィルム調・光るキーワード、青山龍星。2026-10-25作成。暗いBGM `bgm/pattern-03-dark.mp3` は「空っぽのベビーベッド」written by ゆうり(Yuli Audio Craft)、OpenTracks（旧DOVA-SYNDROME））。pattern-02 で作った動画はまだない
 - `pattern-01`（シンプル解説・青山龍星。3〜6本目で使用）は2026-10-28に削除した（ユーザー判断。「もうダメ」）。型のファイルは削除前のコミット（`06ab86c`）に残っている
 - `image/taiyo.mp4`（ユーザー提供・BEST建設現場の空撮）は元ファイルとして残している（Git管理外）
@@ -57,15 +58,23 @@ frames/                     連番JPEG（中間ファイル、消してよい）
 - 書き出し・サムネイル・チャプター：`common/render.md`
 
 ## 方針
-- `../claude-course`（旧`claude-course-video`）・`../../remotion`（旧`remotion-project`）はimportも変更もしない
+- **`../../remotion`（`Projects/remotion`）を共通の動画制作エンジンとして使う（2026-10-30決定、恒久方針。`../../remotion/docs/video-platform-architecture.md`の13章）**。VOICEVOX・WAV・Pexels・FFmpeg/ffprobe・音量・字幕・出典台帳・動画プロジェクト管理・cleanup・書き出し基盤は remotion の `src/core/` と `src/video-types/movie-trivia/` を使い、movie-trivia 側に同じ処理を新しく書かない。remotion側の呼び出しは `scripts/lib/engine.mjs` だけを通す（直接パスを書いたimportを散らばらせない）
+  - 移行の詳細設計（正本・設計案）：`../../remotion/docs/movie-trivia-integration-design.md`。全体の順番：`../../remotion/docs/video-migration-plan.md` の **Phase 2**
+  - **Phase 2で切り替えるまでは、今の手順（このCLAUDE.mdの「コマンド」と `common/render.md`）で制作する**。切り替え前に remotion を部分的にimportし始めない
+  - movie-triviaに残すのは pattern・timeline・scenes・film・HUD・図解・サムネイル・台本の形式・デザイン
+  - remotion側の変更は、他の動画タイプの出力が変わらないことを確かめてから行う。character-news固有の部分（`src/video-types/character-news/`）は変えない
+- `../short-movie` の production は今、この `node_modules` をジャンクションで借りている（制作中の `robot-ai-20261030` と移行用の `sm-engine-test`）。**short-movie側が共通remotionの実行環境に移るまで、`node_modules`の中身・依存（remotion・ffmpeg-static等）を変えない・消さない**
+- `../claude-course` のファイルはimportも変更もしない（共通処理は remotion の core を通して共有する）
 - Git：2026-10-06に初期化（コードと設定のみ。素材・音声・提供素材・BGMは .gitignore でローカルのみ）。push は指示があるまでしない
 - `.env`（Git管理外）に`PEXELS_API_KEY`。値は表示しない
 - パターンには動画固有のもの（テーマ・台本・素材・図解・タイトル・サムネイルの文言・読み替え表・出典）を入れない
 
-## YouTube投稿後の後片付け（このmovie-triviaプロジェクトだけのルール）
-- 条件：動画が完成してYouTubeへのアップロードも終わり、**今後その動画自体を修正・再編集する予定がない**こと。再編集の予定があるかどうか分からなければ、削除前にユーザーに確認する
+## YouTube投稿後の後片付け
+- **全動画プロジェクト共通の方針（2026-10-30）**：video配下を完成動画の保存庫にしない。アップロードと再生確認が終わったら、その動画固有の制作物を毎回すべて削除する。手順は「①削除対象の一覧 → ②削除後に残るもの → ③ユーザー確認 → ④承認後に削除」（自動で即削除しない）。共通の対象一覧は `../../remotion/docs/video-migration-plan.md` の「cleanupの対象」。Phase 2の移行後は remotion の `video:cleanup` で行う
+- 条件：動画が完成してYouTubeへのアップロードと再生確認が終わったこと
 - 削除してよいもの（その動画専用の素材）：連番画像（`frames/`）、`out/<id>/`、ナレーション（`public/audio/<id>/`）、音声・素材検索のキャッシュ（`.cache/`）、素材（`public/media/<id>/`）、台本（`script/<id>.json`）、図解（`src/videos/<id>/`）、投稿メモ（`youtube/<id>.md`）
 - 残すもの：`common/`、`patterns/`、`src/`（`videos/<id>/` 以外）、`scripts/`、設定ファイル、`node_modules/`
 - 図解を消した後は `src/current.ts` が消えた動画を指したままになるので、次の動画を `new-video.mjs` で作るまで Studio・lint は動かない
 - 削除後、このCLAUDE.mdの状態欄を更新する
-- remotion（旧remotion-project）・claude-course（旧claude-course-video）など他のプロジェクトには適用しない（用途が違うため）
+- その動画専用のBGM（`bgm/`のうち、その動画でしか使わない曲）も削除対象。pattern が使う共通BGM（`bgm/pattern-03-dark.mp3` など）は残す
+- 移行用テスト動画 `mt-engine-test` は移行が終わるまで対象外
