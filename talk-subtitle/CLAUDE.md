@@ -31,7 +31,8 @@
 - video配下を完成動画の保存庫にしない。アップロードと再生確認が終わったら、その動画固有の制作物（`projects/<id>/` の元動画・音声・中間生成物・確認用動画・完成MP4・その案件の承認ファイルや固有名詞辞書など）を毎回削除する
 - 手順：①削除対象の一覧 → ②削除後に残るもの → ③ユーザー確認 → ④承認後に削除（自動で即削除しない）
 - 残すもの：コード・`docs/`・`python/`・`remotion/`・共通辞書（`_shared/glossary.json`）・字幕プリセット（`_shared/subtitle-presets`）・学習データ（`style-data/`）・CLAUDE.md。学習に使う案件は、`npm run style -- observe` や reference の結果を `style-data/` に記録してから消す
-- 共通の対象一覧は `../../remotion/docs/video-migration-plan.md` の「cleanupの対象」。`talking-test-01` は Phase 5 の移行確認の入力にもなるので、cleanup する前に Phase 5 まで残すかを決める
+- 共通の対象一覧は `../../remotion/docs/video-migration-plan.md` の「cleanupの対象」
+- **一時例外（2026-10-30決定）**：`talking-test-01` は移行検証用fixture。**Phase 5 の移行検証が終わるまでcleanupを延期する**（恒久保存ではない。検証後に通常のcleanupの対象にする）
 - この PC は **Smart App Control（アプリ制御）が有効**で、署名のない exe はブロックされる（`0xC0E90002`／"An Application Control policy has blocked this file"）
   - ffprobe：remotion 同梱版はブロックされる → winget の `Gyan.FFmpeg`（ユーザー領域）を入れ、ユーザー環境変数 **`FFPROBE_PATH`** で指定済み（新しく開いたターミナルから有効）
   - whisper.cpp と PyAV の DLL もブロックされる → **Windows の文字起こしは faster-whisper**（`.venv`、`python/fw_transcribe.py`、PyAV は読み込まない。docs/design.md の11章）。**Smart App Control の設定は変更しない・提案しない**

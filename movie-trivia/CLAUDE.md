@@ -52,7 +52,7 @@ frames/                     連番JPEG（中間ファイル、消してよい）
 ## コマンド（<id> は動画のキー）
 - 新しい動画：`node scripts/new-video.mjs --id=<id> --pattern=pattern-03`／既存の動画に戻す：`node scripts/new-video.mjs --switch=<id>`
 - 音声：VOICEVOXアプリを起動（`http://127.0.0.1:50021`）→ `node scripts/build-narration.mjs --script=<id> --dry-run`（読みの確認）→ `--dry-run` なしで生成（文ごとにキャッシュ）
-- Pexels：`node scripts/pexels.mjs candidates --script=<id> [--scene=<キー>] [--kind=video|photo] [--query="..."] [--per=9]` → `out/<id>/candidates/<キー>-<kind>.png`。採用は `node scripts/pexels.mjs pick --script=<id> --scene=<キー> --video=<pexels id>`（差し替えは `--force`）。動画は横長で長辺1280px以下の最大のファイル
+- Pexels：`node scripts/pexels.mjs candidates --script=<id> [--scene=<キー>] [--kind=video|photo] [--query="..."] [--per=9]` → `out/<id>/candidates/<キー>-<kind>.png`。採用は `node scripts/pexels.mjs pick --script=<id> --scene=<キー> --video=<pexels id>`（差し替えは `--force`）。動画は横長で長辺1920px以下の最大のファイル（`scripts/pexels.mjs`の`VIDEO_TARGET_LONG_EDGE`。2026-10-30まで「1280px」と誤って書いていた）
 - 連番化：`node scripts/prepare-media.mjs --script=<id>`（往復ループ。台本の media キーの素材は最大20秒分）
 - 確認：`npm.cmd run dev`（Studio）、`npm.cmd run lint`
 - 書き出し・サムネイル・チャプター：`common/render.md`
@@ -62,6 +62,7 @@ frames/                     連番JPEG（中間ファイル、消してよい）
   - 移行の詳細設計（正本・設計案）：`../../remotion/docs/movie-trivia-integration-design.md`。全体の順番：`../../remotion/docs/video-migration-plan.md` の **Phase 2**
   - **Phase 2で切り替えるまでは、今の手順（このCLAUDE.mdの「コマンド」と `common/render.md`）で制作する**。切り替え前に remotion を部分的にimportし始めない
   - movie-triviaに残すのは pattern・timeline・scenes・film・HUD・図解・サムネイル・台本の形式・デザイン
+  - **描画（Remotion）も共通remotionの実行環境に寄せる（2026-10-30決定）**：最終形は `movie-trivia → scripts/lib/engine.mjs → 共通remotionのcore／render／Node API`。movie-trivia独自のRemotion実行環境（自前の`node_modules`）は恒久的には残さない。`@remotion/google-fonts@4.0.525` は共通remotionに追加済み。**今の実行環境と依存は、Phase 2の移行確認が終わるまで削除しない**
   - remotion側の変更は、他の動画タイプの出力が変わらないことを確かめてから行う。character-news固有の部分（`src/video-types/character-news/`）は変えない
 - `../short-movie` の production は今、この `node_modules` をジャンクションで借りている（制作中の `robot-ai-20261030` と移行用の `sm-engine-test`）。**short-movie側が共通remotionの実行環境に移るまで、`node_modules`の中身・依存（remotion・ffmpeg-static等）を変えない・消さない**
 - `../claude-course` のファイルはimportも変更もしない（共通処理は remotion の core を通して共有する）
