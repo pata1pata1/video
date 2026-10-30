@@ -277,7 +277,7 @@ export const Footage: React.FC<{ mediaKey: string; startFrame: number; dim?: num
   if (media.mediaType === "video") {
     // keep counting from where this footage was left, so a clip used again does not restart
     const still = videoFrameFile(mediaKey, startFrame + frame);
-    if (!still) throw new Error(`${mediaKey}: video frames missing — run node scripts/prepare-media.mjs --script=${SCRIPT.id}`);
+    if (!still) throw new Error(`${mediaKey}: video frames missing — run node scripts/mt.mjs prepare-media --project=${SCRIPT.id}`);
     img = <Img src={staticFile(still)} style={{ ...fill, ...look }} />;
   } else if (F) {
     // a photo (often a person or a document) is shown whole and sharp, framed on a blurred copy of itself

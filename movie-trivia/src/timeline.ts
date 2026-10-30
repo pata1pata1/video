@@ -68,7 +68,7 @@ const MEDIA = mediaSources as Record<string, MediaSource>;
 export const mediaFor = (key: string): MediaSource | undefined => MEDIA[key];
 const FRAMES = mediaFrames as Record<string, number>;
 /**
- * A picked video as a 30 fps JPEG sequence (scripts/prepare-media.mjs),
+ * A picked video as a 30 fps JPEG sequence (scripts/mt.mjs prepare-media),
  * played forward then backward so a loop never jumps.
  * Used instead of <Html5Video>, whose per-frame seek jumps back and forth.
  */
@@ -92,7 +92,7 @@ const CAPTION_HOLD = PATTERN.config.transition.captionHoldSeconds;
 {
   const want = SCRIPT.scenes.flatMap((s) => s.lines.map((l) => l.id)).join(",");
   const got = NARRATION.lines.map((l) => l.id).join(",");
-  if (want !== got) throw new Error("narration.json is out of date. Run: node scripts/build-narration.mjs");
+  if (want !== got) throw new Error("narration.json is out of date. Run: node scripts/mt.mjs narration --project=<id>");
 }
 
 const lineById = new Map(NARRATION.lines.map((l) => [l.id, l]));

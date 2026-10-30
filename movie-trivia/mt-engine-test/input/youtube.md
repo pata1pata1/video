@@ -8,7 +8,7 @@
 ## 説明文
 
 ▼チャプター
-（node scripts/chapters.mjs --script=mt-engine-test の出力）
+（node scripts/mt.mjs chapters --project=mt-engine-test の出力）
 
 ▼出典
 ・

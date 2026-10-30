@@ -8,8 +8,6 @@
   "scripts": {
     "dev": "remotion studio src/index.ts",
     "lint": "eslint src && tsc",
-    "voice": "node scripts/build-narration.mjs",
-    "encode": "node scripts/encode-mp4.mjs",
     "mt": "node scripts/mt.mjs",
     "typecheck:engine": "node ../../remotion/node_modules/typescript/bin/tsc -p tsconfig.engine.json"
   },

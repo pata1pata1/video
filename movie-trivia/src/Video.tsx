@@ -43,7 +43,7 @@ const SegmentView: React.FC<{ seg: Segment; startFrame: number; footageFrom: num
       break;
     case "diagram": {
       const Diagram = DIAGRAMS[s.name];
-      if (!Diagram) throw new Error(`unknown diagram "${s.name}" (add it to src/videos/${SCRIPT.id}/diagrams.tsx)`);
+      if (!Diagram) throw new Error(`unknown diagram "${s.name}" (add it to ${SCRIPT.id}/input/diagrams.tsx)`);
       body = <Diagram steps={steps} />;
       break;
     }
@@ -77,7 +77,7 @@ const SegmentView: React.FC<{ seg: Segment; startFrame: number; footageFrom: num
   );
 };
 
-/** withAudio=false renders silent frames (the MP4 gets the narration in encode-mp4.mjs). */
+/** withAudio=false renders silent frames (the MP4 gets the narration in mt.mjs encode). */
 export const TriviaVideo: React.FC<{ withAudio: boolean }> = ({ withAudio }) => {
   const { fps } = useVideoConfig();
   // where each footage clip continues from (frames already shown of that clip)

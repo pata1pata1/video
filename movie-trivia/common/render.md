@@ -36,7 +36,3 @@ Windows では core/media が出力の確認に ffprobe を使うので、環境
 ## 中間ファイル
 
 `<id>/intermediate/` は消してよい。`<id>/output/` は完成品（Git管理外。アップロードと再生確認の後、cleanupで動画フォルダごと削除する）。
-
-## 旧方式（Phase 2 の移行確認が終わり、削除が承認されるまで残す。新しい動画では使わない）
-
-`npx.cmd remotion render src/index.ts Trivia frames --sequence --muted --props=props-silent.json --image-format=jpeg --jpeg-quality=95` → `node scripts/encode-mp4.mjs --script=<id> frames out/<id>/<id>.mp4`（movie-trivia 自前の node_modules と `script/`・`public/` の置き場所を使う）。

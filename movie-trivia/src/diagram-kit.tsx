@@ -3,7 +3,7 @@ import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } fr
 import { color, font, paper, SUBTITLE_AREA, VIDEO } from "./theme";
 
 /**
- * Shared parts for a video's explanatory diagrams (src/videos/<id>/diagrams.tsx),
+ * Shared parts for a video's explanatory diagrams (<id>/input/diagrams.tsx),
  * drawn in SVG on the paper above the subtitles. A diagram gets its steps
  * ({ at: local frame, step }) from the script's `visual.step`; things that
  * belong to step N appear when step N is reached.
