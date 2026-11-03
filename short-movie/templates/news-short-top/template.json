@@ -1,0 +1,9 @@
+{
+  "composition": "Short",
+  "fps": 30,
+  "frames": { "imageFormat": "jpeg", "jpegQuality": 95 },
+  "audio": "voice-only",
+  "ffmpeg": "system",
+  "loudness": { "targetLufs": -14, "truePeakDb": -1.5, "loudnessRange": 11, "linear": true },
+  "encode": { "codec": "libx264", "preset": "slow", "crf": 18, "profile": "high", "audioBitrate": "192k", "sampleRate": 48000 }
+}

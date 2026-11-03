@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "type": "short-movie",
+  "name": "sm-engine-test",
+  "created": "2026-11-03T01:46:32.680Z",
+  "status": "active",
+  "locked": false,
+  "published": false
+}

@@ -2,6 +2,8 @@
 
 共通remotionへの移行（`../../../../remotion/docs/video-migration-plan.md` の Phase 3）で、今の方式の出力と比べるための fixture。2026-10-30 の Phase 0 で `templates/news-short-top` を今の手順どおりコピーして作った。移行が終わるまで削除しない（cleanup の対象外）。
 
+**Phase 3（2026-11-03）で新しい形 `../../sm-engine-test/`（共通remotion、データだけのフォルダ）に作り直し、このフォルダの出力とすべてバイト一致した。このフォルダは旧方式の基準として、旧実装の削除が承認されるまで残す。**
+
 - Git に入れているのはコード（テンプレートのコピー）と `script.json` だけ。画像・音声・連番・MP4 は Git 管理外
 - 基準データ：`../../../../remotion/docs/migration/phase0-baselines.md`（ハッシュは `docs/migration/baselines/short-movie.sha256`、重いファイルのコピーは `remotion/out/migration-baselines/phase0/short-movie/`）
 
