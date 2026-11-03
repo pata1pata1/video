@@ -16,7 +16,7 @@
 - `templates/news-short-top/` … ニュースショート動画（上部字幕固定型）の**アプリ**（縦型レイアウト・テロップ・`cards.mjs`〈モーラ長からのテロップ時刻〉・`template.json`〈連番・書き出し・-14 LUFS・声のみ〉）。**動画ごとにコピーしない**
 - `scripts/sm.mjs` … 制作コマンド（new・narration・render・encode）。`scripts/lib/engine.mjs` を通して共通remotionを使う
 - `<id>/` … こちらで制作する動画1本ごとのフォルダ（2026-11-03〜、データだけ）：`project.json`・`input/script.json`（Git 管理）、`assets/images/`・`assets/video/`・`audio/`・`intermediate/`・`output/<id>.mp4`（Git 管理外）
-- `productions/<id>/` … 旧方式（テンプレートをコピーして作った動画）。今は制作中の `robot-ai-20261030` と移行の基準 `sm-engine-test` だけ。新しい動画では使わない
+- `productions/<id>/` … 旧方式（テンプレートをコピーして作った動画）。今は制作中の `robot-ai-20261030` だけ（旧方式の `sm-engine-test` は2026-11-03に削除）。新しい動画では使わない
   - ※最初の1本 `gmo-20261028/`（N001）は short-movie の直下にある（ルールを決める前に作ったため）
 
 ## 分析手順
@@ -32,13 +32,13 @@
 - テンプレート自体は案件の都合で直さない。型を変えるときは `STYLE.md` とテンプレートを一緒に直す
 - **制作は共通remotionで行う（2026-11-03、Phase 3）**：`short-movie → scripts/sm.mjs → scripts/lib/engine.mjs → 共通remotion（../../remotion の core／render／Node API）`。手順は `templates/news-short-top/README.md`。VOICEVOX・WAV・SRT・モーラ情報・ffmpeg・2パスloudnorm・AAC・連番→MP4・描画・project.json・lifecycle・cleanup は共通remotionのもの。自前でRemotionをインストールしない。**`node_modules` を作らない・`../movie-trivia/node_modules` へのジャンクションを張らない・テンプレートをコピーしない**
   - **例外：制作中の `productions/robot-ai-20261030` には触らず、旧方式（自分のコピー＋ジャンクション）のまま完成させる**（変更・移動・変換・cleanup をしない）。この案件の公開・再生確認・cleanup でジャンクションが外れる（リンクだけを外し、中身は消さない）までは、movie-trivia の `node_modules` を消せない
-  - 旧方式の残り（`scripts/render.mjs`〈Phase 2-0〉、テンプレートの `scripts/build-narration.mjs`・`scripts/encode.sh`・`remotion.config.ts`・`package.json`、`productions/sm-engine-test`）は、ユーザーの承認まで残す（`../../remotion/docs/migration/phase3-short-movie.md`）
+  - 旧方式の実装（`scripts/render.mjs`〈Phase 2-0〉、テンプレートの `scripts/build-narration.mjs`・`scripts/encode.sh`・`remotion.config.ts`・`package.json`・`public/`、`productions/sm-engine-test`）は2026-11-03にユーザーの承認を得て削除した（`../../remotion/docs/migration/phase3-short-movie.md`）。`productions/` と `.gitignore` の `productions/**`・`node_modules` の行は robot-ai-20261030 の cleanup まで残す
 
 ## 共通remotionとの関係（2026-10-30決定、恒久方針）
 - `../../remotion` を共通の動画制作エンジンとして使う（`../../remotion/docs/video-platform-architecture.md` の13章）。VOICEVOX・WAV・FFmpeg/ffprobe・音量・字幕・project管理・cleanup・書き出し基盤は remotion の core を使い、このフォルダで新しく独自実装しない。移行計画は `../../remotion/docs/video-migration-plan.md` の **Phase 3**
 - type名は **`short-movie`**（縦型ショート専用。1080×1920）。横長の movie-trivia・talk-subtitle・claude-course・character-news と混ぜない（adapter・設定・テンプレートを共有しない。共有するのは remotion の core の関数だけ）
 - このフォルダに残すもの：縦型レイアウト（`templates/` の `Short.tsx`・`layout.ts`）、上部字幕帯のデザイン、cards の形式とモーラ長からのテロップ時刻（`cards.mjs`）、-14 LUFS・声のみの設定（`template.json`）、`STYLE.md`、作風の学習（`samples/`・`analysis/`）。core が出すのはモーラの長さ・数まで
-- 移行用テスト動画 `sm-engine-test`（**公開しない**。テストパターン画像2枚の8秒の動画）：Phase 0（2026-10-30）に旧方式で `productions/sm-engine-test` を作り、Phase 3（2026-11-03）に新しい形 `sm-engine-test/` で作り直して、音声・timeline・字幕・241コマ・MP4 がすべてバイト一致（-15.1 LUFS／-1.5 dBTP）。**移行が終わるまで削除しない**（cleanupの対象外）。基準データは `../../remotion/docs/migration/phase0-baselines.md`
+- 移行用テスト動画 `sm-engine-test`（**公開しない**。テストパターン画像2枚の8秒の動画）：Phase 0（2026-10-30）に旧方式で `productions/sm-engine-test` を作り（旧方式のフォルダは2026-11-03に削除）、Phase 3（2026-11-03）に新しい形 `sm-engine-test/` で作り直して、音声・timeline・字幕・241コマ・MP4 がすべてバイト一致（-15.1 LUFS／-1.5 dBTP）。**移行が終わるまで削除しない**（cleanupの対象外）。基準データは `../../remotion/docs/migration/phase0-baselines.md`
 
 ## 完成後のファイル管理（アップロード後の整理）
 **制作中**：画像・音声・字幕・連番画像などのレンダリングデータは全部残し、いつでも修正・再書き出しできる状態にしておく。
@@ -57,7 +57,7 @@
 **注意**
 - アップロード前に素材を消さない。ユーザーの承認なしに消さない
 - 完成MP4（`<id>/output/<id>.mp4`）も削除対象（2026-10-30の共通方針）。一覧に含めて、承認を得てから消す
-- 移行用テスト動画 `sm-engine-test`（新しい形と `productions/` の旧方式）は移行が終わるまで対象外
+- 移行用テスト動画 `sm-engine-test` は移行が終わるまで対象外
 - 旧方式の `productions/<id>/` は `video:cleanup` の対象外（同じ4段階を手作業で行う）。`robot-ai-20261030` の cleanup はこの方法で、公開・再生確認の後に行う
 - 他の動画やテンプレートから参照されているファイルは消さない
 - 他のプロジェクト（`../movie-trivia` など。`node_modules` はジャンクションなので、消すときはリンクだけを外し、中身を消さない）に影響を与えない

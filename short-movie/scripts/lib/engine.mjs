@@ -24,7 +24,5 @@ process.on("warning", (w) => {
 
 const load = (rel) => import(pathToFileURL(path.join(REMOTION_ROOT, rel)).href);
 
-export const render = await load("src/core/render/nodeApi.mts");
-export const media = await load("src/core/media/index.ts");
 // The short-movie commands (new / narration / render / encode), used by scripts/sm.mjs.
 export const shortMovie = await load("src/video-types/short-movie/cli.mjs");

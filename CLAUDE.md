@@ -17,7 +17,7 @@
 - 手順：①削除対象の一覧 → ②削除後に残るもの → ③ユーザー確認 → ④承認後に削除（自動で即削除しない）
 - 残すもの：共通エンジン・各タイプの共通コード・テンプレート・pattern・STYLE.md・CLAUDE.md・共通素材・共通設定・共通辞書・学習ロジックと学習データ・次回以降も使う設計とルール
 - 対象一覧の詳細：`../remotion/docs/video-migration-plan.md`の「cleanupの対象」
-- 移行用テスト動画（`movie-trivia`の`mt-engine-test`、`short-movie`の`sm-engine-test`〈新しい形〉と`productions/sm-engine-test`〈旧方式〉）は公開しない。移行が終わるまで削除しない
+- 移行用テスト動画（`movie-trivia`の`mt-engine-test`、`short-movie`の`sm-engine-test`）は公開しない。移行が終わるまで削除しない
 
 ## Git
 

@@ -46,7 +46,7 @@
 7. 確認：全場面のコマを抜き出して字幕位置・文字切れを見る／faster-whisper で字幕と声のズレを測る／尺・音量
 8. 公開・再生確認の後：共通remotionの `video:mark-completed` → `video:mark-published` → `video:cleanup -- --type=short-movie --project=<id>`（`../../CLAUDE.md` の「完成後のファイル管理」）
 
-旧方式（このフォルダを `productions/<id>/` にコピーし、コピーした `scripts/build-narration.mjs`・`scripts/encode.sh` で作る）は新しい動画では使わない。制作中の `productions/robot-ai-20261030` だけが旧方式のまま（自分のコピーと movie-trivia の `node_modules` へのジャンクションを使う）
+旧方式（このフォルダを `productions/<id>/` にコピーして作る）は2026-11-03に廃止し、テンプレートの旧スクリプトは削除した。制作中の `productions/robot-ai-20261030` だけが旧方式のまま（自分のコピーと movie-trivia の `node_modules` へのジャンクションを使う）
 
 ## ファイル
 ```
@@ -59,6 +59,5 @@ cards.mjs            テロップの時刻の決め方：文を丸ごと合成�
 template.json        連番（JPEG 95）・書き出し（x264 slow CRF18 high・AAC 192k 48kHz）・音量（-14 LUFS／TP -1.5／LRA 11、linear）・声のみ・ffmpeg（PATH）
 tsconfig.engine.json 型チェック（共通remotionの tsc と型だけ）：node ../../../../remotion/node_modules/typescript/bin/tsc -p tsconfig.engine.json
 script.example.json  台本の雛形（sm.mjs new がコピーする）
-旧方式の残り（承認後に削除）：scripts/build-narration.mjs・scripts/encode.sh・remotion.config.ts・package.json・public/
 ```
 このフォルダは共通テンプレート。案件のファイルを置かない・案件の都合で直さない（直すときは STYLE.md と合わせる）。
