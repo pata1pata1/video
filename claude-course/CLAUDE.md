@@ -23,19 +23,20 @@
   5. `node scripts/cc.mjs encode --project=<id>` → `output/<id>.mp4`（共通remotionの`npm run video:render -- --type=claude-course --project=<id>`でも4→5）
   6. 公開・再生確認の後：共通remotionで`video:mark-completed` → `video:mark-published` → `video:cleanup -- --type=claude-course --project=<id>`（①削除対象・②残るもの・fingerprint → ③確認 → ④`--confirm-delete`）
 - Windowsでは`FFPROBE_PATH`が必要（共通remotionのCLAUDE.md）。メモリが少ないときは`--concurrency=1〜2`で描画し、描画・合成・ffmpegを同時に動かさない
-- **完成済み3本（L01・free-trial・sales-intro）**は今の場所のまま（`lessons/<…>/`・`public/<…>/`・`out/<…>/`）の移行検証用fixture。`--lesson=01|free-trial|sales-intro --out-dir=<claude-course の外>`で同じ処理を動かせるが、元のファイルには書き込まない（`--out-dir`なし・claude-course内は拒否）。L01はmp4-direct、free-trial・sales-introはimage-sequenceのまま（方式の統一は移行完了後の別課題）
+- **完成済みのfree-trial・sales-intro**は今の場所のまま（`lessons/<…>/`・`public/<…>/`・`out/<…>/`）の移行検証用fixture。`--lesson=free-trial|sales-intro --out-dir=<claude-course の外>`で同じ処理を動かせるが、元のファイルには書き込まない（`--out-dir`なし・claude-course内は拒否）。どちらもimage-sequence（方式の統一は移行完了後の別課題）。L01（mp4-direct）は2026-11-05にcleanup済みでfixtureから外した
 - 録画の加工（`scripts/free-trial/prepare-recordings.mjs`・`scripts/sales-intro/prepare-recordings.mjs`）は、切り出し・ぼかしの指定はここに残し、ffmpegは`engine.mjs`経由（共通remotionの`runTool`）で実行する。`--out-dir=<dir>`で別の場所に作れる
 - 型チェック（共通remotionのtscと型だけ）：`node ../../remotion/node_modules/typescript/bin/tsc -p tsconfig.engine.json`
 
 - remotionの**character-news固有のもの**は持ち込まない：ニュース動画用component、HUD／overlay計画、キャラクター構成・口パク、`youtube-test-*`の構成、ニュース動画固有の素材
 - 移行の基準データ（L01・free-trial・sales-introの音声・静止画・音量）は`../../remotion/docs/migration/phase0-baselines.md`（2026-10-30取得）
-- `../../web-project`（会員サイト）は変更しない。完成MP4は`out/lesson-XX/`に書き出すところまでがこのプロジェクトの担当。**web-projectの`public/`には動画を置かない**（ログイン不要で誰でも取得できるため）。配信先（Supabase Storage／動画配信サービス）は未決定で、制作中はホスティング方式を前提にしない
+- `../../web-project`（会員サイト）は変更しない。完成MP4は`<id>/output/`に書き出すところまでがこのプロジェクトの担当。**web-projectの`public/`には動画を置かない**（ログイン不要で誰でも取得できるため）。配信先（Supabase Storage／動画配信サービス）は未決定で、制作中はホスティング方式を前提にしない
 
 ## 現在の状態（2026-10-02）
 
-- 済：Lesson 01導入動画の正式台本、VOICEVOXナレーション、字幕タイミング、会員サイトのスクショ6枚とサポーター録画（`lessons/lesson-01/assets.md`）、Remotionで全26シーンの画面（Studioで最初から最後まで確認できる。デザインと字幕ルールは2026-09-30に正式採用）
-- 済（2026-09-30）：最終MP4 `out/lesson-01/lesson-01-intro.mp4`（＋`captions.vtt`・`poster.png`）
-- 未着手：配信先の決定とweb-projectへの組み込み
+- **Lesson 01導入動画：公開済み・ローカル制作物はcleanup済み**
+  - 済（2026-09-30）：正式台本、VOICEVOXナレーション、字幕、全26シーンの画面、最終MP4（約4分57秒。デザインと字幕ルールは2026-09-30に正式採用）
+  - 済（2026-10-01）：会員サイト（`../../paid-site`）のSupabase Storage（非公開bucket `lesson-videos`の`lesson-01/intro-v1.mp4`、字幕`lesson-01/captions-v1.vtt`）へアップロード。会員画面でposter・再生・音声・シークを実機確認（記録は`../../paid-site/CLAUDE.md`の「レッスン動画の配信」）
+  - 済（2026-11-05）：ユーザー承認でローカル制作物をcleanup（台本`lessons/lesson-01/`・音声`public/lessons/lesson-01/audio/`・`out/lesson-01/`〈完成MP4・VTT・poster〉・試聴WAV`out/review/`・未使用の`raw/screens/dashboard-test.png`）。Composition `L01-Intro`とfixture「01」も外した。台本はGitの履歴に残る。会員画面のスクショ・サポーター録画（`public/lessons/lesson-01/screens/`・`recordings/`・`raw/screens/`・`raw/supporter/`）はsales-introが使うので残している。Storage上の動画・posterとpaid-siteは触っていない
 - 進行中：メルマガ登録者向けの無料体験動画（下記「無料体験動画」）
   - 済（2026-10-02）：全編の台本（7章18シーン54文）、ナレーション（4:02.3）、字幕（`captions.json`の表記調整11件、`captions.vtt`）。声と速度（玄野武宏 ノーマル・1.04）はこの動画でも確定
   - 済（2026-10-02）：映像（Composition `FreeTrial`）と確認用MP4 `out/free-trial/free-trial-preview.mp4`（4:01.9、-16.1 LUFS／True Peak -1.1 dBTP）
@@ -48,24 +49,21 @@
   - 済（2026-10-02）：ユーザー確認で修正なし。確認用MP4を再レンダリングせずそのまま`sales-intro-final.mp4`としてコピー（内容は`sales-intro-preview.mp4`と同一）
   - 未着手：販売ページへの埋め込み（配信先は未決定）
 - Git：親フォルダ`Projects/video`のリポジトリ（GitHub `pata1pata1/video`）で管理されている（コード・台本・設定。素材・音声・`out/`は`video/.gitignore`で管理外）。commit・pushは指示があるまで行わない
-- **cleanup（全動画プロジェクト共通、2026-10-30）**：アップロードと再生確認が終わったら、その動画固有の制作物（録画・スクショ等の専用素材、音声、中間生成物、キャッシュ、連番、完成MP4、専用の出典台帳・メモ等）を毎回削除する。手順は「①削除対象の一覧 → ②削除後に残るもの → ③ユーザー確認 → ④承認後に削除」。残すのは共通コード・デザイン・共通の読み辞書（`lessons/shared/`）・CLAUDE.md・共通設定など次回以降も使うもの。詳細は`../../remotion/docs/video-migration-plan.md`の「cleanupの対象」。3本（L01・free-trial・sales-intro）はまだ配信先が未決定で、アップロード前なので対象外
-  - **一時例外（2026-10-30決定）**：この3本は移行検証用fixture。アップロードと再生確認が済んでも、**Phase 4の移行検証が終わるまでcleanupを延期する**（恒久保存ではない。Phase 4の検証後に通常のcleanup〈①一覧→②残るもの→③確認→④承認後に削除〉の対象にする）。**Phase 4の移行検証は2026-11-04に完了**（3本とも音声・LUFS／TPがPhase 0と一致、映像の差は旧方式でも同じ場所に出る環境・録画再生の揺れで、移行による差ではない）。cleanupは公開・配信の状況を確認し、ユーザーの承認を得てから。同計画の「移行用の基準（fixture）」
+- **cleanup（全動画プロジェクト共通、2026-10-30）**：アップロードと再生確認が終わったら、その動画固有の制作物（録画・スクショ等の専用素材、音声、中間生成物、キャッシュ、連番、完成MP4、専用の出典台帳・メモ等）を毎回削除する。手順は「①削除対象の一覧 → ②削除後に残るもの → ③ユーザー確認 → ④承認後に削除」。残すのは共通コード・デザイン・共通の読み辞書（`lessons/shared/`）・CLAUDE.md・共通設定など次回以降も使うもの。詳細は`../../remotion/docs/video-migration-plan.md`の「cleanupの対象」。L01は2026-11-05にcleanup済み（上記）。free-trialはアップロードの記録が無い。sales-introはCloudflare R2へアップロード済み（2026-10-25、`../../paid-site/CLAUDE.md`）だが、公開URLでの再生確認の記録が無い。どちらも確認できるまでcleanupしない
+  - **一時例外（2026-10-30決定）**：この3本（L01・free-trial・sales-intro）は移行検証用fixture。アップロードと再生確認が済んでも、**Phase 4の移行検証が終わるまでcleanupを延期する**（恒久保存ではない。Phase 4の検証後に通常のcleanup〈①一覧→②残るもの→③確認→④承認後に削除〉の対象にする）。**Phase 4の移行検証は2026-11-04に完了**（3本とも音声・LUFS／TPがPhase 0と一致、映像の差は旧方式でも同じ場所に出る環境・録画再生の揺れで、移行による差ではない）。cleanupは公開・配信の状況を確認し、ユーザーの承認を得てから。同計画の「移行用の基準（fixture）」
 
 ## フォルダ
 
 ```
 lessons/shared/pronunciation.json   全Lesson共通の読み辞書
-lessons/lesson-XX/lesson.json       Lessonの台本＋画面指定（正本）
-course.json                         声・音量・描画・仕上げの設定と完成済み3本（fixtures）
+course.json                         声・音量・描画・仕上げの設定と完成済みの2本（fixtures）
 scripts/cc.mjs                      制作コマンド（new / narration / captions / render / encode）
 scripts/lib/engine.mjs              共通remotionへの唯一の入口
 scripts/lib/lesson.mjs・captions.mjs  台本のルール・字幕の表示ルール
 lessons/shared/lesson.example.json  新しいLessonの台本の雛形
 <id>/                               新しいLessonの外部プロジェクト（2026-11-03〜）
-public/lessons/lesson-XX/audio/     生成物（手で直さない。台本を直して作り直す）
-public/lessons/lesson-XX/screens/member-site/   会員サイトの実画面
-public/lessons/lesson-XX/recordings/            採用した画面録画
-lessons/lesson-XX/assets.md         素材台帳（どの素材をどのシーンで使うか）
+public/lessons/lesson-01/screens/member-site/   会員サイトの実画面（L01で撮影。sales-introが使う）
+public/lessons/lesson-01/recordings/            サポーター録画（同上）
 lessons/free-trial/lesson.json      無料体験動画の台本（正本。--lesson=free-trial）
 public/free-trial/                  無料体験動画の録画素材（01〜05）
 public/free-trial/audio/            無料体験動画のナレーション生成物（手で直さない）
@@ -86,7 +84,7 @@ src/scenes/index.tsx                layout名→画面の対応（title / chapte
 src/components/                     共通component（Frame / TitleCard / ChapterTitle / KeyPoints / Subtitle / SceneFade / ScreenFrame / FlowSteps / ChatBubbles / CompareCards / CardGrid / EndCard / FitText）、字幕・画面文字の改行ロジック（captionLayout.ts）、表示タイミング（reveal.ts）
 src/theme/tokens.ts                 色・フォント（Noto Sans JP）・領域・字幕・動きの値
 raw/                                録画・キャプチャの元データ（Git管理外）
-out/lesson-XX/                      完成MP4など（Git管理外）
+out/<free-trial|sales-intro>/       完成済み2本のMP4など（Git管理外）
 .cache/voicevox-engine/             完成済み3本（fixtures）の文ごとの合成キャッシュ（Git管理外、消してもよい。新しいLessonは各プロジェクトのintermediate/cache/voicevox/）
 ```
 
@@ -114,12 +112,12 @@ out/lesson-XX/                      完成MP4など（Git管理外）
   - speedScaleは1.00／1.04／1.08／1.12を聞き比べて1.04に決定（2026-09-30）
   - 話者を変えたら、`lesson.json`のend画面の`visual.credit`も同じ話者名に直す
 - 間：冒頭0.6秒、文と文の間0.5秒、シーンの間1.0秒、末尾2.0秒（`lesson.json`の`timing`）
-- コマンド（`<video>`は`--project=<id>`、完成済み3本は`--lesson=01|free-trial|sales-intro --out-dir=<claude-course の外>`）：
+- コマンド（`<video>`は`--project=<id>`、完成済みの2本は`--lesson=free-trial|sales-intro --out-dir=<claude-course の外>`）：
   - `node scripts/cc.mjs narration <video> --dry-run [--kana]`：台本検査・字幕と読みの一覧・ENGINE確認（`--kana`でENGINEの読みと推定尺も表示）。合成・書き込みなし
   - `node scripts/cc.mjs narration <video> [--force]`：生成。既存出力は`--force`なしでは上書きしない
   - `node scripts/cc.mjs narration <video> --line=l021`：1文だけ合成して試聴用に出す（プロジェクトは`intermediate/cache/voicevox/preview/`、fixtureは`<out-dir>/preview/`）
 - 処理：文ごとに`audio_query`→`synthesis`（24kHz mono 16bit、読み＋話者＋設定＋ENGINEバージョンでキャッシュ）→ 無音を挟んで1本のタイムラインに結合 → 48kHzに変換して音量を測り、線形ゲイン1回だけで-16 LUFSへ近づける（true peak -1.5 dBTPが上限。圧縮・リミッターは使わない）→ `pcm_s16le` 48kHz stereo
-- 出力（`public/lessons/lesson-XX/audio/`）：
+- 出力（`<id>/audio/`。完成済みの2本は`public/<…>/audio/`）：
   - `narration.wav`：動画全体の音声トラック（0秒＝動画の先頭）
   - `narration.json`：ENGINEバージョン・話者・設定・音量・章／シーン／文ごとの開始・終了秒（映像側はこれを正とする）
   - `narration.srt`：1文＝1キュー、読み上げた本文のまま（音声の書き起こし）
@@ -198,8 +196,8 @@ out/lesson-XX/                      完成MP4など（Git管理外）
 
 ## 映像（Remotion）
 
-- コマンド：`npm.cmd run dev`（Studio。Windowsはnpm.cmd）／`npm.cmd run lint`（eslint＋tsc）／`node scripts/check-display-text.mjs --lesson=01`（字幕の表示と改行、画面文字（`visual`・章タイトル）の読点と表記、`captions.vtt`が表示と一致するかを検査）
-- Composition：`L01-Intro`（1920×1080／30fps）。尺は`calculateMetadata`で`narration.json`の`durationSeconds`から決める（固定値を書かない）
+- コマンド：`npm.cmd run dev`（Studio。Windowsはnpm.cmd）／`npm.cmd run lint`（eslint＋tsc）／`node scripts/check-display-text.mjs --project=<id>`（`--lesson=free-trial|sales-intro`も可。字幕の表示と改行、画面文字（`visual`・章タイトル）の読点と表記、`captions.vtt`が表示と一致するかを検査）
+- Composition：`FreeTrial`・`SalesIntro`、新しいLessonは`Lesson`（1920×1080／30fps）。尺は`calculateMetadata`で`narration.json`の`durationSeconds`から決める（固定値を書かない）
 - 1920×1080／30fps。**動画本体は黒〜チャコールのダークデザイン**（背景チャコール、見出し白、本文は白〜薄いグレー、補助はグレー、アクセントは青〜水色を少量、カードは濃いグレー、字幕帯は背景より濃い黒・字幕は白）。ネオン・発光・派手なHUDは使わない。過度なアニメーションは使わない。トランジションは短いフェード（`SceneFade`）のみ。色は`src/theme/tokens.ts`の`color`だけで決める
 - 会員サイトのスクショ・画面録画は元の白・青系のまま使い、ダーク背景の上にブラウザ風／カード風の枠・余白・控えめな影を付けて置く（`tokens.ts`の`screen`）。動画本体の背景を白・青にしない
 - 画面：上に見出し帯（講座名＋章ラベル。title・chapterのシーンでは非表示）、下200pxは字幕専用の帯で、内容は字幕帯に入らない
@@ -213,15 +211,15 @@ out/lesson-XX/                      完成MP4など（Git管理外）
   - 和文は`palt`（プロポーショナル字詰め）で表示する（全角カナの前後に空白が見えないように）
 - 表示文字の表記（字幕・タイトル・見出し・要点・画面中央のメッセージなど視聴者に見える日本語すべて。`lesson.json`の`text`・`yomi`・音声・`narration.json`・SRTは変えない）：
   - 画面文字は`lesson.json`の`visual`（と章タイトル）に最初からこのルールで書く。字幕は下記`captions.json`で整える
-  - 表記の調整は`lessons/lesson-XX/captions.json`の`overrides`（文ID→表示字幕）に書く。無い文は`narration.json`の`caption`をそのまま出す。存在しない文IDや2行（全角50字）を超える字幕は読み込み時にエラー
+  - 表記の調整は`<id>/input/captions.json`（完成済みの2本は`lessons/<…>/captions.json`）の`overrides`（文ID→表示字幕）に書く。無い文は`narration.json`の`caption`をそのまま出す。存在しない文IDや2行（全角50字）を超える字幕は読み込み時にエラー
   - 「、」は表示しない（描画時に取り除く。2行に分ける位置の目印としてだけ使う）。名詞の並びは「・」、動作の並びは全角スペースで区切る。「|」で2行の区切り位置を指定できる
   - 2行表示（`src/components/captionLayout.ts`）：1行は全角25字まで（英字は0.6字として計算）。超えたら意味の区切り（「、」「」」「・」全角スペースの後、「「」の前、ひらがなの後で次が漢字・カタカナ・英字になる所）だけで改行し、その中で元の「、」の位置を優先、次に2行の長さが均等になる位置を選ぶ。英字の名称（Claude Code・Windows等）・漢字語・カタカナ語の途中、ひらがな同士の間（「ます」「です」だけ残さない）、「下さい」「欲しい」の直前では改行せず、2行目を助詞・小さい字で始めない。短すぎる行（全体の35%未満）は他に候補が無いときだけ。各行はブラウザに折り返させない
   - 漢字にできる一般語は読みやすさを損なわない範囲で漢字にする（例：三つ→３つ、こと→事、すべて→全て、つかむ→掴む、ください→下さい、たとえば→例えば、とき→時）。「できる」「ただし」「まず」「このように」などはひらがなのまま
 - `narration.json`と`lesson.json`の章・シーン・文（ID・順番・本文）が一致しないと、読み込み時にエラーで止まる（台本を直したら音声を`--force`で作り直す）
 - 画面キャプチャはテスト用アカウントで撮り、メールアドレス・氏名・ChatGPTのアカウント名などの個人情報は映さない（またはぼかす）
-- 完成MP4の書き出し（mp4-direct方式。`narration.wav`自体は変えない。共通remotionで行う）：
-  1. `node scripts/cc.mjs render --lesson=01 --out-dir=<claude-course の外> [--concurrency=N]`：h264 CRF18 yuv420p・AAC 320kの中間MP4（`<out-dir>/render.mp4`。JPEGフレーム由来でフルレンジ）
-  2. `node scripts/cc.mjs encode --lesson=01 --out-dir=<同じ>`：中間MP4の音量を測り、映像はlibx264 CRF18 slow・フル→リミテッドレンジ・BT.709、音声は2パスloudnorm（I=-16・TP=-1.5）→48kHz AAC 192k、faststart（設定は`course.json`の`finish`）
+- 完成MP4の書き出し（mp4-direct方式＝`presentation.json`の`render`が`mp4-direct`のLesson。L01と同じ方法。`narration.wav`自体は変えない。共通remotionで行う）：
+  1. `node scripts/cc.mjs render --project=<id> [--concurrency=N]`：h264 CRF18 yuv420p・AAC 320kの中間MP4（`intermediate/render.mp4`。JPEGフレーム由来でフルレンジ）
+  2. `node scripts/cc.mjs encode --project=<id>`：中間MP4の音量を測り、映像はlibx264 CRF18 slow・フル→リミテッドレンジ・BT.709、音声は2パスloudnorm（I=-16・TP=-1.5）→48kHz AAC 192k、faststart（設定は`course.json`の`finish`）
   3. 確認：1920×1080・30fps・h264・yuv420p・AAC 48kHz・フレーム数、-16 LUFS前後／True Peak -1〜-2 dBTP、moov→mdat
-  - poster：`node scripts/cc.mjs render --lesson=01 --out-dir=<同じ> --still=<png> --frame=17`（最初の字幕が出る直前のタイトル画面）。`captions.vtt`は`public/lessons/lesson-01/audio/`からコピー
+  - poster：`node scripts/cc.mjs render --project=<id> --still=<png> --frame=N`（L01は最初の字幕が出る直前のタイトル画面＝frame 17）。`captions.vtt`は`audio/`にある
 - サポーター録画（`claude-supporter-demo.mp4`）はミュートで使い、「質問する→回答が始まる→1ステップずつ案内される」部分を中心にする。回答中の「ファイルを修正→commit→push」が長く目立つ使い方はしない（本編でpushまで実践すると誤解させない）

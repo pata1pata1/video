@@ -9,7 +9,7 @@
 //      few may be correct as they are.
 //   4. captions.vtt: must match the displayed captions (wording and rows).
 //
-// Usage: node scripts/check-display-text.mjs --project=<id>   (or --lesson=01 / free-trial / sales-intro)
+// Usage: node scripts/check-display-text.mjs --project=<id>   (or --lesson=free-trial / sales-intro)
 // Exit code 1 when there are errors (hints alone do not fail).
 
 import fs from "node:fs";
@@ -19,7 +19,7 @@ import { claudeCourse } from "./lib/engine.mjs";
 
 const arg = (name) => process.argv.find((a) => a.startsWith(`--${name}=`))?.slice(name.length + 3);
 const project = arg("project");
-const lessonNo = project ? undefined : (arg("lesson") ?? "01");
+const lessonNo = project ? undefined : arg("lesson");
 const paths = claudeCourse.videoSources({ lesson: lessonNo, project });
 const read = (file) => JSON.parse(fs.readFileSync(file, "utf8"));
 
