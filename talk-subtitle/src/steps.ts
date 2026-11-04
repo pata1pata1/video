@@ -220,26 +220,13 @@ export function appendRetakeCandidates(project: Project, options: { dryRun?: boo
   const approved = cuts.items
     .filter((c) => decisions.cuts.items[c.id]?.decision === "cut")
     .map((c) => ({ start: decisions.cuts.items[c.id].start ?? c.start, end: decisions.cuts.items[c.id].end ?? c.end }));
-  const speechKinds = new Set(["filler", "restart", "retake", "correction-marker"]);
   const uncovered = (s: number, e: number) => {
     // seconds of [s, e) not already inside an approved cut
     let covered = 0;
     for (const r of unionRanges(approved)) covered += Math.max(0, Math.min(e, r.end) - Math.max(s, r.start));
     return e - s - covered;
   };
-  const settings = loadSettings(paths).candidates;
-  const pcm = readPcmWav(paths.audioWav);
-  const found = [
-    ...detectRetakes(transcript),
-    // Hidden pauses have no sentence/phrase information: keep the (longer) sentence-boundary room.
-    ...detectHiddenPauses(transcript, pcm, cuts.speechDb, { ...settings, keepPaddingSeconds: pausePadding(settings, true) }),
-  ].sort((a, b) => a.start - b.start);
-  const drafts = found.filter((d) => {
-    if (uncovered(d.start, d.end) < 0.15) return false; // already cut
-    // Same thing as an existing candidate of the same family (≥ 50 % overlap).
-    const family = (k: string) => (speechKinds.has(k) ? "speech" : k);
-    return !cuts.items.some((c) => family(c.kind) === family(d.kind) && Math.min(c.end, d.end) - Math.max(c.start, d.start) >= 0.5 * Math.min(c.end - c.start, d.end - d.start));
-  });
+  const drafts = round2Drafts(transcript, readPcmWav(paths.audioWav), cuts.speechDb, loadSettings(paths).candidates, cuts.items, uncovered);
   let next = Math.max(0, ...cuts.items.map((c) => Number(c.id.slice(1)) || 0)) + 1;
   const added = drafts.map((d) => ({ id: `c${next++}`, ...d, duration: Math.round((d.end - d.start) * 1000) / 1000, round }));
   const items = [...cuts.items, ...added];
@@ -270,7 +257,35 @@ export function appendRetakeCandidates(project: Project, options: { dryRun?: boo
   return { added, uncoveredSeconds, written: true };
 }
 
-function unionRanges(ranges: { start: number; end: number }[]) {
+/**
+ * Round-2 detectors (phrase retakes + hidden pauses / speech in word spans), minus what adds
+ * nothing: less than 0.15 s outside what is already cut (`uncovered`), or the same thing as an
+ * existing candidate of the same family (≥ 50 % overlap). Shared by appendRetakeCandidates and
+ * the evaluation (src/style/evaluate.ts), so both see the same candidates.
+ */
+export function round2Drafts(
+  transcript: Transcript,
+  pcm: ReturnType<typeof readPcmWav>,
+  speechDb: number,
+  settings: ReturnType<typeof loadSettings>["candidates"],
+  existing: { kind: string; start: number; end: number }[],
+  uncovered: (s: number, e: number) => number,
+) {
+  const speechKinds = new Set(["filler", "restart", "retake", "correction-marker"]);
+  const found = [
+    ...detectRetakes(transcript),
+    // Hidden pauses have no sentence/phrase information: keep the (longer) sentence-boundary room.
+    ...detectHiddenPauses(transcript, pcm, speechDb, { ...settings, keepPaddingSeconds: pausePadding(settings, true) }),
+  ].sort((a, b) => a.start - b.start);
+  return found.filter((d) => {
+    if (uncovered(d.start, d.end) < 0.15) return false; // already cut
+    // Same thing as an existing candidate of the same family (≥ 50 % overlap).
+    const family = (k: string) => (speechKinds.has(k) ? "speech" : k);
+    return !existing.some((c) => family(c.kind) === family(d.kind) && Math.min(c.end, d.end) - Math.max(c.start, d.start) >= 0.5 * Math.min(c.end - c.start, d.end - d.start));
+  });
+}
+
+export function unionRanges(ranges: { start: number; end: number }[]) {
   const out: { start: number; end: number }[] = [];
   for (const r of [...ranges].sort((a, b) => a.start - b.start)) {
     const last = out[out.length - 1];

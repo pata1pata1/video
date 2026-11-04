@@ -12,6 +12,8 @@ export const SUBTITLE_PRESETS_DIR = path.join(SHARED_DIR, "subtitle-presets");
 /** Editing-style learning data (outside Git: holds speech text of real projects). */
 export const STYLE_DATA_DIR = path.join(TOOL_ROOT, "style-data");
 export const STYLE_OBSERVATIONS_DIR = path.join(STYLE_DATA_DIR, "observations");
+/** Evaluation results (npm run evaluate): never read by the learning. */
+export const STYLE_TRIALS_DIR = path.join(STYLE_DATA_DIR, "trials");
 
 export const PROJECT_SUBDIRS = ["input", "audio", "intermediate", "review", "output"] as const;
 

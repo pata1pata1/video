@@ -42,7 +42,7 @@
 
 | コマンド | 内容 |
 |---|---|
-| `npm run new -- --id=<id> [--kind=reference]` | 案件を作る（上書きしない）。reference は別のソフトで編集した横長の動画の学習用（`input/reference/` の `source/` に元動画1本・`final/` に完成動画1本と任意の SRT・`assets/` に素材。前の形の直下 source.*・final.* も可） |
+| `npm run new -- --id=<id> [--kind=reference|evaluation]` | 案件を作る（上書きしない）。evaluation は reference と同じ形で、学習に使わず再現度を測る検証用（下記）。reference は別のソフトで編集した横長の動画の学習用（`input/reference/` の `source/` に元動画1本・`final/` に完成動画1本と任意の SRT・`assets/` に素材。前の形の直下 source.*・final.* も可） |
 | `npm run phase1 -- --project=<id>` | 解析 → 文字起こし → 固有名詞 → カット候補 → review.html を順に実行（済んだ文字起こしは省略） |
 | `npm run analyze` / `transcribe` / `terms` / `candidates` / `review` | 各工程を1つずつ |
 | `npm run status -- --project=<id>` | 工程・未承認の件数・次にやること |
@@ -57,6 +57,7 @@
 | `npm run render -- --project=<id> [--force]` | 最終書き出し output/final.mp4（字幕の焼き込み・-14 LUFS・検証。14.3）。**字幕の承認と確認動画のチェックの後、ユーザーの指示で** |
 | `npm run style -- observe / show --project=<id>` | 編集スタイルの学習 S1：案件の判断を `style-data/observations/<id>.json` に記録（観察だけ。何も適用しない。**横長の動画だけ**。docs/design.md の15章） |
 | `npm run reference -- register / analyze / transcribe / reconstruct / all / show --project=<id>` | 学習 S2：reference 案件の元動画と完成動画（**どちらも横長**）を比べて、残した区間・削った区間を復元（intermediate/reconstruction.json）。すべて読み取りのみ。`register` は sha256 と素材の一覧の記録だけ（解析しない） |
+| `npm run evaluate -- --project=<id> [--list] [--dry-run]`／`npm run evaluate -- summary` | 既定値の再現度の検証：元動画から今の既定値で候補をメモリ上だけで作り、完成動画から復元したユーザーのカットと比べる（適合率・再現率・時間の一致など）。案件のファイルは変えない。結果は `style-data/trials/<id>.json`（学習には使わない）。docs/design.md の15章「検証」 |
 | `npm run setup-faster-whisper` | faster-whisper の環境（`.venv`）とモデルを用意（何度でも可） |
 | `npm run typecheck` / `npm run lint` | 型チェック（remotion の TypeScript）／client JS・Python の構文チェック |
 
@@ -90,6 +91,7 @@
 
 - カット候補の既定値は、reference 学習4本（`ref-landscape-001`〜`004`）から出したルール：文の区切りの間 約0.5秒・文の途中の間 約0.3秒・冒頭の撮り直しは最後のテイク・強いフィラーは原則削る・「なんか」は残す・言葉の重ね（でで・このこの）は最後の1回を残す。詳細は `docs/design.md` の6.1、根拠は `docs/landscape-edit-pattern.md`
 - 基本ルールとして使い、内容や話し方に合わせて柔軟に判断する（案件ごとに `input/settings.json` で変えられる）。**意味が変わりそうなカット・判断が難しい所は確認対象（review）にして、勝手に確定しない**
+- **新しい動画での検証**：学習に使っていない動画は `--kind=evaluation` で作り、`npm run reference -- all` → `npm run evaluate -- summary`。evaluation 案件は `style observe` が止まり、学習データ（`style-data/observations/`）に入らない。検証のために、Claude が完成動画を見てから候補を直すことはしない（測るのはツールの自動候補）
 - **横長トーク動画だけのルール**。ニュースショートなど別の編集スタイル（`../short-movie` など）には使わない
 
 ## 未実装

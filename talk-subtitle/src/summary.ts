@@ -8,7 +8,7 @@ import { currentCutDecisions, currentTermDecisions, cutSummary, loadDecisions } 
 import { loadMergedGlossary } from "./glossary.ts";
 import path from "node:path";
 import type { CutReport, Timemap } from "./cut.ts";
-import { STYLE_OBSERVATIONS_DIR } from "./paths.ts";
+import { STYLE_OBSERVATIONS_DIR, STYLE_TRIALS_DIR } from "./paths.ts";
 import { readJsonIfExists, type Project } from "./project.ts";
 import { glossaryFingerprint } from "./steps.ts";
 import type { TranscriptFile } from "./transcript.ts";
@@ -39,7 +39,8 @@ export function printStatus(project: Project) {
   if (json.kind === "reference") {
     const ref = json.reference;
     const mark = (b: boolean) => (b ? "✔" : "・");
-    console.log(`種類: reference（別のソフトで編集した動画。編集スタイルの学習用）`);
+    const isEval = json.learning?.purpose === "evaluation";
+    console.log(isEval ? `種類: evaluation（別のソフトで編集した動画。既定値の再現度の検証用。学習には使わない）` : `種類: reference（別のソフトで編集した動画。編集スタイルの学習用）`);
     console.log(`完成動画: ${ref ? `${ref.final.file}（${mb(ref.final.sizeBytes)}）` : "未登録"}　SRT: ${ref?.srt ? ref.srt.file : "なし"}`);
     console.log(`素材: ${ref?.assets ? `${ref.assets.count}ファイル（${mb(ref.assets.totalBytes)}、一覧は intermediate/reference-assets.json）` : "未登録"}`);
     console.log("\n工程:");
@@ -47,7 +48,8 @@ export function printStatus(project: Project) {
     console.log(`  ${mark(fs.existsSync(paths.probe) && fs.existsSync(paths.finalWav))} 1. 解析（両方）        npm run reference -- analyze`);
     console.log(`  ${mark(fs.existsSync(paths.transcript) && fs.existsSync(paths.finalTranscript))} 2. 文字起こし（両方）  npm run reference -- transcribe`);
     console.log(`  ${mark(fs.existsSync(paths.reconstruction))} 3. カットの復元        npm run reference -- reconstruct`);
-    console.log(`  ${mark(fs.existsSync(path.join(STYLE_OBSERVATIONS_DIR, `${json.id}.json`)))} 4. 観察               npm run style -- observe`);
+    if (isEval) console.log(`  ${mark(fs.existsSync(path.join(STYLE_TRIALS_DIR, `${json.id}.json`)))} 4. 再現度の検証       npm run evaluate`);
+    else console.log(`  ${mark(fs.existsSync(path.join(STYLE_OBSERVATIONS_DIR, `${json.id}.json`)))} 4. 観察               npm run style -- observe`);
     return;
   }
 

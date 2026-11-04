@@ -47,7 +47,7 @@ export type ProjectJson = {
     assets?: { count: number; totalBytes: number; fingerprint: string } | null;
   };
   /** Kept out of the editing-style learning (a trial / check project): style observe refuses it. */
-  learning?: { exclude: true; reason: string };
+  learning?: { exclude: true; reason: string; /** evaluation: a reference project kept to measure how well the defaults reproduce the user (npm run evaluate). */ purpose?: "evaluation" };
 };
 
 export type ProjectKind = "production" | "reference";
@@ -108,14 +108,16 @@ export function sha256File(file: string): Promise<string> {
   });
 }
 
-export function createProject(id: string, options: { dryRun?: boolean; kind?: ProjectKind } = {}): ProjectPaths {
+/** evaluation = a reference project that is never learned from (learning.exclude); see src/style/evaluate.ts. */
+export function createProject(id: string, options: { dryRun?: boolean; kind?: ProjectKind | "evaluation" } = {}): ProjectPaths {
+  const isRef = options.kind === "reference" || options.kind === "evaluation";
   const paths = projectPaths(id);
   if (fs.existsSync(paths.root)) {
     throw new UserError(`案件 ${id} はすでにあります: ${paths.root}（上書きしません）`);
   }
   if (options.dryRun) return paths;
   for (const sub of PROJECT_SUBDIRS) fs.mkdirSync(path.join(paths.root, sub), { recursive: true });
-  if (options.kind === "reference") for (const d of [paths.referenceSourceDir, paths.referenceAssetsDir, paths.referenceFinalDir]) fs.mkdirSync(d, { recursive: true });
+  if (isRef) for (const d of [paths.referenceSourceDir, paths.referenceAssetsDir, paths.referenceFinalDir]) fs.mkdirSync(d, { recursive: true });
   const json: ProjectJson = {
     version: 1,
     tool: "talk-subtitle",
@@ -125,7 +127,10 @@ export function createProject(id: string, options: { dryRun?: boolean; kind?: Pr
     status: "active",
     locked: false,
     source: null,
-    ...(options.kind === "reference" ? { kind: "reference" as const } : {}),
+    ...(isRef ? { kind: "reference" as const } : {}),
+    ...(options.kind === "evaluation"
+      ? { learning: { exclude: true as const, reason: "学習に使っていない動画で、既定値の再現度を測る検証用（evaluation）", purpose: "evaluation" as const } }
+      : {}),
   };
   writeJsonAtomic(paths.projectJson, json);
   return paths;

@@ -8,13 +8,14 @@
 //   npm run reference -- reconstruct --project=<id> [--dry-run]
 //     元動画と完成動画を比べて、残した区間・削った区間を復元 → intermediate/reconstruction.json
 //   npm run reference -- all --project=<id>（横長の元動画・完成動画だけ）
-//     上の3つ ＋ npm run style -- observe
+//     上の3つ ＋ npm run style -- observe（evaluation 案件は observe の代わりに npm run evaluate の検証）
 //   npm run reference -- show --project=<id> [--list]
 
 import fs from "node:fs";
 import { parseArgs, runCli, UserError } from "../src/cli.ts";
 import { loadProject, readJson, writeJsonAtomic } from "../src/project.ts";
 import { analyzeReference, assertReference, registerReference, transcribeReference } from "../src/reference.ts";
+import { evaluateProject, printTrial, trialFile } from "../src/style/evaluate.ts";
 import { observationFile, observeProject } from "../src/style/observe.ts";
 import { reconstructCuts, writeReconstruction, type Reconstruction } from "../src/style/reconstruct.ts";
 import { printObservation, printReconstruction } from "../src/style/report.ts";
@@ -30,8 +31,10 @@ await runCli(async () => {
   const scope = args.get("scope");
   if (scope !== undefined && scope !== "landscape") throw new UserError("--scope は landscape だけです（talk-subtitle の学習は横長の動画だけ）。");
 
-  const steps = command === "all" ? ["analyze", "transcribe", "reconstruct", "observe"] : [command];
-  if (!steps.every((s) => ["register", "analyze", "transcribe", "reconstruct", "observe", "show"].includes(s))) {
+  // evaluation projects are never learned from: measure the defaults instead of observing.
+  const isEvaluation = project.json.learning?.purpose === "evaluation";
+  const steps = command === "all" ? ["analyze", "transcribe", "reconstruct", isEvaluation ? "evaluate" : "observe"] : [command];
+  if (!steps.every((s) => ["register", "analyze", "transcribe", "reconstruct", "observe", "evaluate", "show"].includes(s))) {
     throw new UserError("使い方: npm run reference -- register|analyze|transcribe|reconstruct|all|show --project=<id>");
   }
   for (const step of steps) {
@@ -63,6 +66,12 @@ await runCli(async () => {
       printObservation(o);
       writeJsonAtomic(observationFile(project.json.id), o);
       console.log(`\n→ style-data/observations/${project.json.id}.json`);
+    } else if (step === "evaluate") {
+      const t = evaluateProject(project);
+      console.log("");
+      printTrial(t);
+      writeJsonAtomic(trialFile(t.id), t);
+      console.log(`\n→ style-data/trials/${t.id}.json（学習データには入りません。一覧は npm run evaluate -- --project=${t.id} --list）`);
     } else if (step === "show") {
       if (!fs.existsSync(project.paths.reconstruction)) throw new UserError("reconstruction.json がまだありません。");
       printReconstruction(readJson<Reconstruction>(project.paths.reconstruction), sourceWords(), { list: args.has("list") });
