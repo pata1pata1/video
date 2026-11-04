@@ -155,14 +155,24 @@ talk-subtitle/
 
 | kind | 検出方法 | 提案 |
 |---|---|---|
-| `silence` | **単語と単語の時刻の隙間**（既定 0.7秒以上、冒頭・末尾を含む）のうち、音量（WAV から直接測る RMS）が話し声より 15dB 以上小さいもの。前後に余白（既定 0.2秒）を残す | cut |
-| `filler` | えー・えっと・うーん・あのー など。あの・その・まあ は普通の言葉でもあるので確認だけ | cut／review |
-| `restart` | 同じ語句（3文字以上、または「、」を挟んだ2文字）が続けて繰り返される。前の方を削る | cut |
-| `retake` | 隣り合う文がよく似ている、または前の文が次の文の書き出しと同じ。**後のテイクを残す** | cut |
+| `silence` | **単語と単語の時刻の隙間**（冒頭・末尾を含む）のうち、音量（WAV から直接測る RMS）が話し声より 15dB 以上小さいもの。**文の区切り**（Whisper の文の終わり・。！？）は 0.7秒以上の間を **約0.5秒**に、**文の途中**（、の後も含む）は 0.5秒以上の間を **約0.3秒**にする（前後に半分ずつ残す。2026-11-04 の既定、下の6.1）。冒頭・末尾は最初の語の前・最後の語の後に 0.3秒 | cut |
+| `filler` | えー・えっと・うーん・あのー など（強いフィラー）は原則削る案。あの・その・まあ は普通の言葉でもあるので確認だけ（文頭の「あの」「まあ」は「削ることが多い」と表示）。**「なんか」は話し方の特徴なので候補にしない**（`speechStyleWords`） | cut／review |
+| `restart` | 同じ語句（3文字以上、または「、」を挟んだ2文字）が続けて繰り返される。前の方を削る。**文の頭の接続の言葉の重ね**（「で。で、あと」「でで、だから」「このこの」。`repeatedConnectives`）は文をまたいでも見て、最後の1回だけ残す | cut |
+| `retake` | 隣り合う文がよく似ている、または前の文が次の文の書き出しと同じ。**後のテイクを残す**。**冒頭の撮り直し**（最初の120秒で、最初の書き出しと同じ言葉からもう一度始めている。前のテイクが40字以内で止まっている時だけ数える）は、最後のテイクを残す案。前のテイクが20字を超える時は、最後のテイクに足りない内容があるかもしれないので確認だけ | cut／review |
 | `correction-marker` | 「じゃなくて」「言い直し」「もう一回」「失礼しました」など | review |
 | `unclear` | 確からしさが低い文／単語の隙間なのに音がある（話し声との差が 15dB 未満）区間 | review（削る提案はしない） |
 
 Whisper はフィラーを文字に起こさないことがあるので、`unclear`（声はあるのに文字が無い）も見る。
+
+### 6.1 学習した編集ルールの既定値（2026-11-04、横長トーク動画用）
+
+reference 学習（`ref-landscape-001`〜`004`、ユーザーが自分で編集した横長の動画4本）から出したルールを、ユーザーの指示で既定値にした。根拠の数値は `docs/landscape-edit-pattern.md`。
+
+- **基本ルールであって、決まりではない**：候補は今までどおり提案だけで、承認するまで何も削らない。動画の内容や話し方に合わせて、案件ごとに `input/settings.json` の `candidates` で変えられる（`sentencePauseSeconds`・`phrasePauseSeconds`・`phraseMinGapSeconds`・`speechStyleWords`・`repeatedConnectives`・`openingWindowSeconds`）。前の決まり（どの間も前後 0.2秒）に戻すなら `"keepPaddingSeconds": 0.2`
+- **話の意味が変わりそうなものや判断が難しいものは、確認だけ（review）にする**：訂正の言葉・不明瞭・弱いフィラー・前のテイクが長い冒頭の撮り直し。脱線や重なる内容の話はツールでは見つけないので、今までどおり Claude が候補を出して、ユーザーが確認する
+- **横長トーク動画だけに使う**。縦型ショート（`../short-movie`）やニュースショートなど、別の編集スタイルには使わない（そちらのツールはこの設定を読まない）
+- 既存の案件の候補は、作り直さない限り変わらない（`npm run candidates` は、承認済みの案件では `--force` が無いと止まる）。`talking-test-01` は前の既定で作った候補のまま
+- 学習動画4本で、新しい候補と実際の編集を比べた結果：削る案のうちユーザーも削っていた割合は 90.2〜91.0%（003 は 59.8%。もとから候補が少ない短い動画）。冒頭の撮り直しは、撮り直しのあった3本すべてで見つかった（実際のカットとの一致 94〜100%）
 
 **実動画での調整（2026-10-09、最初の実案件）**：最初は ffmpeg の silencedetect で間を探していたが、実際の撮影では小さな物音（クリック音・息）で無音が途切れ、間の大半を拾えなかった（67区間・26.7秒のみ。その分「声はあるのに文字が無い」が117件に増えた）。単語の隙間＋区間の音量で判定する方式に変更し、無音・間 64件（190.7秒）／不明瞭 21件になった。`silences.json` は参考情報として残す。
 
@@ -246,6 +256,7 @@ npm run decide -- --project=<id> --accept-term=t1 --reject-term=t2 --term-text=t
 - 指定方法：`npm run transcribe -- --project=<id> --backend=…`（phase1 も同じ）、または案件の `input/settings.json` に `{ "transcribe": { "backend": "faster-whisper" } }`
 - 共通：モデル `large-v3-turbo`、言語 `ja`、glossary から作った prompt（faster-whisper は `initial_prompt`、whisper.cpp は `--prompt`）。入力はどちらも `npm run analyze` が ffmpeg で作った `audio/source-16k.wav`（元動画には触れない）。完全ローカル（faster-whisper はモデルの初回ダウンロードだけ通信）
 - faster-whisper の既定：CPU・`compute_type=int8`・6スレッド・beam_size 5（`input/settings.json` の `transcribe.fasterWhisper` で変更可）。i5-9400 で 25 秒の音声が約 13〜20 秒
+- **同じ文が最後まで繰り返される時**（2026-11-03、ref-landscape-004：長い無音のあと「おやすみなさい」が約4分続いた）：その案件の `input/settings.json` に `{ "transcribe": { "fasterWhisper": { "conditionOnPreviousText": false } } }` を書いて `--force` でやり直す（前の文を次の文の手がかりにしない）。既定は true（今までと同じ）。false にした時だけ transcript の `engine.conditionOnPreviousText: false` に記録する。注意：false では「まあ」などのフィラーが文字になりにくいことがある（ref-landscape-004 の前半で「まあ」8 → 0）
 - 導入：`npm run setup-faster-whisper`（Python は `winget install --id Python.Python.3.12 -e --scope user`。`.venv` 作成・requirements 導入・モデル取得。何度実行しても安全）。確認：`npm run doctor`
 
 ### PyAV を使わない理由と方法
@@ -440,6 +451,8 @@ npm run reference -- all --project=<id>             上の3つ＋observe
 - `reconstruction.json` は timemap.json と同じ `segments`（srcStart／srcEnd／outStart／outEnd／frames）・`removed`（＋`seconds`・`speechSeconds`：中の声の秒数）を持ち、`srcToOut` などがそのまま使える。ほかに `offset`・`ncc`・`gain`・`unmatched`・`pauses`・`speed`・`quality`（話し声の何%を再現できたか）・`stats`（カット回数・1分あたり・削除時間・残した割合）
 - observe は reference 案件では reconstruction.json を timemap の代わりに使う（`origin: "reference"`、間の provenance はすべて user-choice）。削った区間が「間だけ」か「声を含む」かは、元動画の音声で決める（Whisper の語の時刻は間にはみ出すため）
 - 映像は使わない（完成動画は切り抜き・拡大・重ねた画像があり、元の映像と直接は比べられない）。音声を差し替えた・BGM を入れた完成動画では、相関が下がって復元できない所が増える
+
+**4本の学習のまとめ（2026-11-03）**：`ref-landscape-001`〜`004` から出した編集パターンの案は `docs/landscape-edit-pattern.md`（既定値には未反映。項目ごとにユーザーが決める）。
 
 **横長動画での検証結果（2026-10-17）**：カット位置の正解（timemap.json）が分かっている横長動画（1920×1080・元 593.0秒 → 完成 335.5秒。字幕の焼き込み・-14 LUFS）を reference として復元し、正解と比べた。検証用の案件は学習データに入れない（`learning.exclude`）。
 - 話し声の 98.8% を元の位置で再現（相関の平均 0.973）、速度は変更なし（31区間）、音量差 +15.4dB でも対応は取れた。残した時間の誤差は 0.003秒（正解 335.485秒）、削除時間の誤差は 0.009秒（正解 257.547秒）

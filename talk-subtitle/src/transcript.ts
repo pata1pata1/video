@@ -28,6 +28,8 @@ export type TranscriptEngine = {
   computeType?: string;
   threads?: number;
   beamSize?: number | null;
+  /** faster-whisper only; recorded only when it is false (not the default). */
+  conditionOnPreviousText?: boolean;
   runtime?: Record<string, string>;
 };
 

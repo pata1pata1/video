@@ -433,7 +433,7 @@ export function observeProject(project: Project, options: ObserveOptions = {}): 
     gaps.push(
       "Whisper が文字にしなかった声（フィラー・息・言いかけ）は単語として出てこないため、フィラーの数には入りません（その多くは「不明瞭」の候補として判断が記録されています）。",
       "talk-subtitle が候補にしなかった編集（脱線・同じ意味の繰り返し・文中の余計な一語）は、ユーザーが範囲を広げた場合を除き記録できません。",
-      "間の残し方のうち、無音の候補をそのままカットした所は、ツールの余白（keepPaddingSeconds）で決まった長さです（provenance: tool-default）。",
+      "間の残し方のうち、無音の候補をそのままカットした所は、ツールの既定（文の区切り sentencePauseSeconds・文の途中 phrasePauseSeconds、または案件で指定した keepPaddingSeconds）で決まった長さです（provenance: tool-default）。",
     );
   }
 
@@ -478,7 +478,7 @@ export function observeProject(project: Project, options: ObserveOptions = {}): 
       timemapDecisionsFingerprint: timemap?.decisionsFingerprint ?? null,
       subtitleDraftFingerprint: draft?.fingerprint ?? null,
       termCandidatesFingerprint: terms?.fingerprint ?? null,
-      candidateSettings: { minGapSeconds: settings.candidates.minGapSeconds, quietMarginDb: settings.candidates.quietMarginDb, keepPaddingSeconds: settings.candidates.keepPaddingSeconds, edgePaddingSeconds: settings.candidates.edgePaddingSeconds },
+      candidateSettings: { minGapSeconds: settings.candidates.minGapSeconds, quietMarginDb: settings.candidates.quietMarginDb, keepPaddingSeconds: settings.candidates.keepPaddingSeconds, sentencePauseSeconds: settings.candidates.sentencePauseSeconds, phraseMinGapSeconds: settings.candidates.phraseMinGapSeconds, phrasePauseSeconds: settings.candidates.phrasePauseSeconds, edgePaddingSeconds: settings.candidates.edgePaddingSeconds },
       subtitlePreset: preset?.name ?? null,
       ...(recon
         ? { reconstruction: { createdAt: recon.createdAt, matchedSpeechRatio: recon.quality.matchedSpeechRatio, speed: recon.speed.verdict, speedRatio: recon.speed.ratio } }

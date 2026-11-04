@@ -89,7 +89,7 @@ export function planTranscription(settings: Settings["transcribe"], prompt: stri
     return {
       backend, reason, model, language, prompt, problems,
       runner: `${py} -I python/fw_transcribe.py`,
-      details: { device: "cpu", computeType: fw.computeType, threads: fw.threads, beamSize: fw.beamSize, modelsDir: MODELS_DIR, modelDownloaded: present },
+      details: { device: "cpu", computeType: fw.computeType, threads: fw.threads, beamSize: fw.beamSize, conditionOnPreviousText: fw.conditionOnPreviousText, modelsDir: MODELS_DIR, modelDownloaded: present },
     };
   }
   const w = getWhisperStatus();
@@ -196,6 +196,7 @@ async function runFasterWhisper(wav: string, plan: SttPlan, settings: Settings["
         "--compute-type", fw.computeType,
         "--beam-size", String(fw.beamSize),
         "--models-dir", MODELS_DIR,
+        ...(fw.conditionOnPreviousText === false ? ["--no-condition-on-previous-text"] : []),
         ...(plan.prompt ? [`--prompt=${plan.prompt}`] : []), // "=" form: a prompt may start with "-"
         ...(fasterWhisperModelPresent(plan.model) ? ["--offline"] : []),
       ],
@@ -238,6 +239,7 @@ async function runFasterWhisper(wav: string, plan: SttPlan, settings: Settings["
         computeType: r.engine.computeType,
         threads: r.engine.threads,
         beamSize: r.engine.beamSize,
+        ...(fw.conditionOnPreviousText === false ? { conditionOnPreviousText: false } : {}),
         runtime: { ctranslate2: r.engine.ctranslate2 },
       },
       language: r.language,

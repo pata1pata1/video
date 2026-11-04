@@ -5,7 +5,7 @@ Called by src/stt.ts with talk-subtitle/.venv's Python:
     python -I python/fw_transcribe.py --wav <16 kHz mono 16-bit WAV> --out <json>
         [--model large-v3-turbo] [--language ja] [--prompt "..."]
         [--threads 6] [--compute-type int8] [--beam-size 5]
-        [--models-dir .local/models] [--offline]
+        [--models-dir .local/models] [--offline] [--no-condition-on-previous-text]
     python -I python/fw_transcribe.py --check            (environment report, JSON on stdout)
     python -I python/fw_transcribe.py --download-only    (fetch the model, then exit)
 
@@ -110,6 +110,7 @@ def transcribe(args):
         beam_size=args.beam_size,
         word_timestamps=True,
         vad_filter=False,
+        condition_on_previous_text=args.condition_on_previous_text,
     )
     out_segments = []
     last_pct = -1
@@ -166,6 +167,8 @@ def main():
     p.add_argument("--compute-type", default="int8")
     p.add_argument("--beam-size", type=int, default=5)
     p.add_argument("--models-dir", default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".local", "models"))
+    # Default True (faster-whisper's default). False stops a repeated-phrase hallucination from carrying on.
+    p.add_argument("--no-condition-on-previous-text", dest="condition_on_previous_text", action="store_false")
     p.add_argument("--offline", action="store_true")
     p.add_argument("--check", action="store_true")
     p.add_argument("--download-only", action="store_true")

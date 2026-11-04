@@ -79,7 +79,10 @@ await runCli(async () => {
   const videoSeconds = times.length ? times[times.length - 1] + lastGap : 0;
   const audioSeconds = Number(a?.duration ?? 0);
   if (Math.abs(videoSeconds - cutReport.actual.videoSeconds) > 0.02) problems.push(`映像の長さが cut.mp4 と ${(videoSeconds - cutReport.actual.videoSeconds).toFixed(3)}秒違う`);
-  if (Math.abs(audioSeconds - cutReport.actual.audioSeconds) > 0.03) problems.push(`音声の長さが cut.mp4 と ${(audioSeconds - cutReport.actual.audioSeconds).toFixed(3)}秒違う`);
+  // AAC is written in 1024-sample frames (21.3 ms at 48 kHz), so the re-encoded length rounds up by up to
+  // about two frames (63.670 s → 63.700 s seen on 2026-11-04; the old 0.03 s limit failed on that by chance).
+  const AAC_SLACK_SECONDS = (2 * 1024) / 48000 + 0.001;
+  if (Math.abs(audioSeconds - cutReport.actual.audioSeconds) > AAC_SLACK_SECONDS) problems.push(`音声の長さが cut.mp4 と ${(audioSeconds - cutReport.actual.audioSeconds).toFixed(3)}秒違う`);
   const startDiff = Math.abs(Number(v.start_time ?? 0) - Number(a?.start_time ?? 0));
   if (startDiff > 0.005) problems.push(`映像と音声の開始時刻が ${(startDiff * 1000).toFixed(1)}ms 違う`);
 

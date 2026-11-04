@@ -5,7 +5,7 @@
 import fs from "node:fs";
 import type { ProbeJson } from "./analyze.ts";
 import { readPcmWav } from "./audioLevel.ts";
-import { buildCutCandidates, type CutCandidatesJson } from "./candidates.ts";
+import { buildCutCandidates, pausePadding, type CutCandidatesJson } from "./candidates.ts";
 import { UserError } from "./cli.ts";
 import { loadSettings } from "./config.ts";
 import { currentTermDecisions, loadDecisions, saveDecisions } from "./decisions.ts";
@@ -231,7 +231,8 @@ export function appendRetakeCandidates(project: Project, options: { dryRun?: boo
   const pcm = readPcmWav(paths.audioWav);
   const found = [
     ...detectRetakes(transcript),
-    ...detectHiddenPauses(transcript, pcm, cuts.speechDb, settings),
+    // Hidden pauses have no sentence/phrase information: keep the (longer) sentence-boundary room.
+    ...detectHiddenPauses(transcript, pcm, cuts.speechDb, { ...settings, keepPaddingSeconds: pausePadding(settings, true) }),
   ].sort((a, b) => a.start - b.start);
   const drafts = found.filter((d) => {
     if (uncovered(d.start, d.end) < 0.15) return false; // already cut

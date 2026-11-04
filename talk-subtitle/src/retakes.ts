@@ -17,7 +17,7 @@ import { normalizeForCompare, round3, similarity } from "./text.ts";
 import type { Transcript, TranscriptWord } from "./transcript.ts";
 
 export type RetakeDetail = {
-  pattern: "prefix-restart" | "similar-repeat" | "correction";
+  pattern: "prefix-restart" | "similar-repeat" | "correction" | "opening-retake";
   /** The attempt proposed for removal / the attempt kept. */
   first: string;
   second: string;

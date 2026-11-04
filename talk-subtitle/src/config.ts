@@ -18,12 +18,30 @@ export const DEFAULT_SETTINGS = {
     minDetectSeconds: 0.3,
   },
   candidates: {
-    /** A gap between words at least this long becomes a pause candidate. */
+    /**
+     * Pause rules learned from the user's own landscape talk edits (ref-landscape-001〜004,
+     * docs/landscape-edit-pattern.md; adopted as defaults 2026-11-04). Landscape talk videos only.
+     *   sentence boundary (end of a whisper segment / 。！？): pauses under minGapSeconds stay as they are,
+     *     longer ones are shortened to sentencePauseSeconds
+     *   mid-phrase (inside a segment, including after 、): pauses of phraseMinGapSeconds or more are
+     *     shortened to phrasePauseSeconds
+     */
+    /** A sentence-boundary gap at least this long becomes a pause candidate. */
     minGapSeconds: 0.7,
+    /** Pause left at a sentence boundary after the cut (half on each side). */
+    sentencePauseSeconds: 0.5,
+    /** A mid-phrase gap at least this long becomes a pause candidate. */
+    phraseMinGapSeconds: 0.5,
+    /** Pause left inside a sentence after the cut (half on each side). */
+    phrasePauseSeconds: 0.3,
     /** A pause counts as quiet (cut proposed) when its RMS is this far below the speaker's level. */
     quietMarginDb: 15,
-    /** Natural breathing room kept on each side of a cut pause. */
-    keepPaddingSeconds: 0.2,
+    /**
+     * Old rule (before 2026-11-04): the same room on each side of every pause, whatever the boundary.
+     * null = use the sentence / phrase rules above. A number (e.g. 0.2 in a project's settings.json)
+     * brings the old behaviour back for that project.
+     */
+    keepPaddingSeconds: null as number | null,
     /** Head/tail: keep this much before the first / after the last word. */
     edgePaddingSeconds: 0.3,
     /** Consecutive sentences at least this similar are a retake. */
@@ -31,8 +49,17 @@ export const DEFAULT_SETTINGS = {
     retakeMinChars: 6,
     /** Mean word probability below this marks a sentence "unclear". */
     unclearProbability: 0.45,
+    /** Removal proposed (the user cut 14 of 16 in the reference edits). */
     strongFillers: ["えー", "えーと", "えーっと", "えっと", "えと", "あのー", "うーん", "んー", "うー", "あー", "えーっ"],
+    /** Review only: also ordinary words. Kept in this list for the style observer and subtitles. */
     weakFillers: ["あの", "その", "まあ", "なんか", "ま"],
+    /** Part of how the speaker talks: no filler candidate at all (the user kept 7 in 10 「なんか」). */
+    speechStyleWords: ["なんか"],
+    /** Opening retakes: look for restarted openings within this many seconds from the first word. */
+    openingWindowSeconds: 120,
+    /** Repeated connectives at a phrase head (「でで」「だからだから」): the earlier ones are proposed for removal. */
+    // (not まあ/これ/それ: 「まあまあ」「これこれ」「それそれ」 are ordinary speech)
+    repeatedConnectives: ["で", "だから", "それで", "あと", "この", "その", "あの"],
     correctionMarkers: ["じゃなくて", "じゃなく", "言い直", "いいなお", "もう一回", "もう一度", "間違えた", "間違え", "失礼しました", "すみません", "ごめんなさい", "撮り直"],
   },
   transcribe: {
@@ -47,6 +74,12 @@ export const DEFAULT_SETTINGS = {
       /** Physical cores of the Windows PC (i5-9400). */
       threads: Math.min(6, os.availableParallelism?.() ?? os.cpus().length),
       beamSize: 5,
+      /**
+       * faster-whisper's condition_on_previous_text. true (default, unchanged) feeds the previous text
+       * back as context. false stops a hallucination (one phrase repeated to the end) from carrying on;
+       * set it per project in input/settings.json when a transcript loops.
+       */
+      conditionOnPreviousText: true,
     },
     whisperCpp: {
       /** undefined = remotion defaults (all cores up to 8, greedy). */
