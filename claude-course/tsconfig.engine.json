@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@remotion/google-fonts/*": ["../../remotion/node_modules/@remotion/google-fonts/dist/cjs/*.d.ts"],
+      "*": ["../../remotion/node_modules/@types/*", "../../remotion/node_modules/*"]
+    },
+    "typeRoots": ["../../remotion/node_modules/@types"]
+  }
+}

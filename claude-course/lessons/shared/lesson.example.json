@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "lesson-example",
+  "lesson": "lesson-example",
+  "course": "Claude Codeで始めるAI副業実践講座",
+  "title": "Lesson XX",
+  "voice": { "speaker": 11 },
+  "timing": { "leadInSeconds": 0.6, "linePauseSeconds": 0.5, "scenePauseSeconds": 1, "tailOutSeconds": 2 },
+  "chapters": [
+    {
+      "id": "ch01",
+      "number": "01",
+      "title": "オープニング",
+      "scenes": [
+        {
+          "id": "s01-title",
+          "layout": "title",
+          "visual": { "title": "Claude Codeで始めるAI副業実践講座", "subtitle": "Lesson XX" },
+          "lines": [{ "id": "l001", "text": "この動画では、レッスンの内容を説明します。" }]
+        },
+        {
+          "id": "s02-end",
+          "layout": "end",
+          "visual": { "message": "ここから始めましょう", "credit": "VOICEVOX:玄野武宏" },
+          "lines": [{ "id": "l002", "text": "では、始めましょう。" }]
+        }
+      ]
+    }
+  ]
+}

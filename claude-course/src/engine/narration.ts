@@ -19,8 +19,17 @@ export async function loadNarration(
 ): Promise<Narration> {
   const res = await fetch(staticFile(file));
   if (!res.ok) throw new Error(`Cannot load ${file} (HTTP ${res.status}). Run scripts/voicevox/build-narration.mjs.`);
-  const narration = (await res.json()) as Narration;
+  return checkNarration((await res.json()) as Narration, file, lesson, captions, presentation);
+}
 
+/** The same check for a narration passed as props (composition "Lesson"). */
+export function checkNarration(
+  narration: Narration,
+  file: string,
+  lesson: LessonScript,
+  captions: Record<string, string>,
+  presentation: Pick<LessonEntry, "cues" | "shots" | "beats">,
+): Narration {
   const problems: string[] = [];
   if (narration.lessonId !== lesson.id) problems.push(`lessonId ${narration.lessonId} != ${lesson.id}`);
 

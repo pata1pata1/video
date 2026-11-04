@@ -1,0 +1,53 @@
+{
+  "app": { "entryPoint": "src/index.ts", "lessonComposition": "Lesson" },
+  "dictionary": "lessons/shared/pronunciation.json",
+  "voice": {
+    "settings": { "speedScale": 1.04, "pitchScale": 0, "intonationScale": 1.0, "volumeScale": 1.0 }
+  },
+  "narration": {
+    "sampleRate": 48000,
+    "channels": 2,
+    "codec": "pcm_s16le",
+    "targetLufs": -16,
+    "truePeakCeilingDb": -1.5
+  },
+  "render": {
+    "mp4-direct": {
+      "codec": "h264",
+      "crf": 18,
+      "pixelFormat": "yuv420p",
+      "imageFormat": "jpeg",
+      "audioCodec": "aac",
+      "audioBitrate": "320k"
+    },
+    "image-sequence": { "imageFormat": "jpeg", "jpegQuality": 95 }
+  },
+  "finish": {
+    "fps": 30,
+    "video": { "codec": "libx264", "preset": "slow", "crf": 18, "color": "jpeg-full-to-bt709" },
+    "audio": { "targetLufs": -16, "truePeakCeilingDb": -1.5, "loudnessRange": 11, "bitrate": "192k", "sampleRate": 48000, "channels": 2 }
+  },
+  "fixtures": {
+    "01": {
+      "composition": "L01-Intro",
+      "script": "lessons/lesson-01",
+      "audio": "public/lessons/lesson-01/audio",
+      "render": "mp4-direct",
+      "final": "out/lesson-01/lesson-01-intro.mp4"
+    },
+    "free-trial": {
+      "composition": "FreeTrial",
+      "script": "lessons/free-trial",
+      "audio": "public/free-trial/audio",
+      "render": "image-sequence",
+      "final": "out/free-trial/free-trial-final.mp4"
+    },
+    "sales-intro": {
+      "composition": "SalesIntro",
+      "script": "lessons/sales-intro",
+      "audio": "public/sales-intro/audio",
+      "render": "image-sequence",
+      "final": "out/sales-intro/sales-intro-final.mp4"
+    }
+  }
+}

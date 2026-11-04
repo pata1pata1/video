@@ -7,8 +7,26 @@
 ## 他プロジェクトとの関係
 
 - **`../../remotion`は全動画プロジェクト共通の動画制作エンジン。このプロジェクトも共通remotionへ移す（2026-10-30決定、恒久方針。`../../remotion/docs/video-platform-architecture.md`の13章）**。移行計画は`../../remotion/docs/video-migration-plan.md`の**Phase 4**（VOICEVOX・WAV・SRT／VTT・ffmpeg・音量・連番→MP4・project管理・cleanup・renderをcoreに置き換え、remotionへの入口は`engine.mjs`の1ファイルにする）
-  - **Phase 4までは今の手順（`scripts/voicevox/`・`scripts/video/encode-mp4.mjs`・自前のRemotion）で制作する。ただしcoreで賄える処理（上の一覧）を新しく独自実装しない**
+  - **Phase 4（2026-11-03）で共通remotionに接続した。制作は下の「制作（共通remotion）」の手順で行う**。VOICEVOX・WAV・SRT／VTT・ffmpeg／ffprobe・音量・連番→MP4・MP4の仕上げ・描画（Node API）・project.json・lifecycle・cleanupは共通remotionのもので、ここに独自実装しない
+  - 旧手順（`scripts/voicevox/`・`scripts/video/encode-mp4.mjs`・`scripts/free-trial/encode-mp4.mjs`・`scripts/build-captions.mjs`・自前のRemotion CLI）は、ユーザーの承認まで残している（新しい動画では使わない。一覧は`../../remotion/docs/migration/phase4-claude-course.md`）
   - このプロジェクトに残すもの：`lesson.json`の形式、cues・shots（`registry.ts`）、`captionLayout.ts`と表記ルール、デザイン（`tokens.ts`・components・scenes）、文・シーン・末尾の間の値
+## 制作（共通remotion、2026-11-03〜）
+
+- 入口：`node scripts/cc.mjs <command>` → `scripts/lib/engine.mjs`（共通remotionへの唯一の入口）→ `../../remotion/src/video-types/claude-course/cli.mjs` → core。claude-course側で`../../remotion/src/core`を直接importしない
+- 設定は`course.json`（声の設定〈speedScale 1.04ほか〉、ナレーションの音量〈-16 LUFS・TP上限-1.5の線形ゲイン、48kHz stereo s16〉、描画〈mp4-direct：h264 CRF18 yuv420p・AAC 320k／image-sequence：JPEG 95〉、仕上げ〈libx264 slow CRF18・JPEGのフルレンジ→BT.709、-16 LUFS／TP -1.5／LRA 11、AAC 192k 48kHz〉、完成済み3本〈fixtures〉）。話者（style 11）と間（冒頭0.6・文0.5・シーン1.0・末尾2.0秒）は各`lesson.json`。どれもcoreに書かない
+- 台本のルール（検査・字幕44字・読み）は`scripts/lib/lesson.mjs`、字幕の表示（captions.json・2行の改行）は`scripts/lib/captions.mjs`。ファイルの書き出し（SRT／VTT）はcore
+- **新しいLesson**は外部プロジェクト`<id>/`（`project.json`、`input/lesson.json`・`captions.json`・`presentation.json`〈render・cues・shots・beats・hideHeader〉、`assets/`〈スクショ・録画。描画のpublic〉、`audio/`、`intermediate/`、`output/<id>.mp4`）。アプリ（`src/`）はコピーしない。描画はComposition `Lesson`（台本・見せ方・narrationをpropsで渡す）
+  1. `node scripts/cc.mjs new --project=<id>`（`lessons/shared/lesson.example.json`から。描画方式は`presentation.json`の`render`：`image-sequence`〈既定〉か`mp4-direct`）
+  2. `node scripts/cc.mjs narration --project=<id> --dry-run [--kana]` → `--dry-run`なしで生成（`--force`・`--line=<id>`も今までと同じ。文ごとのキャッシュは`intermediate/cache/voicevox/`）
+  3. `node scripts/cc.mjs captions --project=<id>`（`captions.json`だけ直したとき）／`node scripts/check-display-text.mjs --project=<id>`
+  4. `node scripts/cc.mjs render --project=<id> [--concurrency=N]`（mp4-direct：`intermediate/render.mp4`、image-sequence：`intermediate/frames/`）／代表コマ `--still=<png> --frame=N`
+  5. `node scripts/cc.mjs encode --project=<id>` → `output/<id>.mp4`（共通remotionの`npm run video:render -- --type=claude-course --project=<id>`でも4→5）
+  6. 公開・再生確認の後：共通remotionで`video:mark-completed` → `video:mark-published` → `video:cleanup -- --type=claude-course --project=<id>`（①削除対象・②残るもの・fingerprint → ③確認 → ④`--confirm-delete`）
+- Windowsでは`FFPROBE_PATH`が必要（共通remotionのCLAUDE.md）。メモリが少ないときは`--concurrency=1〜2`で描画し、描画・合成・ffmpegを同時に動かさない
+- **完成済み3本（L01・free-trial・sales-intro）**は今の場所のまま（`lessons/<…>/`・`public/<…>/`・`out/<…>/`）の移行検証用fixture。`--lesson=01|free-trial|sales-intro --out-dir=<claude-course の外>`で同じ処理を動かせるが、元のファイルには書き込まない（`--out-dir`なし・claude-course内は拒否）。L01はmp4-direct、free-trial・sales-introはimage-sequenceのまま（方式の統一は移行完了後の別課題）
+- 録画の加工（`scripts/free-trial/prepare-recordings.mjs`・`scripts/sales-intro/prepare-recordings.mjs`）は、切り出し・ぼかしの指定はここに残し、ffmpegは`engine.mjs`経由（共通remotionの`runTool`）で実行する。`--out-dir=<dir>`で別の場所に作れる
+- 型チェック（共通remotionのtscと型だけ）：`node ../../remotion/node_modules/typescript/bin/tsc -p tsconfig.engine.json`
+
 - remotionの**character-news固有のもの**は持ち込まない：ニュース動画用component、HUD／overlay計画、キャラクター構成・口パク、`youtube-test-*`の構成、ニュース動画固有の素材
 - 移行の基準データ（L01・free-trial・sales-introの音声・静止画・音量）は`../../remotion/docs/migration/phase0-baselines.md`（2026-10-30取得）
 - `../../web-project`（会員サイト）は変更しない。完成MP4は`out/lesson-XX/`に書き出すところまでがこのプロジェクトの担当。**web-projectの`public/`には動画を置かない**（ログイン不要で誰でも取得できるため）。配信先（Supabase Storage／動画配信サービス）は未決定で、制作中はホスティング方式を前提にしない
@@ -31,14 +49,20 @@
   - 未着手：販売ページへの埋め込み（配信先は未決定）
 - Git：親フォルダ`Projects/video`のリポジトリ（GitHub `pata1pata1/video`）で管理されている（コード・台本・設定。素材・音声・`out/`は`video/.gitignore`で管理外）。commit・pushは指示があるまで行わない
 - **cleanup（全動画プロジェクト共通、2026-10-30）**：アップロードと再生確認が終わったら、その動画固有の制作物（録画・スクショ等の専用素材、音声、中間生成物、キャッシュ、連番、完成MP4、専用の出典台帳・メモ等）を毎回削除する。手順は「①削除対象の一覧 → ②削除後に残るもの → ③ユーザー確認 → ④承認後に削除」。残すのは共通コード・デザイン・共通の読み辞書（`lessons/shared/`）・CLAUDE.md・共通設定など次回以降も使うもの。詳細は`../../remotion/docs/video-migration-plan.md`の「cleanupの対象」。3本（L01・free-trial・sales-intro）はまだ配信先が未決定で、アップロード前なので対象外
-  - **一時例外（2026-10-30決定）**：この3本は移行検証用fixture。アップロードと再生確認が済んでも、**Phase 4の移行検証が終わるまでcleanupを延期する**（恒久保存ではない。Phase 4の検証後に通常のcleanup〈①一覧→②残るもの→③確認→④承認後に削除〉の対象にする）。同計画の「移行用の基準（fixture）」
+  - **一時例外（2026-10-30決定）**：この3本は移行検証用fixture。アップロードと再生確認が済んでも、**Phase 4の移行検証が終わるまでcleanupを延期する**（恒久保存ではない。Phase 4の検証後に通常のcleanup〈①一覧→②残るもの→③確認→④承認後に削除〉の対象にする）。**Phase 4の移行検証は2026-11-04に完了**（3本とも音声・LUFS／TPがPhase 0と一致、映像の差は旧方式でも同じ場所に出る環境・録画再生の揺れで、移行による差ではない）。cleanupは公開・配信の状況を確認し、ユーザーの承認を得てから。同計画の「移行用の基準（fixture）」
 
 ## フォルダ
 
 ```
 lessons/shared/pronunciation.json   全Lesson共通の読み辞書
 lessons/lesson-XX/lesson.json       Lessonの台本＋画面指定（正本）
-scripts/voicevox/                   ナレーション生成（engine / wav / lesson / subtitles / build-narration）
+course.json                         声・音量・描画・仕上げの設定と完成済み3本（fixtures）
+scripts/cc.mjs                      制作コマンド（new / narration / captions / render / encode）
+scripts/lib/engine.mjs              共通remotionへの唯一の入口
+scripts/lib/lesson.mjs・captions.mjs  台本のルール・字幕の表示ルール
+lessons/shared/lesson.example.json  新しいLessonの台本の雛形
+<id>/                               新しいLessonの外部プロジェクト（2026-11-03〜）
+scripts/voicevox/                   旧：ナレーション生成（承認後に削除）
 public/lessons/lesson-XX/audio/     生成物（手で直さない。台本を直して作り直す）
 public/lessons/lesson-XX/screens/member-site/   会員サイトの実画面
 public/lessons/lesson-XX/recordings/            採用した画面録画
@@ -92,7 +116,7 @@ out/lesson-XX/                      完成MP4など（Git管理外）
   - speedScaleは1.00／1.04／1.08／1.12を聞き比べて1.04に決定（2026-09-30）
   - 話者を変えたら、`lesson.json`のend画面の`visual.credit`も同じ話者名に直す
 - 間：冒頭0.6秒、文と文の間0.5秒、シーンの間1.0秒、末尾2.0秒（`lesson.json`の`timing`）
-- コマンド：
+- コマンド（旧手順。2026-11-03からは上の`scripts/cc.mjs narration`。同じ処理・同じ出力）：
   - `node scripts/voicevox/build-narration.mjs --lesson=01 --dry-run [--kana]`：台本検査・字幕と読みの一覧・ENGINE確認（`--kana`でENGINEの読みと推定尺も表示）。合成・書き込みなし
   - `node scripts/voicevox/build-narration.mjs --lesson=01 [--force]`：生成。既存出力は`--force`なしでは上書きしない
   - `node scripts/voicevox/build-narration.mjs --lesson=01 --line=l021`：1文だけ合成して`.cache/voicevox/preview/`に出す（試聴用）

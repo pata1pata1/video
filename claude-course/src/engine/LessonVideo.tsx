@@ -3,7 +3,7 @@ import { Audio, Sequence, staticFile, useCurrentFrame, useVideoConfig } from "re
 import { Frame } from "../components/Frame";
 import { SceneFade } from "../components/SceneFade";
 import { Subtitle } from "../components/Subtitle";
-import { lessons } from "../lessons/registry";
+import { lessons, type LessonData } from "../lessons/registry";
 import { SceneView, fullBleedLayouts } from "../scenes";
 import { motion } from "../theme/tokens";
 import { ContentHeightContext, contentHeight } from "./contentArea";
@@ -18,6 +18,8 @@ export type LessonVideoProps = {
    * for a silent image-sequence render whose audio is muxed afterwards.
    */
   withAudio?: boolean;
+  /** Composition "Lesson": the lesson itself (instead of a registry entry). */
+  lesson?: LessonData | null;
 };
 
 /**
@@ -36,10 +38,10 @@ const lineAt = (lines: TimedLine[], t: number): TimedLine | null => {
   return null;
 };
 
-export const LessonVideo: React.FC<LessonVideoProps> = ({ lessonKey, narration, withAudio = true }) => {
+export const LessonVideo: React.FC<LessonVideoProps> = ({ lessonKey, narration, withAudio = true, lesson }) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
-  const entry = lessons.find((l) => l.key === lessonKey);
+  const entry = lesson ?? lessons.find((l) => l.key === lessonKey);
   if (!entry) throw new Error(`Unknown lesson "${lessonKey}".`);
   if (!narration) throw new Error("narration is missing (calculateMetadata did not run).");
 

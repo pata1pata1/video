@@ -9,22 +9,21 @@
 //      few may be correct as they are.
 //   4. captions.vtt: must match the displayed captions (wording and rows).
 //
-// Usage: node scripts/check-display-text.mjs --lesson=01   (or --lesson=free-trial / sales-intro)
+// Usage: node scripts/check-display-text.mjs --project=<id>   (or --lesson=01 / free-trial / sales-intro)
 // Exit code 1 when there are errors (hints alone do not fail).
 
 import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { MAX_ROW_WIDTH, splitCaption, widthOf } from "../src/components/captionLayout.ts";
-import { lessonPaths } from "./voicevox/lesson.mjs";
-import { displayCues, loadCaptionOverrides, toVtt } from "./voicevox/subtitles.mjs";
+import { displayCues, loadCaptionOverrides } from "./lib/captions.mjs";
+import { claudeCourse } from "./lib/engine.mjs";
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const lessonNo = (process.argv.find((a) => a.startsWith("--lesson=")) ?? "--lesson=01").slice("--lesson=".length);
-const paths = lessonPaths(ROOT, lessonNo);
+const arg = (name) => process.argv.find((a) => a.startsWith(`--${name}=`))?.slice(name.length + 3);
+const project = arg("project");
+const lessonNo = project ? undefined : (arg("lesson") ?? "01");
+const paths = claudeCourse.videoSources({ lesson: lessonNo, project });
 const read = (file) => JSON.parse(fs.readFileSync(file, "utf8"));
 
-const narration = read(path.join(paths.audioDir, "narration.json"));
+const narration = read(paths.narrationJson);
 const lesson = read(paths.lessonFile);
 const overrides = loadCaptionOverrides(paths.captionsFile);
 
@@ -84,14 +83,14 @@ console.log(`${screenTexts.length} screen texts checked`);
 
 console.log("");
 console.log("== captions.vtt ==");
-const vttFile = path.join(paths.audioDir, "captions.vtt");
-const expected = toVtt(displayCues(narration.lines, overrides));
+const vttFile = paths.captionsVtt;
+const expected = claudeCourse.vttFromCues(displayCues(narration.lines, overrides));
 const actual = fs.existsSync(vttFile) ? fs.readFileSync(vttFile, "utf8") : null;
 if (actual === expected) {
   console.log("captions.vtt matches the displayed captions");
 } else {
   errors++;
-  console.log("captions.vtt is out of date -> node scripts/build-captions.mjs --lesson=" + lessonNo);
+  console.log(`captions.vtt is out of date -> node scripts/cc.mjs captions ${project ? `--project=${project}` : `--lesson=${lessonNo} --out-dir=<dir>`}`);
 }
 
 console.log("");

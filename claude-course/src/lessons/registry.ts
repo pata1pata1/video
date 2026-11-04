@@ -56,6 +56,14 @@ export type LessonEntry = {
   hideHeader?: boolean;
 };
 
+/**
+ * A lesson's script and presentation passed as props (composition "Lesson"):
+ * lessons made after 2026-11-03 live in their own project folder
+ * (<id>/input/lesson.json, captions.json, presentation.json) instead of an entry
+ * below. audioFile is under the render's public folder.
+ */
+export type LessonData = Pick<LessonEntry, "script" | "audioFile" | "cues" | "shots" | "captions" | "beats" | "hideHeader">;
+
 /** Member-site screenshots: 1920x1080 at deviceScaleFactor 2. */
 const SCREENSHOT = { width: 3840, height: 2160 };
 /** claude-supporter-demo.mp4 */

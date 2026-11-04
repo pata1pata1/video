@@ -12,21 +12,26 @@
 // Masks (blur) cover only the user name inside a terminal path; the
 // instructions and the changed parts of the site are never covered.
 //
-// Usage: node scripts/free-trial/prepare-recordings.mjs [--force]
+// Usage: node scripts/free-trial/prepare-recordings.mjs [--force] [--out-dir=<dir>]
 
 import fs from "node:fs";
 import path from "node:path";
-import { execFile } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { promisify } from "node:util";
-import ffmpegPath from "ffmpeg-static";
+import { media } from "../lib/engine.mjs";
 
-const run = promisify(execFile);
+// ffmpeg is the shared engine's (core/media runTool); the arguments are this video's edit.
+const ffmpeg = (args) => media.runTool("ffmpeg", args, { timeoutMs: 60 * 60 * 1000 });
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const SRC = path.join(ROOT, "public", "free-trial");
-const OUT = path.join(SRC, "edit");
+const OUT = outDirArg() ?? path.join(SRC, "edit");
 const STILLS = path.join(OUT, "stills");
 const force = process.argv.includes("--force");
+
+/** --out-dir=<dir>: write the edited copies elsewhere (e.g. to compare), not into public/. */
+function outDirArg() {
+  const a = process.argv.find((x) => x.startsWith("--out-dir="));
+  return a ? path.resolve(a.slice("--out-dir=".length)) : null;
+}
 
 /** Blur one rectangle (output pixels) between two times (seconds of the trimmed clip). */
 const blur = ({ x, y, w, h }, from, to) => ({ x, y, w, h, from, to });
@@ -115,7 +120,6 @@ function filterFor(clip) {
 }
 
 async function main() {
-  if (!ffmpegPath || !fs.existsSync(ffmpegPath)) throw new Error("ffmpeg-static binary not found.");
   fs.mkdirSync(STILLS, { recursive: true });
   for (const clip of CLIPS) {
     const out = path.join(OUT, clip.out);
@@ -124,17 +128,17 @@ async function main() {
       continue;
     }
     console.log(`make ${clip.out} <- ${clip.src}`);
-    await run(ffmpegPath, [
+    await ffmpeg([
       "-v", "error", "-y", "-i", path.join(SRC, clip.src),
       "-filter_complex", filterFor(clip), "-map", "[v]", "-an",
       "-c:v", "libx264", "-preset", "medium", "-crf", "16", "-g", "30",
       "-pix_fmt", "yuv420p", "-movflags", "+faststart", out,
-    ], { maxBuffer: 16 * 1024 * 1024 });
+    ]);
   }
   for (const still of STILL_FRAMES) {
     const out = path.join(STILLS, still.out);
     if (fs.existsSync(out) && !force) continue;
-    await run(ffmpegPath, ["-v", "error", "-y", "-ss", String(still.at), "-i", path.join(OUT, still.clip), "-frames:v", "1", out]);
+    await ffmpeg(["-v", "error", "-y", "-ss", String(still.at), "-i", path.join(OUT, still.clip), "-frames:v", "1", out]);
     console.log(`still ${still.out}`);
   }
 }
