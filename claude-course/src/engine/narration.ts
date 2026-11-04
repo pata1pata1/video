@@ -18,7 +18,7 @@ export async function loadNarration(
   presentation: Pick<LessonEntry, "cues" | "shots" | "beats">,
 ): Promise<Narration> {
   const res = await fetch(staticFile(file));
-  if (!res.ok) throw new Error(`Cannot load ${file} (HTTP ${res.status}). Run scripts/voicevox/build-narration.mjs.`);
+  if (!res.ok) throw new Error(`Cannot load ${file} (HTTP ${res.status}). Run node scripts/cc.mjs narration.`);
   return checkNarration((await res.json()) as Narration, file, lesson, captions, presentation);
 }
 
@@ -71,7 +71,7 @@ export function checkNarration(
   if (problems.length > 0) {
     throw new Error(
       `${file} does not match lesson.json (${problems.slice(0, 5).join("; ")}). ` +
-        "Rebuild it: node scripts/voicevox/build-narration.mjs --lesson=NN|free-trial --force",
+        "Rebuild it: node scripts/cc.mjs narration --project=<id> --force",
     );
   }
   return narration;

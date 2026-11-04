@@ -10,9 +10,7 @@
   },
   "scripts": {
     "dev": "remotion studio src/index.ts",
-    "lint": "eslint src && tsc",
-    "voice:dry": "node scripts/voicevox/build-narration.mjs --lesson=01 --dry-run",
-    "voice:build": "node scripts/voicevox/build-narration.mjs --lesson=01"
+    "lint": "eslint src && tsc"
   },
   "dependencies": {
     "@remotion/cli": "4.0.525",

@@ -1,5 +1,5 @@
 // Shapes of lessons/lesson-XX/lesson.json and the generated narration.json
-// (scripts/voicevox/build-narration.mjs). Only the fields the video uses.
+// (node scripts/cc.mjs narration). Only the fields the video uses.
 
 export type ScriptLine = { id: string; text: string; yomi?: string };
 

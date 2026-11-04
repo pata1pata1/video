@@ -8,7 +8,7 @@
 
 - **`../../remotion`は全動画プロジェクト共通の動画制作エンジン。このプロジェクトも共通remotionへ移す（2026-10-30決定、恒久方針。`../../remotion/docs/video-platform-architecture.md`の13章）**。移行計画は`../../remotion/docs/video-migration-plan.md`の**Phase 4**（VOICEVOX・WAV・SRT／VTT・ffmpeg・音量・連番→MP4・project管理・cleanup・renderをcoreに置き換え、remotionへの入口は`engine.mjs`の1ファイルにする）
   - **Phase 4（2026-11-03）で共通remotionに接続した。制作は下の「制作（共通remotion）」の手順で行う**。VOICEVOX・WAV・SRT／VTT・ffmpeg／ffprobe・音量・連番→MP4・MP4の仕上げ・描画（Node API）・project.json・lifecycle・cleanupは共通remotionのもので、ここに独自実装しない
-  - 旧手順（`scripts/voicevox/`・`scripts/video/encode-mp4.mjs`・`scripts/free-trial/encode-mp4.mjs`・`scripts/build-captions.mjs`・自前のRemotion CLI）は、ユーザーの承認まで残している（新しい動画では使わない。一覧は`../../remotion/docs/migration/phase4-claude-course.md`）
+  - 旧手順（`scripts/voicevox/`・`scripts/build-captions.mjs`・`scripts/video/encode-mp4.mjs`・`scripts/free-trial/encode-mp4.mjs`・`package.json`の`voice:dry`／`voice:build`・L01の手作業の仕上げ）は2026-11-05にユーザー承認で削除した。自前のRemotion環境（`node_modules`・`remotion.config.ts`・eslint・`tsconfig.json`）はStudioとlintのためPhase 7まで残す
   - このプロジェクトに残すもの：`lesson.json`の形式、cues・shots（`registry.ts`）、`captionLayout.ts`と表記ルール、デザイン（`tokens.ts`・components・scenes）、文・シーン・末尾の間の値
 ## 制作（共通remotion、2026-11-03〜）
 
@@ -62,7 +62,6 @@ scripts/lib/engine.mjs              共通remotionへの唯一の入口
 scripts/lib/lesson.mjs・captions.mjs  台本のルール・字幕の表示ルール
 lessons/shared/lesson.example.json  新しいLessonの台本の雛形
 <id>/                               新しいLessonの外部プロジェクト（2026-11-03〜）
-scripts/voicevox/                   旧：ナレーション生成（承認後に削除）
 public/lessons/lesson-XX/audio/     生成物（手で直さない。台本を直して作り直す）
 public/lessons/lesson-XX/screens/member-site/   会員サイトの実画面
 public/lessons/lesson-XX/recordings/            採用した画面録画
@@ -76,7 +75,6 @@ public/sales-intro/audio/           講座紹介動画のナレーション生�
 public/sales-intro/demo/            冒頭専用のデモページ（架空の美容サロンLumière、lumiere/index.html＋写真）と書き出し画像lumiere-hero.png。出典はdemo/CREDITS.md
 public/sales-intro/edit/            講座紹介動画の加工素材（切り出し・30fps固定・無音）と静止画。scripts/sales-intro/prepare-recordings.mjsで作る
 src/lessons/sales-intro.ts          講座紹介動画の画面指定（beats）
-scripts/video/encode-mp4.mjs        画像連番＋narration.wav→MP4（--lesson=free-trial|sales-intro。AAC後のピーク確認付き）
 public/free-trial/edit/             録画の加工版（切り出し・マスク・30fps固定・無音）と静止画。scripts/free-trial/prepare-recordings.mjsで作る（元の録画は変更しない）
 src/lessons/free-trial.ts           無料体験動画の画面指定（beats：どの文で何を見せるか）
 src/engine/contentArea.ts           内容の領域の高さ（見出し帯の有無で変わる）。recordingの画面の大きさに使う
@@ -89,7 +87,7 @@ src/components/                     共通component（Frame / TitleCard / Chapte
 src/theme/tokens.ts                 色・フォント（Noto Sans JP）・領域・字幕・動きの値
 raw/                                録画・キャプチャの元データ（Git管理外）
 out/lesson-XX/                      完成MP4など（Git管理外）
-.cache/voicevox/                    文ごとの合成キャッシュ（Git管理外、消してもよい）
+.cache/voicevox-engine/             完成済み3本（fixtures）の文ごとの合成キャッシュ（Git管理外、消してもよい。新しいLessonは各プロジェクトのintermediate/cache/voicevox/）
 ```
 
 ## 台本（lesson.json）
@@ -111,21 +109,21 @@ out/lesson-XX/                      完成MP4など（Git管理外）
 ## ナレーション生成（VOICEVOX）
 
 - 前提：VOICEVOXアプリ（ENGINE）を起動しておく。接続先は`http://127.0.0.1:50021`固定（外部・有料APIは使わない）
-- 本番話者：**玄野武宏 ノーマル（style ID 11）、speedScale 1.04**。話者は`lesson.json`の`voice.speaker`、声の設定は`scripts/voicevox/engine.mjs`の`VOICE_SETTINGS`（全Lesson共通）。pitchScale 0／intonationScale 1.0／volumeScale 1.0はENGINE初期値
+- 本番話者：**玄野武宏 ノーマル（style ID 11）、speedScale 1.04**。話者は`lesson.json`の`voice.speaker`、声の設定は`course.json`の`voice.settings`（全Lesson共通）。pitchScale 0／intonationScale 1.0／volumeScale 1.0はENGINE初期値
   - 2026-09-30に青山龍星 ノーマル（style ID 13）から変更した（5候補の聞き比べで決定）。青山龍星は本番話者として使わない
   - speedScaleは1.00／1.04／1.08／1.12を聞き比べて1.04に決定（2026-09-30）
   - 話者を変えたら、`lesson.json`のend画面の`visual.credit`も同じ話者名に直す
 - 間：冒頭0.6秒、文と文の間0.5秒、シーンの間1.0秒、末尾2.0秒（`lesson.json`の`timing`）
-- コマンド（旧手順。2026-11-03からは上の`scripts/cc.mjs narration`。同じ処理・同じ出力）：
-  - `node scripts/voicevox/build-narration.mjs --lesson=01 --dry-run [--kana]`：台本検査・字幕と読みの一覧・ENGINE確認（`--kana`でENGINEの読みと推定尺も表示）。合成・書き込みなし
-  - `node scripts/voicevox/build-narration.mjs --lesson=01 [--force]`：生成。既存出力は`--force`なしでは上書きしない
-  - `node scripts/voicevox/build-narration.mjs --lesson=01 --line=l021`：1文だけ合成して`.cache/voicevox/preview/`に出す（試聴用）
+- コマンド（`<video>`は`--project=<id>`、完成済み3本は`--lesson=01|free-trial|sales-intro --out-dir=<claude-course の外>`）：
+  - `node scripts/cc.mjs narration <video> --dry-run [--kana]`：台本検査・字幕と読みの一覧・ENGINE確認（`--kana`でENGINEの読みと推定尺も表示）。合成・書き込みなし
+  - `node scripts/cc.mjs narration <video> [--force]`：生成。既存出力は`--force`なしでは上書きしない
+  - `node scripts/cc.mjs narration <video> --line=l021`：1文だけ合成して試聴用に出す（プロジェクトは`intermediate/cache/voicevox/preview/`、fixtureは`<out-dir>/preview/`）
 - 処理：文ごとに`audio_query`→`synthesis`（24kHz mono 16bit、読み＋話者＋設定＋ENGINEバージョンでキャッシュ）→ 無音を挟んで1本のタイムラインに結合 → 48kHzに変換して音量を測り、線形ゲイン1回だけで-16 LUFSへ近づける（true peak -1.5 dBTPが上限。圧縮・リミッターは使わない）→ `pcm_s16le` 48kHz stereo
 - 出力（`public/lessons/lesson-XX/audio/`）：
   - `narration.wav`：動画全体の音声トラック（0秒＝動画の先頭）
   - `narration.json`：ENGINEバージョン・話者・設定・音量・章／シーン／文ごとの開始・終了秒（映像側はこれを正とする）
   - `narration.srt`：1文＝1キュー、読み上げた本文のまま（音声の書き起こし）
-  - `captions.vtt`：視聴者向け。時刻は`narration.srt`と同じで、表記と2行の改行は動画の字幕と同じ（`captions.json`＋`captionLayout.ts`）。`captions.json`だけ直したときは`node scripts/build-captions.mjs --lesson=01`で作り直す（音声・`narration.json`・SRTは触らない）
+  - `captions.vtt`：視聴者向け。時刻は`narration.srt`と同じで、表記と2行の改行は動画の字幕と同じ（`captions.json`＋`captionLayout.ts`）。`captions.json`だけ直したときは`node scripts/cc.mjs captions <video>`で作り直す（音声・`narration.json`・SRTは触らない）
 - 時刻はすべて**実際の音声サンプル数から**計算する（文字数からの推定はしない）
 - **台本を直したら必ず`--force`で作り直す**（変わった文だけ再合成される）
 - クレジット：`VOICEVOX:玄野武宏`を動画の最後と配信ページに記載する。有料講座での利用になるため、**公開前にVOICEVOXと玄野武宏の利用規約を人が確認する**
@@ -133,16 +131,12 @@ out/lesson-XX/                      完成MP4など（Git管理外）
 
 ## 無料体験動画（メルマガ登録者向け）
 
-- 講座のLessonとは別の動画。キーは`free-trial`で、`--lesson=NN`の代わりに`--lesson=free-trial`を指定する（`build-narration.mjs`・`build-captions.mjs`・`check-display-text.mjs`で使える。パスの対応は`scripts/voicevox/lesson.mjs`の`lessonPaths`）
+- 講座のLessonとは別の動画。キーは`free-trial`で、`--lesson=NN`の代わりに`--lesson=free-trial`を指定する（`scripts/cc.mjs`〈`--out-dir`と一緒に〉・`check-display-text.mjs`で使える。パスの対応は`course.json`の`fixtures`）
 - 保存先（既存Lessonとは共有しない）：
   - 台本：`lessons/free-trial/lesson.json`（`"lesson": "free-trial"`）。表示字幕の調整は`lessons/free-trial/captions.json`
   - 音声：`public/free-trial/audio/`（`narration.wav`・`narration.json`・`narration.srt`・`captions.vtt`）
-  - 1文プレビュー：`.cache/voicevox/preview/free-trial/<文ID>.wav`
-- 音声は講座と同じ設定（玄野武宏 ノーマル style ID 11、`VOICE_SETTINGS`、`timing`、共通の読み辞書、音量処理）。台本の書き方・字幕ルールもLessonと同じ
-- コマンド：
-  - `node scripts/voicevox/build-narration.mjs --lesson=free-trial --dry-run [--kana]`
-  - `node scripts/voicevox/build-narration.mjs --lesson=free-trial [--force]`
-  - `node scripts/voicevox/build-narration.mjs --lesson=free-trial --line=l001`
+- 音声は講座と同じ設定（玄野武宏 ノーマル style ID 11、`course.json`の`voice.settings`、`timing`、共通の読み辞書、音量処理）。台本の書き方・字幕ルールもLessonと同じ
+- コマンド：`node scripts/cc.mjs narration --lesson=free-trial --out-dir=<claude-course の外> [--dry-run [--kana]] [--force] [--line=l001]`（完成済みのfixtureなので出力は`--out-dir`へ。元の`public/free-trial/audio/`は上書きしない）
 - 録画素材（`public/free-trial/`）：01 Claude Codeへ依頼→index.html作成（2:38、2880×1800、可変fps）／02 完成ページをブラウザで確認（0:34、2940×1800）／03 修正依頼（文字の大きさ・ボタンの色・スマホ表示）（0:36、1920×1080、音声あり）／04 修正後の確認（0:23、1920×1080、音声あり）／05 PC幅→スマホ幅の確認（0:21、3086×1800）。使うときはミュート。Macのユーザー名（ターミナルのタイトル・パス・URL欄）、ブックマークバー・タブ・Dockが映っているので、ぼかすか切り出して隠す
 - 構成：1 導入・完成サイト（02）→ 2 日本語で依頼（01）→ 3 初版を確認（02）→ 4 修正を依頼（03）→ 5 変更を確認（04）→ 6 狭い画面で確認（05）→ 7 まとめ・締め。章＝見出しの1〜7、シーン＝台本の段落。`visual.recording`は使う録画の目安
 - 字幕44字（2行）を超える文は意味の区切りで複数の文に分けた（l002/l003・l007/l008・l041/l042・l047/l048・l049/l050）。分けた所には文の間0.5秒が入る
@@ -155,9 +149,9 @@ out/lesson-XX/                      完成MP4など（Git管理外）
   - 6 狭い画面：録画05。幅を狭める操作→狭い画面を拡大。「ブラウザの幅を変えて確認」を常に表示
   - 7 まとめ：完成サイト＋要点→基本の流れ→小さく始める→講座で学ぶ事（メルマガでご案内）→締め（VOICEVOX:玄野武宏）
 - 録画の加工（`node scripts/free-trial/prepare-recordings.mjs [--force]`）：macOSのメニュー・ターミナルのタイトル（ユーザー名）・ブラウザのタブ／URL欄（ローカルパス）／ブックマーク・Dock・リンクのプレビューを切り出しで除外。本文中のユーザー名（01の`ls -la /Users/…` 8〜75秒、03の`/private/tmp/…-Users-…` 23〜30.5秒）だけぼかす。指示文とサイトの変更箇所は隠さない。04はウインドウが7.75秒で15px動くので切り出し位置も合わせる
-- 書き出し（このPCではWindowsのスマートアプリコントロールがRemotion同梱のffmpeg/ffprobe（compositor）のDLLを止めるため、通常の`remotion render`→MP4は失敗する。free-trialは録画を`Html5Video`で再生し、画像連番＋ffmpeg-staticで書き出す）：
-  1. `npx remotion render src/index.ts FreeTrial <連番フォルダ> --sequence --muted --props='{"withAudio":false}' --image-format=jpeg --jpeg-quality=95`（約20分）
-  2. `node scripts/free-trial/encode-mp4.mjs <連番フォルダ> [out/free-trial/free-trial-final.mp4]`：フレーム数を確認→映像をlibx264 CRF18 slow・フル→リミテッドレンジ・BT.709で1回エンコード→`narration.wav`を測定して2パスloudnorm（-16 LUFS）＋48kHz AAC 192k→**AACに変換した後の**True Peakをebur128で測り、-1.6 dBTP（-1.5に測定の刻み0.1 dBの余裕）を超えたらloudnormのTP目標を下げて音声だけ作り直す（ピーク上限をLUFSより優先）→映像と音声をコピーで結合、faststart
+- 書き出し（image-sequence方式。録画を`Html5Video`で再生し、画像連番→MP4。共通remotionで行う）：
+  1. `node scripts/cc.mjs render --lesson=free-trial --out-dir=<claude-course の外> [--concurrency=N]`：音声なしのJPEG 95連番を`<out-dir>/frames/`へ
+  2. `node scripts/cc.mjs encode --lesson=free-trial --out-dir=<同じ>`：フレーム数を確認→映像をlibx264 CRF18 slow・フル→リミテッドレンジ・BT.709で1回エンコード→`narration.wav`を2パスloudnorm（-16 LUFS）＋48kHz AAC 192k→**AACに変換した後の**True Peakを測り、上限を超えたらTP目標を下げて音声だけ作り直す（ピーク上限をLUFSより優先）→結合、faststart（設定は`course.json`の`finish`）
 - 確認結果（2026-10-02、確認用MP4）：1920×1080・30fps・h264 High yuv420p（bt709）・AAC 48kHz stereo・4:01.90。ebur128で-16.1 LUFS、LRA 4.1、True Peak -1.1 dBTP（AACエンコードでloudnormの上限-1.5から0.4 dB上振れ）。moov→mdat。代表フレームで字幕の欠け・画面のはみ出し・マスク漏れが無い事を確認
 - 確認後の修正（2026-10-02）：
   - l036を「上部のメニューを押すと、メニューの場所へ移動します」に変更（録画04の操作＝ヘッダーの「メニュー」リンクに合わせた）。再合成はl036だけで他の53文はキャッシュを再利用。音声は+0.405秒で全体242.304秒、l037以降は全て0.405秒後ろへ（時刻は`narration.json`から計算するので映像・字幕は自動で追従）
@@ -167,9 +161,9 @@ out/lesson-XX/                      完成MP4など（Git管理外）
 
 ## 講座紹介動画（販売ページ用、キー sales-intro）
 
-- 販売ページに埋め込む約3分の紹介動画。`--lesson=sales-intro`で`build-narration.mjs`・`build-captions.mjs`・`check-display-text.mjs`が使える（`scripts/voicevox/lesson.mjs`の`STANDALONE_VIDEOS`。free-trialと同じ扱い）
-- 保存先：台本`lessons/sales-intro/lesson.json`、表示字幕の調整`lessons/sales-intro/captions.json`、音声`public/sales-intro/audio/`（narration.wav・narration.json・narration.srt・captions.vtt）、1文プレビュー`.cache/voicevox/preview/sales-intro/`
-- コマンド：`node scripts/voicevox/build-narration.mjs --lesson=sales-intro --dry-run [--kana]`／`--lesson=sales-intro [--force]`／`--lesson=sales-intro --line=l001`
+- 販売ページに埋め込む約3分の紹介動画。`--lesson=sales-intro`で`scripts/cc.mjs`（`--out-dir`と一緒に）・`check-display-text.mjs`が使える（`course.json`の`fixtures`。free-trialと同じ扱い）
+- 保存先：台本`lessons/sales-intro/lesson.json`、表示字幕の調整`lessons/sales-intro/captions.json`、音声`public/sales-intro/audio/`（narration.wav・narration.json・narration.srt・captions.vtt）
+- コマンド：`node scripts/cc.mjs narration --lesson=sales-intro --out-dir=<claude-course の外> [--dry-run [--kana]] [--force] [--line=l001]`
 - 音声は講座と同じ設定（玄野武宏 ノーマル ID 11、speedScale 1.04、timing・音量処理も同じ）。2026-10-02生成：186.364秒（3:06.4）、44文、-19.98 LUFS／-1.5 dBTP（-16 LUFSはMP4書き出し時に合わせる）
 - 読み辞書に追加（2026-10-02）：Standard→スタンダード、Premium→プレミアム、Zoom→ズーム、X→エックス（英字の単独の「X」だけ）。Lesson 01・free-trialの台本には出てこない語で、両者の読みが変わらない事を確認済み（音声は作り直していない）
 - 台本：承認済み台本のまま。字幕44字を超える文だけ意味の区切りで分けた（l005/l006・l025/l026・l035/l036）。`scene.layout`・`visual`は映像制作前の仮の値で、`visual.source`は使う素材の目安
@@ -185,9 +179,7 @@ out/lesson-XX/                      完成MP4など（Git管理外）
   - 5 サポート：サポーター案内ページ→Lesson 01のサポーター録画（質問入力→回答冒頭。commit→pushの行は範囲外）→Standard／Premium（全て「Standard・Premium共通：AIサポーター」表示）→販売ページのZoom個別サポートの静止画（「販売ページより」）＋「Premium限定」「１年間・最大12回」、利用条件をハイライト。架空の相談映像は無し
   - 6 締め：完成サイト・X記事ツールと「できる事が増える」→要点カード→「自分で形にできる側へ」→end（「詳しいレッスン内容・料金プランはこのページで」、VOICEVOX:玄野武宏）。価格・期間限定の訴求は無し
 - 加工素材（`node scripts/sales-intro/prepare-recordings.mjs [--force]`）：X記事ツールはタブ・URL欄（localhost）・ブックマーク・左下の「N」を、販売ページはタブ・URL欄（ドメイン）・ブックマークを切り出し（サイトのヘッダーは残す）。Lesson 01のサポーター録画も0〜24秒を30fps・無音にコピー。どちらの録画にも個人名・ローカルパスは無くマスクは不要。元の録画は変更しない
-- 書き出し（free-trialと同じ方法。Windowsの設定は変えない）：
-  1. `npx remotion render src/index.ts SalesIntro <連番フォルダ> --sequence --muted --props='{"withAudio":false}' --image-format=jpeg --jpeg-quality=95`（約15分）
-  2. `node scripts/video/encode-mp4.mjs --lesson=sales-intro <連番フォルダ> out/sales-intro/sales-intro-preview.mp4`
+- 書き出し（free-trialと同じimage-sequence方式）：`node scripts/cc.mjs render --lesson=sales-intro --out-dir=<claude-course の外> [--concurrency=N]` → `node scripts/cc.mjs encode --lesson=sales-intro --out-dir=<同じ>`
 - 確認結果（2026-10-02、確認用MP4）：1920×1080・30fps・h264 High yuv420p（bt709）・AAC 48kHz stereo。5591フレーム・3:06.37。ebur128で-16.2 LUFS、LRA 4.4、True Peak -1.6 dBTP（TP目標-1.5で-1.3になったため-1.9で作り直し）。moov→mdat。全6章の代表フレーム（36枚）で字幕の欠け・はみ出し・切り出し漏れが無い事、説明と表示の一致を確認
 - 冒頭の修正（2026-10-02、s01-hook）：
   - ホームページ：free-trialの実演サイト（録画04）から、冒頭専用のデモページ`public/sales-intro/demo/lumiere/index.html`に差し替え（白・ベージュ、大きなサロン内装写真、明朝の見出しと余白、濃いブラウンのボタン、ページ内に「※架空の美容サロンのデモページです」）。`node scripts/sales-intro/capture-demo.mjs`でインストール済みのGoogle Chrome（headless、1920×1080・倍率2）で表示して`demo/lumiere-hero.png`（3840×2160）に書き出し、動画では「制作例」ラベル付きで表示。フォントはGoogle Fontsから読むので書き出しにはネット接続が必要
@@ -227,10 +219,9 @@ out/lesson-XX/                      完成MP4など（Git管理外）
   - 漢字にできる一般語は読みやすさを損なわない範囲で漢字にする（例：三つ→３つ、こと→事、すべて→全て、つかむ→掴む、ください→下さい、たとえば→例えば、とき→時）。「できる」「ただし」「まず」「このように」などはひらがなのまま
 - `narration.json`と`lesson.json`の章・シーン・文（ID・順番・本文）が一致しないと、読み込み時にエラーで止まる（台本を直したら音声を`--force`で作り直す）
 - 画面キャプチャはテスト用アカウントで撮り、メールアドレス・氏名・ChatGPTのアカウント名などの個人情報は映さない（またはぼかす）
-- 完成MP4の書き出し（`narration.wav`自体は変えない）：
-  1. `npx remotion render src/index.ts L01-Intro <中間ファイル>.mp4 --codec=h264 --crf=18 --pixel-format=yuv420p --audio-codec=aac --audio-bitrate=320k`（中間ファイルはout外。Remotionの出力はJPEGフレーム由来でyuvj420p（フルレンジ）になる）
-  2. 音量を測る：`ffmpeg -i 中間.mp4 -vn -af loudnorm=I=-16:TP=-1.5:LRA=11:print_format=json -f null -`
-  3. 仕上げ（ffmpeg-static）：映像はlibx264 CRF18 preset slow・`scale=in_range=full:out_range=tv:in_color_matrix=bt601:out_color_matrix=bt709,format=yuv420p`＋bt709タグ、音声は2で測った値を入れた2パスloudnorm（I=-16・TP=-1.5）→`aresample=48000`→AAC 192k stereo、`-movflags +faststart`
-  4. 確認：`npx remotion ffprobe`で1920×1080・30fps・h264・yuv420p・AAC 48kHz・フレーム数、`ebur128=peak=true`で-16 LUFS前後／True Peak -1〜-2 dBTP、先頭のatomがmoov→mdat（faststart）
-  - poster：`npx remotion still src/index.ts L01-Intro out/lesson-01/poster.png --frame=17`（最初の字幕が出る直前のタイトル画面）。`captions.vtt`は`public/lessons/lesson-01/audio/`からコピー
+- 完成MP4の書き出し（mp4-direct方式。`narration.wav`自体は変えない。共通remotionで行う）：
+  1. `node scripts/cc.mjs render --lesson=01 --out-dir=<claude-course の外> [--concurrency=N]`：h264 CRF18 yuv420p・AAC 320kの中間MP4（`<out-dir>/render.mp4`。JPEGフレーム由来でフルレンジ）
+  2. `node scripts/cc.mjs encode --lesson=01 --out-dir=<同じ>`：中間MP4の音量を測り、映像はlibx264 CRF18 slow・フル→リミテッドレンジ・BT.709、音声は2パスloudnorm（I=-16・TP=-1.5）→48kHz AAC 192k、faststart（設定は`course.json`の`finish`）
+  3. 確認：1920×1080・30fps・h264・yuv420p・AAC 48kHz・フレーム数、-16 LUFS前後／True Peak -1〜-2 dBTP、moov→mdat
+  - poster：`node scripts/cc.mjs render --lesson=01 --out-dir=<同じ> --still=<png> --frame=17`（最初の字幕が出る直前のタイトル画面）。`captions.vtt`は`public/lessons/lesson-01/audio/`からコピー
 - サポーター録画（`claude-supporter-demo.mp4`）はミュートで使い、「質問する→回答が始まる→1ステップずつ案内される」部分を中心にする。回答中の「ファイルを修正→commit→push」が長く目立つ使い方はしない（本編でpushまで実践すると誤解させない）
