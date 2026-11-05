@@ -9,7 +9,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { UserError } from "./cli.ts";
-import { PROJECT_SUBDIRS, projectPaths, type ProjectPaths } from "./paths.ts";
+import { PROJECT_SUBDIRS, projectPaths, SHARED_DIR, type ProjectPaths } from "./paths.ts";
 
 export const VIDEO_EXTENSIONS = [".mp4", ".mov", ".m4v", ".mkv", ".webm", ".avi", ".mts"];
 
@@ -133,6 +133,14 @@ export function createProject(id: string, options: { dryRun?: boolean; kind?: Pr
       : {}),
   };
   writeJsonAtomic(paths.projectJson, json);
+  // Production videos start from the user's own subtitle / finish look (_shared/project-template/,
+  // decided on talk-001). Reference / evaluation projects are measured on the tool defaults.
+  if (!isRef) {
+    for (const f of ["subtitle-style.json", "settings.json"]) {
+      const src = path.join(SHARED_DIR, "project-template", f);
+      if (fs.existsSync(src)) fs.copyFileSync(src, path.join(paths.input, f));
+    }
+  }
   return paths;
 }
 

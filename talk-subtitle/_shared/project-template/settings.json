@@ -1,0 +1,7 @@
+{
+  "_note": "横長トーク動画の仕上げの見本（2026-11-05 talk-001）。明るさ20%増し・字幕を0.1秒遅らせる。BGM は input/bgm/ に入れた時だけ（声より bgmBelowVoiceDb 下、既定 20）",
+  "render": {
+    "brightness": 1.2,
+    "subtitleDelaySeconds": 0.1
+  }
+}

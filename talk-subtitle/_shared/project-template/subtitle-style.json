@@ -1,0 +1,26 @@
+{
+  "name": "talk-landscape-v1",
+  "note": "横長トーク動画の字幕の見本（2026-11-05 talk-001 でユーザーが決めた形）。新しい案件の input/ に npm run new がコピーする。1行のみ（長い文は字幕を分ける）・最大幅 93%・文字 短辺の 0.077（single-line-93 の 25%増し）・単独の「はい」「ね」は出さない・出る時は 50% から 0.2秒で表示、消える時はすぐ",
+  "font": {
+    "sizeRatio": 0.077
+  },
+  "position": {
+    "maxWidthRatio": 0.93
+  },
+  "layout": {
+    "lineBreak": "fit-width",
+    "maxLines": 1,
+    "maxCharsPerLine": {
+      "landscape": 24
+    },
+    "dropWords": [
+      "はい",
+      "ね"
+    ]
+  },
+  "transition": {
+    "fadeInSeconds": 0.2,
+    "fadeInFromOpacity": 0.5,
+    "fadeOutSeconds": 0
+  }
+}

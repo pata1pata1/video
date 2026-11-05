@@ -102,7 +102,7 @@
 - `input/settings.json` の `render`：`brightness`（1.2＝20%明るく。字幕は変えない）・`bgmBelowVoiceDb`（BGM を声より何 LU 下げるか。既定 20）・`subtitleDelaySeconds`（字幕を全部ずらす秒）
 - BGM：`input/bgm/` に1曲置くと、subtitle-clip・render が共通エンジンの `mixVoiceWithBgm` で声の下に混ぜる（繰り返し・フェード・話す間は下げる）。subtitle-clip も完成版と同じ -14 LUFS
 - `_shared/subtitle-text-rules.json`：全動画共通の字幕の表記ルール（例：いただ→頂）。学習の記録（style observe）には当てない
-- ユーザーの字幕の好み（1行・短く分ける・はい／ね無し・字幕大きめ 0.077 など）は talk-001 の `input/subtitle-style.json` が見本。次の動画でも最初からこの形で始める
+- ユーザーの字幕と仕上げの見本は `_shared/project-template/`（`subtitle-style.json`：1行・はい／ね無し・字幕大きめ 0.077・半透明から表示、`settings.json`：明るさ1.2・字幕0.1秒遅らせ）。`npm run new` が新しい制作案件の `input/` にコピーする（reference・evaluation にはコピーしない）。長い字幕は言葉の区切りで短く分ける
 
 ## 未実装
 
