@@ -7,7 +7,7 @@
 //   node scripts/cc.mjs render    --project=<id> [--force] | [--still=<png> --frame=N ...]
 //   node scripts/cc.mjs encode    --project=<id> [--force]
 //
-// The finished videos free-trial・sales-intro are migration fixtures in
+// The finished videos free-trial・sales-intro are regression fixtures in
 // their old places (L01 was cleaned up 2026-11-05): --lesson=free-trial|sales-intro with
 // --out-dir=<dir outside claude-course> (they are never overwritten).
 // Settings: course.json. Script rules: scripts/lib/lesson.mjs, captions.mjs.

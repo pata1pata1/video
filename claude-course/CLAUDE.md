@@ -50,7 +50,7 @@
   - 未着手：販売ページへの埋め込み（配信先は未決定）
 - Git：親フォルダ`Projects/video`のリポジトリ（GitHub `pata1pata1/video`）で管理されている（コード・台本・設定。素材・音声・`out/`は`video/.gitignore`で管理外）。commit・pushは指示があるまで行わない
 - **cleanup（全動画プロジェクト共通、2026-10-30）**：アップロードと再生確認が終わったら、その動画固有の制作物（録画・スクショ等の専用素材、音声、中間生成物、キャッシュ、連番、完成MP4、専用の出典台帳・メモ等）を毎回削除する。手順は「①削除対象の一覧 → ②削除後に残るもの → ③ユーザー確認 → ④承認後に削除」。残すのは共通コード・デザイン・共通の読み辞書（`lessons/shared/`）・CLAUDE.md・共通設定など次回以降も使うもの。詳細は`../../remotion/docs/video-migration-plan.md`の「cleanupの対象」。L01は2026-11-05にcleanup済み（上記）。free-trialはアップロードの記録が無い。sales-introはCloudflare R2へアップロード済み（2026-10-25、`../../paid-site/CLAUDE.md`）だが、公開URLでの再生確認の記録が無い。どちらも確認できるまでcleanupしない
-  - **一時例外（2026-10-30決定）**：この3本（L01・free-trial・sales-intro）は移行検証用fixture。アップロードと再生確認が済んでも、**Phase 4の移行検証が終わるまでcleanupを延期する**（恒久保存ではない。Phase 4の検証後に通常のcleanup〈①一覧→②残るもの→③確認→④承認後に削除〉の対象にする）。**Phase 4の移行検証は2026-11-04に完了**（3本とも音声・LUFS／TPがPhase 0と一致、映像の差は旧方式でも同じ場所に出る環境・録画再生の揺れで、移行による差ではない）。cleanupは公開・配信の状況を確認し、ユーザーの承認を得てから。同計画の「移行用の基準（fixture）」
+  - **回帰fixture（2026-11-06 Phase 7で決定）**：free-trial・sales-introの台本・narrationキャッシュ・captions・静止画はclaude-courseの軽量回帰fixture（恒久。最終全体ゲート`../../remotion/docs/migration/phase7/gate.sh`）。ただし**完成動画（`out/<…>/`）は本番制作物で、通常のcleanup条件を変えない**（free-trialはアップロードの記録なし、sales-introは公開URLでの再生確認の記録なし。確認と承認が済むまで残す）。以下は当時の記録：この3本（L01・free-trial・sales-intro）は移行検証用fixture。アップロードと再生確認が済んでも、**Phase 4の移行検証が終わるまでcleanupを延期する**（恒久保存ではない。Phase 4の検証後に通常のcleanup〈①一覧→②残るもの→③確認→④承認後に削除〉の対象にする）。**Phase 4の移行検証は2026-11-04に完了**（3本とも音声・LUFS／TPがPhase 0と一致、映像の差は旧方式でも同じ場所に出る環境・録画再生の揺れで、移行による差ではない）。cleanupは公開・配信の状況を確認し、ユーザーの承認を得てから。同計画の「移行用の基準（fixture）」
 
 ## フォルダ
 
