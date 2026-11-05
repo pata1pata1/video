@@ -26,7 +26,7 @@ talk-subtitle/
   docs/design.md             この文書
   package.json               依存パッケージなし（Node 22.18 以上、.ts を直接実行）
   src/
-    engine.ts                remotion の共通基盤（core/media・core/speech）への唯一の窓口
+    engine.ts                remotion の共通基盤（core/media・core/speech・core/render）への唯一の窓口
     paths.ts project.ts      プロジェクトの場所・project.json・安全な書き込み
     config.ts                解析設定（既定値＋案件ごとの input/settings.json）
     analyze.ts               ffprobe（回転を含む）・音声抽出・ラウドネス・無音検出・確認用プロキシ
@@ -57,9 +57,9 @@ talk-subtitle/
       output/                完成動画（Phase 3）
 ```
 
-- remotion 側の動画タイプ名 `human-video-editor` は `project.json` の `type` に互換のため記録するだけ。作業フォルダ名は `talk-subtitle` で統一する
+- remotion 側の動画タイプ名は `talk-subtitle`（2026-11-05〜、新しい案件の `project.json` の `type`）。以前の案件の `human-video-editor` は旧名称（互換alias）で、書き換えない。作業フォルダ名は `talk-subtitle` で統一する
 - remotion の `src/core/` は **コピーせず import する**（`src/engine.ts` の1か所だけ。`../../remotion` の位置関係が前提）。FFmpeg・ffprobe・whisper.cpp（`remotion/.local/whisper.cpp`）のパス解決も remotion 側の仕組みを使う
-- remotion の `video:new-project`／`video:cleanup` の管理対象ではない（独自の `projects/`）。汎用化できた部品は後で remotion の `src/core/` へ移す
+- 案件は独自の `projects/<id>/`（作成は `npm run new`。remotion の `video:new-project` は使わない）。公開後の `video:mark-completed`・`video:mark-published`・`video:cleanup` は remotion の core の lifecycle を使う（2026-11-05、Phase 5）。焼き込みの ffmpeg・音量・BGM・STT の実行・Remotion の描画も core（`src/engine.ts` 経由）。判断・承認・学習はこのツール
 
 ## 3. 制作フロー
 
@@ -348,7 +348,7 @@ npm run decide -- --project=<id> --accept-term=t1 --reject-term=t2 --term-text=t
 `npm run subtitle-stills -- --project=<id> [--cues=s010,s002,s044,s056]` → `review/subtitle-design/*.png`・`sheet.png`（2×2）
 
 - cut.mp4 から ffmpeg でフレームを取り出し、Remotion（`talk-subtitle/remotion/` の `Subtitle` コンポーネント。最終レンダリングでも同じものを使う）で字幕を重ねて PNG にする
-- Remotion のパッケージ・headless Chrome は `../../remotion` にあるものを Node API（`src/render.ts`）で使う。remotion.config.ts（Rspack・Tailwind）は使わず、webpack + esbuild（この PC の Smart App Control で動く）
+- Remotion のパッケージ・headless Chrome は `../../remotion` にあるものを Node API（`src/render.ts` → `src/engine.ts` → remotion の `core/render/nodeApi.mts`）で使う。remotion.config.ts（Rspack・Tailwind）は使わず、webpack + esbuild（この PC の Smart App Control で動く）
 - 縁取りは文字の後ろに別の層として描く（文字そのものに stroke を付けると線の内側が細る）
 - `remotion/` は別の tsconfig（JSX・react の型を remotion の node_modules から）。`npm run typecheck` で両方を確認する
 - 比較案：`--variant=<name>` で `review/subtitle-design/<name>/style.json` を preset に重ねて描き、default の同じ場面と左右に並べた `compare-<name>/`（場面ごと・`all.png`）を作る。正式設定（`input/subtitle-style.json`）は変えない

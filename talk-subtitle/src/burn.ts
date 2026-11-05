@@ -2,12 +2,17 @@
 // laid out by the project's preset (input/subtitle-style.json; "fit-width" = one line unless it
 // does not fit), each drawn once by Remotion as a transparent PNG and composited onto
 // intermediate/cut.mp4 by ffmpeg during the cue's time range.
+//
+// talk-subtitle decides everything about the picture here (which cues, their lines and times,
+// the fades, the brightness) and builds the filtergraph; remotion's core runs the steps
+// (src/engine.ts: Remotion stills, burnOverlayGraph = the ffmpeg composite, the measured
+// loudnorm filter, the BGM mix and the audio extraction).
 
 import fs from "node:fs";
 import path from "node:path";
 import { UserError } from "./cli.ts";
 import { loadSettings } from "./config.ts";
-import { measureLoudness, mixVoiceWithBgm, runTool } from "./engine.ts";
+import { burnOverlayGraph, extractAudio, loudnormApplyFilter, measureLoudness, mixVoiceWithBgm } from "./engine.ts";
 import type { ProjectPaths } from "./paths.ts";
 import { readJson, readJsonIfExists } from "./project.ts";
 import { bundleCompositions, measureTextEm, renderStillPng } from "./render.ts";
@@ -34,7 +39,7 @@ export async function prepareRenderAudio(paths: ProjectPaths, duration: number):
   fs.mkdirSync(work, { recursive: true });
   const voice = path.join(work, "voice.wav");
   const mix = path.join(work, "mix.wav");
-  await runTool("ffmpeg", ["-hide_banner", "-loglevel", "error", "-nostdin", "-y", "-i", paths.cutFinal, "-vn", "-ac", "2", "-ar", "48000", "-c:a", "pcm_s16le", voice]);
+  await extractAudio(paths.cutFinal, voice, { sampleRate: 48000, channels: 2, overwrite: true });
   const r = await mixVoiceWithBgm(voice, path.join(dir, files[0]), mix, { durationSeconds: duration, belowVoiceDb, overwrite: true });
   fs.rmSync(voice, { force: true });
   return { file: mix, bgm: files[0], gainDb: Math.round(r.gainDb * 10) / 10, belowVoiceDb };
@@ -44,10 +49,7 @@ export async function prepareRenderAudio(paths: ProjectPaths, duration: number):
 export async function loudnormFilter(file: string, targetLufs: number, truePeakDb: number) {
   const before = await measureLoudness(file, { targetLufs, truePeakDb, loudnessRange: 11 });
   const lra = Math.min(50, Math.max(11, Math.ceil(before.loudnessRangeLu + 1)));
-  const filter =
-    `loudnorm=I=${targetLufs}:TP=${truePeakDb}:LRA=${lra}` +
-    `:measured_I=${before.integratedLufs}:measured_TP=${before.truePeakDb}:measured_LRA=${before.loudnessRangeLu}` +
-    `:measured_thresh=${before.thresholdLufs}:offset=${before.targetOffsetLu}:linear=true:print_format=summary,aresample=48000`;
+  const filter = `${loudnormApplyFilter(before, { targetLufs, truePeakDb, loudnessRange: lra, linear: true, printFormat: "summary" })},aresample=48000`;
   return { before, filter };
 }
 
@@ -191,27 +193,18 @@ export async function burnRange(
       ];
       outLabel = inRange.length ? `[v${inRange.length}]` : pre.length ? "[b0]" : null;
     }
-    const graphFile = path.join(stage, "filtergraph.txt");
-    fs.writeFileSync(graphFile, chain.join(";\n"));
-    const loop = fade > 0 ? ["-loop", "1", "-framerate", "60"] : [];
-    await runTool("ffmpeg", [
-      "-v", "error",
-      // The whole video is read as is (no seek), so frame and audio timestamps stay those of cut.mp4.
-      ...(from > 0 ? ["-ss", from.toFixed(3)] : []),
-      ...(to < plan.duration ? ["-t", (to - from).toFixed(3)] : []),
-      "-i", paths.cutFinal,
-      ...pngInputs.flatMap((p) => [...loop, "-i", p]),
-      ...(opts.audioInput ? [...(from > 0 ? ["-ss", from.toFixed(3)] : []), ...(to < plan.duration ? ["-t", (to - from).toFixed(3)] : []), "-i", opts.audioInput] : []),
-      // The graph goes in a file (-filter_complex_script; ffmpeg 6.1): with ~100 subtitles it is longer than Windows allows on a command line.
-      ...(outLabel ? ["-filter_complex_script", graphFile, "-map", outLabel] : ["-map", "0:v"]),
-      "-map", opts.audioInput ? `${pngInputs.length + 1}:a` : "0:a?",
-      "-c:v", "libx264", "-preset", "medium", "-crf", "18", "-pix_fmt", "yuv420p",
-      "-fps_mode", "passthrough", "-enc_time_base:v", "demux", // keep cut.mp4's frame times exactly (no rounding to 1/fps)
-      ...(opts.audioFilter ? ["-af", opts.audioFilter] : []),
-      "-c:a", "aac", "-b:a", "192k", "-ar", "48000",
-      "-movflags", "+faststart",
-      "-y", output,
-    ], { timeoutMs: opts.timeoutMs ?? 30 * 60 * 1000 });
+    // core runs ffmpeg: cut.mp4 [from, to) (frame times kept), the PNGs (looped at 60 fps for the fades),
+    // the graph (from a file), H.264 CRF 18 + AAC 192k 48 kHz, faststart.
+    await burnOverlayGraph(paths.cutFinal, pngInputs, output, {
+      overwrite: true,
+      graph: outLabel ? { filterGraph: chain.join(";\n"), outLabel } : null,
+      pngInputArgs: fade > 0 ? ["-loop", "1", "-framerate", "60"] : [],
+      audioInput: opts.audioInput,
+      from,
+      duration: to < plan.duration ? to - from : undefined,
+      audioFilter: opts.audioFilter,
+      timeoutMs: opts.timeoutMs ?? 30 * 60 * 1000,
+    });
     return inRange;
   } finally {
     fs.rmSync(stage, { recursive: true, force: true });

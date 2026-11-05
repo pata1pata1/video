@@ -25,8 +25,12 @@ export type SourceRecord = {
 export type ProjectJson = {
   version: 1;
   tool: "talk-subtitle";
-  /** remotion's video type name, kept for compatibility only. */
-  type: "human-video-editor";
+  /**
+   * remotion's video type name. New projects (2026-11-05, Phase 5) are written as "talk-subtitle";
+   * "human-video-editor" is the former name, still read (here and by remotion's core, as an alias).
+   * Existing project.json files are not rewritten. remotion's core reads "id" as the project name.
+   */
+  type: "talk-subtitle" | "human-video-editor";
   id: string;
   created: string;
   status: "active" | "completed" | "archived";
@@ -121,7 +125,7 @@ export function createProject(id: string, options: { dryRun?: boolean; kind?: Pr
   const json: ProjectJson = {
     version: 1,
     tool: "talk-subtitle",
-    type: "human-video-editor",
+    type: "talk-subtitle",
     id,
     created: new Date().toISOString(),
     status: "active",
