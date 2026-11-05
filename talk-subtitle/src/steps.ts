@@ -5,7 +5,7 @@
 import fs from "node:fs";
 import type { ProbeJson } from "./analyze.ts";
 import { readPcmWav } from "./audioLevel.ts";
-import { buildCutCandidates, pausePadding, type CutCandidatesJson } from "./candidates.ts";
+import { buildCutCandidates, pausePadding, type CutCandidate, type CutCandidatesJson } from "./candidates.ts";
 import { UserError } from "./cli.ts";
 import { loadSettings } from "./config.ts";
 import { currentTermDecisions, loadDecisions, saveDecisions } from "./decisions.ts";
@@ -204,7 +204,51 @@ export function runReview(project: Project): string {
  * new ones get the next IDs and start undecided, and decisions.json is moved to
  * the new fingerprint only after checking the old items are unchanged.
  */
-export function appendRetakeCandidates(project: Project, options: { dryRun?: boolean } = {}) {
+/** One content proposal by Claude (npm run candidates -- --add-claude=<file>). */
+export type ClaudeProposal = {
+  start: number;
+  end: number;
+  /** retake: an earlier take of what is said again later. abandoned: a phrase left unfinished. repeat: the same point made twice. tangent: off-topic talk. other. */
+  type: ClaudeContentType;
+  suggestion: "cut" | "review";
+  reason: string;
+  /** For retake / repeat: what is kept instead (shown in the review). */
+  kept?: string;
+};
+export type ClaudeContentType = "retake" | "abandoned" | "repeat" | "tangent" | "other";
+const CLAUDE_TYPES: ClaudeContentType[] = ["retake", "abandoned", "repeat", "tangent", "other"];
+
+/** Validates Claude's proposals and fills in text / context from the transcript. */
+function claudeDrafts(transcript: Transcript, cuts: CutCandidatesJson, proposals: ClaudeProposal[]) {
+  const words = transcript.segments.flatMap((s) => s.words);
+  const mid = (w: { start: number; end: number }) => (w.start + w.end) / 2;
+  return proposals.map((p, i) => {
+    const where = `提案 ${i + 1}（${p.start}–${p.end}）`;
+    if (!(Number.isFinite(p.start) && Number.isFinite(p.end) && p.start >= 0 && p.end > p.start && p.end <= cuts.durationSeconds + 1e-6)) throw new UserError(`${where}: 範囲が正しくありません。`);
+    if (!CLAUDE_TYPES.includes(p.type)) throw new UserError(`${where}: type は ${CLAUDE_TYPES.join("|")} のどれかです。`);
+    if (p.suggestion !== "cut" && p.suggestion !== "review") throw new UserError(`${where}: suggestion は cut か review です。`);
+    if (!p.reason?.trim()) throw new UserError(`${where}: reason が必要です。`);
+    const inside = words.filter((w) => mid(w) >= p.start && mid(w) < p.end);
+    return {
+      kind: (p.type === "abandoned" ? "restart" : "retake") as CutCandidate["kind"],
+      start: Math.round(p.start * 1000) / 1000,
+      end: Math.round(p.end * 1000) / 1000,
+      confidence: p.suggestion === "cut" ? 0.7 : 0.5,
+      suggestion: p.suggestion,
+      reason: `[Claude] ${p.reason}${p.kept ? `（残す：「${p.kept}」）` : ""}`,
+      text: inside.map((w) => w.text).join(""),
+      context: {
+        before: words.filter((w) => mid(w) < p.start).slice(-10).map((w) => w.text).join(""),
+        after: words.filter((w) => mid(w) >= p.end).slice(0, 10).map((w) => w.text).join(""),
+      },
+      segmentIds: [...new Set(transcript.segments.filter((s) => s.words.some((w) => inside.includes(w))).map((s) => s.id))],
+      proposedBy: "claude" as const,
+      claudeType: p.type,
+    };
+  });
+}
+
+export function appendRetakeCandidates(project: Project, options: { dryRun?: boolean; claude?: ClaudeProposal[] } = {}) {
   if (!options.dryRun) assertWritable(project);
   const { paths } = project;
   const cuts = need<CutCandidatesJson>(paths.cutCandidates, `npm run candidates -- --project=${project.json.id}`);
@@ -226,7 +270,13 @@ export function appendRetakeCandidates(project: Project, options: { dryRun?: boo
     for (const r of unionRanges(approved)) covered += Math.max(0, Math.min(e, r.end) - Math.max(s, r.start));
     return e - s - covered;
   };
-  const drafts = round2Drafts(transcript, readPcmWav(paths.audioWav), cuts.speechDb, loadSettings(paths).candidates, cuts.items, uncovered);
+  // Claude's content proposals are taken as given (checked in claudeDrafts); otherwise run the round-2 detectors.
+  const drafts = options.claude
+    ? claudeDrafts(transcript, cuts, options.claude)
+    : round2Drafts(transcript, readPcmWav(paths.audioWav), cuts.speechDb, loadSettings(paths).candidates, cuts.items, uncovered);
+  const detector = options.claude
+    ? "claude content review (abandoned / last take / repeated talk / tangent; proposedBy: claude)"
+    : "retakes v1 (phrase prefix / similar repeat / correction) + hidden pauses/speech in word spans (audio)";
   let next = Math.max(0, ...cuts.items.map((c) => Number(c.id.slice(1)) || 0)) + 1;
   const added = drafts.map((d) => ({ id: `c${next++}`, ...d, duration: Math.round((d.end - d.start) * 1000) / 1000, round }));
   const items = [...cuts.items, ...added];
@@ -236,7 +286,7 @@ export function appendRetakeCandidates(project: Project, options: { dryRun?: boo
     fingerprint: fingerprint(items),
     rounds: [
       ...(cuts.rounds ?? []),
-      { round, addedAt: new Date().toISOString(), detector: "retakes v1 (phrase prefix / similar repeat / correction) + hidden pauses/speech in word spans (audio)", ids: added.map((a) => a.id), previousFingerprint: cuts.fingerprint },
+      { round, addedAt: new Date().toISOString(), detector, ids: added.map((a) => a.id), previousFingerprint: cuts.fingerprint },
     ],
   };
   const uncoveredSeconds = added.map((a) => Math.round(uncovered(a.start, a.end) * 100) / 100);

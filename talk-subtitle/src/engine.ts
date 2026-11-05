@@ -10,6 +10,7 @@ export {
   detectSilence,
   extractAudio,
   measureLoudness,
+  mixVoiceWithBgm,
   probeMedia,
   resolveBinary,
   runTool,

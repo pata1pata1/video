@@ -2,6 +2,9 @@
 //   npm run subtitles -- draft  --project=<id>        → intermediate/subtitles.draft.json + review/subtitles.html
 //   npm run subtitles -- show   --project=<id> [--review]
 //   npm run subtitles -- edit   --project=<id> --cue=s012 --text="…"   （改行は \n）
+//   npm run subtitles -- edit   --project=<id> --cue=s003 --end=7.78   （終わりの時刻。--start と同じくカット後の秒）
+//   npm run subtitles -- edit   --project=<id> --cue=s001 --start=0.28   （開始時刻をカット後の秒で。文字起こしに無い声の分）
+//   npm run subtitles -- edit   --project=<id> --cue=s001 --before="文" --before-start=0.28 --before-end=1.6   （前に字幕を1つ追加）
 //   npm run subtitles -- edit   --project=<id> --cue=s012 --delete | --ok | --reset
 //   npm run subtitles -- import --project=<id> --file=<subtitles.html から書き出した JSON>
 //   npm run subtitles -- approve --project=<id>       （要確認がすべて確認済みのときだけ）
@@ -43,7 +46,7 @@ await runCli(async () => {
   };
   const counts = (draft: SubtitleDraft, s: SubtitlesJson) => {
     const cues = effectiveCues(draft, s);
-    return { live: cues.length, deleted: draft.cues.length - cues.length, review: cues.filter((c) => c.review).length, open: cues.filter((c) => c.review && !c.ok).length, edited: cues.filter((c) => c.edited).length };
+    return { live: cues.length, deleted: draft.cues.filter((c) => s.edits[c.id]?.deleted).length, review: cues.filter((c) => c.review).length, open: cues.filter((c) => c.review && !c.ok).length, edited: cues.filter((c) => c.edited).length };
   };
   const refresh = (draft: SubtitleDraft, s: SubtitlesJson) => {
     saveSubtitleEdits(paths, s);
@@ -114,11 +117,41 @@ await runCli(async () => {
       console.log(`${id}: 元の案に戻しました「${cue.text.replace(/\n/g, " ／ ")}」`);
     } else {
       if (args.get("text") !== undefined) e.text = args.get("text")!.replace(/\\n/g, "\n");
+      if (args.get("start") !== undefined) {
+        // Start time in the cut video (e.g. a voice the transcript has no words for). Never overlaps the previous cue.
+        const t = Number(args.get("start"));
+        const i = draft.cues.indexOf(cue);
+        const prevEnd = draft.cues.slice(0, i).filter((c) => !s.edits[c.id]?.deleted).at(-1)?.end ?? 0;
+        if (!Number.isFinite(t) || t < prevEnd || t >= cue.end) throw new UserError(`--start は ${prevEnd.toFixed(2)}〜${cue.end.toFixed(2)} 秒の間で指定してください（前の字幕と重ねない）。`);
+        e.start = Math.round(t * 1000) / 1000;
+      }
+      if (args.get("end") !== undefined) {
+        // End time in the cut video. Never overlaps the next cue (its edited start, or its added cue before it).
+        const t = Number(args.get("end"));
+        const i = draft.cues.indexOf(cue);
+        const next = draft.cues.slice(i + 1).find((c) => !s.edits[c.id]?.deleted);
+        const ne = next ? s.edits[next.id] : undefined;
+        const nextStart = next ? (ne?.before?.start ?? ne?.start ?? next.start) : Infinity;
+        const start = e.start ?? cue.start;
+        if (!Number.isFinite(t) || t <= start || t > nextStart) throw new UserError(`--end は ${start.toFixed(2)}〜${nextStart.toFixed(2)} 秒の間で指定してください（次の字幕と重ねない）。`);
+        e.end = Math.round(t * 1000) / 1000;
+      }
+      if (args.get("before") !== undefined) {
+        // --before="文" --before-start=秒 --before-end=秒: add a cue just before this one.
+        const a = Number(args.get("before-start"));
+        const b = Number(args.get("before-end"));
+        const i = draft.cues.indexOf(cue);
+        const prevEnd = draft.cues.slice(0, i).filter((c) => !s.edits[c.id]?.deleted).at(-1)?.end ?? 0;
+        const start = e.start ?? cue.start;
+        if (!Number.isFinite(a) || !Number.isFinite(b) || a < prevEnd || b <= a || b > start) throw new UserError(`--before-start／--before-end は ${prevEnd.toFixed(2)}〜${start.toFixed(2)} 秒の間で指定してください。`);
+        e.before = { text: args.get("before")!, start: Math.round(a * 1000) / 1000, end: Math.round(b * 1000) / 1000 };
+      }
       if (args.has("delete")) e.deleted = true;
       if (args.has("ok")) e.ok = true;
-      if (e.text === undefined && !e.deleted && !e.ok) throw new UserError("--text=… / --delete / --ok / --reset のどれかを指定してください。");
+      if (e.text === undefined && e.start === undefined && e.end === undefined && !e.before && !e.deleted && !e.ok) throw new UserError("--text=… / --start=秒 / --before=… / --delete / --ok / --reset のどれかを指定してください。");
       s.edits[id] = e;
-      console.log(`${id}: ${e.deleted ? "削除" : e.text !== undefined ? `「${e.text.replace(/\n/g, " ／ ")}」` : "確認OK"}`);
+      const shown = e.text !== undefined ? `「${e.text.replace(/\n/g, " ／ ")}」` : e.start === undefined ? "確認OK" : "";
+      console.log(`${id}: ${e.deleted ? "削除" : shown}${e.start !== undefined ? `（開始 ${e.start.toFixed(2)}秒）` : ""}${e.end !== undefined ? `（終わり ${e.end.toFixed(2)}秒）` : ""}${e.before ? `（前に追加 ${e.before.start.toFixed(2)}–${e.before.end.toFixed(2)}「${e.before.text}」）` : ""}`);
     }
     if (s.approved) {
       s.approved = null;

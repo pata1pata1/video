@@ -171,6 +171,7 @@ export function observeProject(project: Project, options: ObserveOptions = {}): 
           suggestion: c.suggestion,
           confidence: c.confidence,
           round: c.round ?? 1,
+          ...(c.proposedBy ? { proposedBy: c.proposedBy, claudeType: c.claudeType } : {}),
           ...(c.detail ? { retakePattern: c.detail.pattern, retakeKeep: c.detail.keep, retakeSimilarity: c.detail.similarity } : {}),
           duration: round3(c.duration),
           position,
@@ -279,7 +280,7 @@ export function observeProject(project: Project, options: ObserveOptions = {}): 
     ...settings.candidates.weakFillers.map((w) => ({ word: w, strength: "weak" as const })),
   ].sort((a, b) => b.word.length - a.word.length);
   const fillerWords = [...new Set(fillerLists.map((f) => f.word))];
-  const cues = draft && subtitleState !== "stale" ? effectiveCues(draft, edits) : [];
+  const cues = draft && subtitleState !== "stale" ? effectiveCues(draft, edits, { textRules: false }) : [];
   if (transcript && timemapCurrent) {
     for (const seg of transcript.segments) {
       const ix = indexSegment(seg);

@@ -39,6 +39,9 @@ export type CutCandidate = {
   round?: number;
   /** Retake / restart details (round 2+): the two attempts, their similarity, which one is kept. */
   detail?: import("./retakes.ts").RetakeDetail;
+  /** claude: a content judgment added by Claude (candidates --add-claude), not by a rule. */
+  proposedBy?: "claude";
+  claudeType?: import("./steps.ts").ClaudeContentType;
 };
 
 export type CutCandidatesJson = {

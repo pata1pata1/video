@@ -6,12 +6,13 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import { approvedBurnCues, burnRange } from "../src/burn.ts";
+import { approvedBurnCues, burnRange, loudnormFilter, prepareRenderAudio } from "../src/burn.ts";
 import { fmtTime, parseArgs, runCli, UserError } from "../src/cli.ts";
 import { audioLagMs, frameTimestamps, grayFrame, monoFloat, outToSrc, readWav16, type Timemap } from "../src/cut.ts";
-import { measureLoudness, probeMedia, runTool } from "../src/engine.ts";
+import { probeMedia, runTool } from "../src/engine.ts";
 import { assertSourceUnchanged, assertWritable, loadProject, sha256File, writeJsonAtomic } from "../src/project.ts";
 import { checkCutInputs } from "../src/subtitles.ts";
+import { loadSettings } from "../src/config.ts";
 
 const TARGET_LUFS = -14;
 const TARGET_TP = -1.5;
@@ -36,19 +37,18 @@ await runCli(async () => {
   if (plan.cues.some((c) => c.lines.length > 2)) throw new UserError("3行以上の字幕があります。");
 
   // Loudness: measure, then one linear gain (loudnorm with the measured values).
+  // BGM (input/bgm/): mixed under the voice first, then the mix is normalised as one.
+  const mix = await prepareRenderAudio(paths, plan.duration);
+  if (mix) console.log(`BGM: ${mix.bgm}（声より ${mix.belowVoiceDb} LU 下、ゲイン ${mix.gainDb}dB、声の間は大きく・話す間は小さく）`);
   console.log("音量を測定中…");
-  const before = await measureLoudness(paths.cutFinal, { targetLufs: TARGET_LUFS, truePeakDb: TARGET_TP, loudnessRange: 11 });
-  const lra = Math.min(50, Math.max(11, Math.ceil(before.loudnessRangeLu + 1)));
-  const audioFilter =
-    `loudnorm=I=${TARGET_LUFS}:TP=${TARGET_TP}:LRA=${lra}` +
-    `:measured_I=${before.integratedLufs}:measured_TP=${before.truePeakDb}:measured_LRA=${before.loudnessRangeLu}` +
-    `:measured_thresh=${before.thresholdLufs}:offset=${before.targetOffsetLu}:linear=true:print_format=summary,aresample=48000`;
-  console.log(`  cut.mp4: ${before.integratedLufs} LUFS、true peak ${before.truePeakDb} dBTP、LRA ${before.loudnessRangeLu} LU`);
+  const { before, filter: audioFilter } = await loudnormFilter(mix?.file ?? paths.cutFinal, TARGET_LUFS, TARGET_TP);
+  console.log(`  ${mix ? "声＋BGM" : "cut.mp4"}: ${before.integratedLufs} LUFS、true peak ${before.truePeakDb} dBTP、LRA ${before.loudnessRangeLu} LU`);
 
   console.log("全編を書き出し中（字幕の画像を作ってから H.264 で書き出し。数分かかります）…");
   const t0 = Date.now();
   fs.rmSync(partial, { force: true });
-  await burnRange(paths, plan, 0, plan.duration, partial, { audioFilter, timeoutMs: 3 * 60 * 60 * 1000 });
+  await burnRange(paths, plan, 0, plan.duration, partial, { audioFilter, audioInput: mix?.file, timeoutMs: 3 * 60 * 60 * 1000 });
+  if (mix) fs.rmSync(path.dirname(mix.file), { recursive: true, force: true });
   console.log(`  書き出し ${((Date.now() - t0) / 1000).toFixed(0)}秒`);
 
   // ---- checks ----
@@ -114,6 +114,9 @@ await runCli(async () => {
       audioChecks.push({ outT: Math.round(outT * 1000) / 1000, srcT: Math.round(srcT * 1000) / 1000, ...r });
       if (Math.abs(r.lagMs) > 10 || r.corr < 0.8) problems.push(`音声の位置がずれている可能性（${fmtTime(outT)}: ${r.lagMs}ms、相関 ${r.corr}）`);
     }
+    // cut.mp4 frames get the render's brightness first, so they are compared like with like.
+    const bright = loadSettings(paths).render.brightness;
+    const refFilter = bright === 1 ? undefined : `lutyuv=y='clip(16+(val-16)*${bright},16,235)'`;
     // Frames: the final frame should match cut.mp4 at the same time better than ±6 frames (upper part, above the subtitles).
     const top = (f: Float64Array) => f.subarray(0, 64 * 22);
     const madTop = (x: Float64Array, y: Float64Array) => {
@@ -126,24 +129,24 @@ await runCli(async () => {
       const k = times.findIndex((t) => t >= s.outStart + (s.outEnd - s.outStart) / 2);
       const t = times[k];
       const o = await grayFrame(partial, t + 0.002, work);
-      const here = madTop(o, await grayFrame(paths.cutFinal, t + 0.002, work));
+      const here = madTop(o, await grayFrame(paths.cutFinal, t + 0.002, work, refFilter));
       const nb: number[] = [];
-      for (const d of [-6, 6]) nb.push(madTop(o, await grayFrame(paths.cutFinal, times[k + d] + 0.002, work)));
+      for (const d of [-6, 6]) nb.push(madTop(o, await grayFrame(paths.cutFinal, times[k + d] + 0.002, work, refFilter)));
       videoChecks.push({ outT: Math.round(t * 1000) / 1000, mad: here, madNeighbours: nb });
       if (!(here < Math.min(...nb)) && here > 0.5) problems.push(`映像の位置がずれている可能性（${fmtTime(t)}）`);
     }
     // Every subtitle is on screen: in the middle of each cue, the subtitle band (bottom 40% at
     // 480×108) has clearly changed pixels against cut.mp4 — even a one-character 「ね」 gives dozens.
-    const band = async (file: string, t: number) => {
+    const band = async (file: string, t: number, pre?: string) => {
       const raw = path.join(work, "band.gray");
       await runTool("ffmpeg", ["-hide_banner", "-loglevel", "error", "-nostdin", "-y", "-ss", t.toFixed(4), "-i", file, "-frames:v", "1",
-        "-vf", "crop=iw:ih*0.4:0:ih*0.6,scale=480:108,format=gray", "-f", "rawvideo", raw]);
+        "-vf", `${pre ? `${pre},` : ""}crop=iw:ih*0.4:0:ih*0.6,scale=480:108,format=gray`, "-f", "rawvideo", raw]);
       return fs.readFileSync(raw);
     };
     for (const c of plan.cues) {
       const t = (c.start + c.end) / 2;
       const x = await band(partial, t);
-      const y = await band(paths.cutFinal, t);
+      const y = await band(paths.cutFinal, t, refFilter);
       let changed = 0;
       for (let i = 0; i < x.length; i++) if (Math.abs(x[i] - y[i]) > 48) changed++;
       subtitleChecks.push({ id: c.id, t: Math.round(t * 1000) / 1000, diff: changed });
@@ -169,7 +172,7 @@ await runCli(async () => {
     output: "final.mp4",
     ok: problems.length === 0,
     problems,
-    inputs: { cut: "intermediate/cut.mp4", cutFrames, subtitlesApproved: true, preset: plan.preset.name, sourceSha256 },
+    inputs: { cut: "intermediate/cut.mp4", cutFrames, bgm: mix ? { file: `input/bgm/${mix.bgm}`, belowVoiceDb: mix.belowVoiceDb, gainDb: mix.gainDb } : null, brightness: loadSettings(paths).render.brightness, subtitlesApproved: true, preset: plan.preset.name, sourceSha256 },
     file: { bytes: fs.statSync(partial).size, sha256: await sha256File(partial), formatSeconds: info.durationSeconds },
     video: { codec: v.codec_name, width, height, rotation, rFrameRate: v.r_frame_rate, avgFps: Math.round(fpsOf(v.avg_frame_rate) * 1000) / 1000, frames: times.length, seconds: Math.round(videoSeconds * 1e6) / 1e6 },
     audio: { codec: a?.codec_name, sampleRate: Number(a?.sample_rate), channels: Number(a?.channels), seconds: audioSeconds },

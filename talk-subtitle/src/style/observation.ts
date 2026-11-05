@@ -31,6 +31,9 @@ export type CutCandidateEvent = {
     suggestion: "cut" | "review";
     confidence: number;
     round: number;
+    /** claude: a content judgment Claude added (candidates --add-claude), with its type. */
+    proposedBy?: "claude";
+    claudeType?: string;
     /** Retake / restart pattern (round 2 candidates). */
     retakePattern?: string;
     retakeKeep?: "first" | "second";

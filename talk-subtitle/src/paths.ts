@@ -8,6 +8,8 @@ export const TOOL_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url
 export const PROJECTS_DIR = path.join(TOOL_ROOT, "projects");
 export const SHARED_DIR = path.join(TOOL_ROOT, "_shared");
 export const SHARED_GLOSSARY = path.join(SHARED_DIR, "glossary.json");
+/** Spelling rules for every video's subtitles (e.g. いただ → 頂). */
+export const SUBTITLE_TEXT_RULES = path.join(SHARED_DIR, "subtitle-text-rules.json");
 export const SUBTITLE_PRESETS_DIR = path.join(SHARED_DIR, "subtitle-presets");
 /** Editing-style learning data (outside Git: holds speech text of real projects). */
 export const STYLE_DATA_DIR = path.join(TOOL_ROOT, "style-data");

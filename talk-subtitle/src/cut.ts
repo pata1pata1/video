@@ -172,7 +172,9 @@ export async function planCut(project: Project, log: Log): Promise<CutPlan> {
   let maxSnap = 0;
   const snapIdx = (t: number, edge: boolean) => {
     if (edge && t <= 0) return 0;
-    if (edge && t >= videoEnd) return times.length;
+    // The video end is a boundary too: a cut ending closer to it than to the last frame's start
+    // (e.g. the audio is a few ms shorter than the video) removes the last frame as well.
+    if (edge && t >= (times[times.length - 1] + videoEnd) / 2) return times.length;
     const i = nearestFrame(times, t);
     maxSnap = Math.max(maxSnap, Math.abs(times[i] - t));
     return i;
@@ -312,12 +314,13 @@ export function filterScript(segments: KeepSegment[], quality: CutQuality, minFr
 
 let frameSeq = 0;
 /** One frame at t as 64×36 grayscale (via a temp file: runTool returns text only). */
-export async function grayFrame(file: string, t: number, workDir: string): Promise<Float64Array> {
+/** preFilter: ffmpeg video filter applied before scaling (e.g. the render's brightness, to compare like with like). */
+export async function grayFrame(file: string, t: number, workDir: string, preFilter?: string): Promise<Float64Array> {
   const raw = path.join(workDir, `frame-${frameSeq++}.gray`);
   await runTool("ffmpeg", [
     "-hide_banner", "-loglevel", "error", "-nostdin", "-y",
     "-ss", t.toFixed(4), "-i", file,
-    "-frames:v", "1", "-vf", "scale=64:36,format=gray", "-f", "rawvideo", raw,
+    "-frames:v", "1", "-vf", `${preFilter ? `${preFilter},` : ""}scale=64:36,format=gray`, "-f", "rawvideo", raw,
   ]);
   const bytes = fs.readFileSync(raw);
   fs.rmSync(raw, { force: true });

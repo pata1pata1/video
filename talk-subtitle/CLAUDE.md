@@ -94,6 +94,16 @@
 - **新しい動画での検証**：学習に使っていない動画は `--kind=evaluation` で作り、`npm run reference -- all` → `npm run evaluate -- summary`。evaluation 案件は `style observe` が止まり、学習データ（`style-data/observations/`）に入らない。検証のために、Claude が完成動画を見てから候補を直すことはしない（測るのはツールの自動候補）
 - **横長トーク動画だけのルール**。ニュースショートなど別の編集スタイル（`../short-movie` など）には使わない
 
+## 制作で足した機能（2026-11-05、talk-001）
+
+- `npm run candidates -- --project=<id> --add-claude=<JSON>`：Claude の内容の提案（言い直し・言いかけ・繰り返し・脱線・その他）やユーザーの指示のカットを候補に追加（`proposedBy: "claude"`。承認は従来どおり `npm run decide`）
+- `npm run subtitles -- edit … --start=秒 --end=秒`（字幕の時刻。カット後の秒）／`--before="文" --before-start=秒 --before-end=秒`（前に字幕を1つ追加＝分割や、文字起こしに無い声の字幕）
+- `input/subtitle-style.json`：`layout.maxLines: 1`（必ず1行）・`layout.dropWords`（単独の「はい」「ね」などを字幕に出さない。音声は残す）・`transition`（`fadeInSeconds`・`fadeInFromOpacity`・`fadeOutSeconds`）
+- `input/settings.json` の `render`：`brightness`（1.2＝20%明るく。字幕は変えない）・`bgmBelowVoiceDb`（BGM を声より何 LU 下げるか。既定 20）・`subtitleDelaySeconds`（字幕を全部ずらす秒）
+- BGM：`input/bgm/` に1曲置くと、subtitle-clip・render が共通エンジンの `mixVoiceWithBgm` で声の下に混ぜる（繰り返し・フェード・話す間は下げる）。subtitle-clip も完成版と同じ -14 LUFS
+- `_shared/subtitle-text-rules.json`：全動画共通の字幕の表記ルール（例：いただ→頂）。学習の記録（style observe）には当てない
+- ユーザーの字幕の好み（1行・短く分ける・はい／ね無し・字幕大きめ 0.077 など）は talk-001 の `input/subtitle-style.json` が見本。次の動画でも最初からこの形で始める
+
 ## 未実装
 
 Phase 4（テロップ・高度な補正・複数人）

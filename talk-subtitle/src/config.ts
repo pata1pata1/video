@@ -87,6 +87,21 @@ export const DEFAULT_SETTINGS = {
       beamSize: undefined as number | undefined,
     },
   },
+  render: {
+    /**
+     * Picture brightness for the burn-in / final render (1 = unchanged, 1.2 = 20% brighter).
+     * Luma is scaled up from black (black stays black, the brightest parts may clip); subtitles are not affected.
+     */
+    brightness: 1,
+    /**
+     * BGM (one audio file in input/bgm/, optional): mixed under the voice by the shared engine
+     * (core mixVoiceWithBgm: looped with crossfades, faded in/out, ducked while the voice speaks).
+     * The BGM sits this many LU under the voice.
+     */
+    bgmBelowVoiceDb: 20,
+    /** Every subtitle is shown this many seconds later (start and end alike; negative = earlier). */
+    subtitleDelaySeconds: 0,
+  },
 };
 
 export type Settings = typeof DEFAULT_SETTINGS;
@@ -96,6 +111,7 @@ export function loadSettings(paths: ProjectPaths): Settings {
   return {
     silence: { ...DEFAULT_SETTINGS.silence, ...override.silence },
     candidates: { ...DEFAULT_SETTINGS.candidates, ...override.candidates },
+    render: { ...DEFAULT_SETTINGS.render, ...override.render },
     transcribe: {
       ...DEFAULT_SETTINGS.transcribe,
       ...override.transcribe,

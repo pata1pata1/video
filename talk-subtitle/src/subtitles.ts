@@ -17,7 +17,7 @@ import { DEFAULT_SETTINGS } from "./config.ts";
 import { levelOf, type Pcm } from "./audioLevel.ts";
 import { approvedCuts, type CutReport, type Timemap } from "./cut.ts";
 import { loadDecisions, type By } from "./decisions.ts";
-import { SUBTITLE_PRESETS_DIR, type ProjectPaths } from "./paths.ts";
+import { SUBTITLE_PRESETS_DIR, SUBTITLE_TEXT_RULES, type ProjectPaths } from "./paths.ts";
 import { fingerprint, readJson, readJsonIfExists, writeJsonAtomic } from "./project.ts";
 import { alignQuotes, loadQuotes, type QuoteMatch } from "./quotes.ts";
 import { round3 } from "./text.ts";
@@ -49,7 +49,19 @@ export type SubtitlePreset = {
      * only when it does not (see layoutCues). The approved text itself is not changed.
      */
     lineBreak?: "chars" | "fit-width";
+    /**
+     * Optional: words left out of the subtitle when they stand alone as a word (still in the audio),
+     * e.g. ["はい", "ね"]. A word glued to others (ですね・ますね) is kept.
+     */
+    dropWords?: string[];
   };
+  /**
+   * Optional: how a subtitle appears / goes. Absent = cut (on and off at once).
+   * fadeInSeconds: from its start, the subtitle goes from fadeInFromOpacity (0–1) to fully opaque.
+   * fadeOutSeconds: it fades out over this long after its end (0 = gone at once; back-to-back subtitles then
+   * dissolve into each other).
+   */
+  transition?: { fadeInSeconds?: number; fadeInFromOpacity?: number; fadeOutSeconds?: number };
 };
 
 /** _shared/subtitle-presets/default.json, overridden key by key by input/subtitle-style.json. */
@@ -121,6 +133,12 @@ export type SubtitleEdit = {
   /** Draft text this edit was made against (carry-over key when the draft is rebuilt). */
   origText: string;
   text?: string;
+  /** Start time override (seconds in the cut video), e.g. when the voice has no words in the transcript. */
+  start?: number;
+  /** End time override (seconds in the cut video). */
+  end?: number;
+  /** A cue added just before this one (a voice the transcript has no words for), shown as "<id>a". */
+  before?: { text: string; start: number; end: number };
   deleted?: true;
   /** Reviewed and fine as is. */
   ok?: true;
@@ -404,7 +422,8 @@ export function buildDraft(input: {
   const maxChars = preset.layout.maxCharsPerLine.landscape;
   const maxLines = preset.layout.maxLines;
   const commaStyle = preset.layout.commaStyle ?? "space";
-  const strongFillers = new Set(DEFAULT_SETTINGS.candidates.strongFillers);
+  // Strong fillers (えー・あのー…) and the preset's dropWords (はい・ね…) stay in the audio but not in the subtitle.
+  const strongFillers = new Set([...DEFAULT_SETTINGS.candidates.strongFillers, ...(preset.layout.dropWords ?? [])]);
 
   const quotes = loadQuotes(input.paths.quotes);
   const alignment = alignQuotes(corrected, raw, quotes, timemap);
@@ -416,10 +435,15 @@ export function buildDraft(input: {
 
   // Strong fillers (えー・あのー…) stay in the audio but not in the subtitle.
   const fillerAt: { out: number; text: string }[] = [];
-  units = units.filter((u) => {
+  const dropWords = new Set(preset.layout.dropWords ?? []);
+  units = units.filter((u, i) => {
     if (u.quote || !strongFillers.has(strip(u.text))) return true;
     dropped.push({ srcStart: u.srcStart, srcEnd: u.srcEnd, text: u.text, reason: "filler" });
     fillerAt.push({ out: u.outStart, text: strip(u.text) });
+    // A dropped sentence-end word (ありますね、) keeps its punctuation, so the sentence break stays.
+    const punct = u.text.match(/[、。！？!?]+$/)?.[0];
+    const prev = units[i - 1];
+    if (punct && dropWords.has(strip(u.text)) && prev && !/[、。！？!?]$/.test(prev.text) && u.outStart - prev.outEnd < 0.6) prev.text += punct;
     return false;
   });
   units = units.flatMap((u) => splitLong(u, maxChars * maxLines));
@@ -647,11 +671,26 @@ export function carryEdits(s: SubtitlesJson, draft: SubtitleDraft): { carried: n
 }
 
 /** Draft + edits → the cues that would be burned in. */
-export function effectiveCues(draft: SubtitleDraft, s: SubtitlesJson): (Cue & { edited: boolean; ok: boolean })[] {
-  return draft.cues
-    .filter((c) => !s.edits[c.id]?.deleted)
-    .map((c) => {
-      const e = s.edits[c.id];
-      return { ...c, text: e?.text ?? c.text, edited: e?.text !== undefined, ok: !!e?.ok || e?.text !== undefined };
-    });
+/** _shared/subtitle-text-rules.json: plain replacements applied, in order, to every subtitle's text. */
+export function applyTextRules(text: string): string {
+  const rules = readJsonIfExists<{ replace?: { from: string; to: string }[] }>(SUBTITLE_TEXT_RULES)?.replace ?? [];
+  return rules.reduce((t, r) => (r.from ? t.split(r.from).join(r.to) : t), text);
+}
+
+/**
+ * Draft + edits → the cues that would be burned in. The shared spelling rules are applied
+ * (except to quoted posts); pass { textRules: false } to see the text as the person left it (learning).
+ */
+export function effectiveCues(draft: SubtitleDraft, s: SubtitlesJson, opts: { textRules?: boolean } = {}): (Cue & { edited: boolean; ok: boolean })[] {
+  const useRules = opts.textRules !== false;
+  const rule = (c: Cue, t: string) => (useRules && !c.flags.some((f) => f.kind === "quote" || f.kind === "quote-review") ? applyTextRules(t) : t);
+  return draft.cues.flatMap((c) => {
+    const e = s.edits[c.id];
+    const added = e?.before
+      ? [{ ...c, id: `${c.id}a`, text: rule(c, e.before.text), start: e.before.start, end: e.before.end, srcEnd: c.srcStart, heard: "", flags: [], review: false, note: "追加（文字起こしに無い声）", edited: true, ok: true }]
+      : [];
+    if (e?.deleted) return added;
+    const edited = e?.text !== undefined || e?.start !== undefined || e?.end !== undefined;
+    return [...added, { ...c, text: rule(c, e?.text ?? c.text), start: e?.start ?? c.start, end: e?.end ?? c.end, edited, ok: !!e?.ok || edited }];
+  });
 }

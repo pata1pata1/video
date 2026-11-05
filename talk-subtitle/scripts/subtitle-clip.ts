@@ -5,7 +5,8 @@
 // → review/subtitle-clip-<from>-<to>.mp4. output/final.mp4 is not touched.
 
 import path from "node:path";
-import { approvedBurnCues, burnRange } from "../src/burn.ts";
+import fs from "node:fs";
+import { approvedBurnCues, burnRange, loudnormFilter, prepareRenderAudio } from "../src/burn.ts";
 import { fmtTime, parseArgs, runCli, UserError } from "../src/cli.ts";
 import { assertWritable, loadProject } from "../src/project.ts";
 
@@ -36,7 +37,8 @@ await runCli(async () => {
         const span = cues.slice(i, j + 1);
         const one = span.filter((c) => c.lines.length === 1).length;
         const two = span.length - one;
-        if (!one || !two) continue;
+        // Both kinds when the video has both (an all-one-line video: one-line cues only).
+        if (!one || (!two && plan.cues.some((c) => c.lines.length === 2))) continue;
         const score = Math.min(one, two, 2) * 2 + span.filter((c) => c.end - c.start >= 1.5).length - span.filter((c) => c.end - c.start < 1.5).length;
         if (!best || score > best.score) best = { from: f, to: t, score };
       }
@@ -48,7 +50,12 @@ await runCli(async () => {
   const tag = (s: number) => fmtTime(s).replace(/[:.]/g, "");
   const output = path.join(paths.review, `subtitle-clip-${tag(from)}-${tag(to)}.mp4`);
   console.log(`確認動画を作成中: cut.mp4 ${fmtTime(from)}–${fmtTime(to)}（${(to - from).toFixed(1)}秒）、preset ${plan.preset.name}`);
-  const used = await burnRange(paths, plan, from, to, output);
+  // Same picture and sound as the final render: brightness, BGM and loudness (-14 LUFS, measured over the whole video).
+  const mix = await prepareRenderAudio(paths, plan.duration);
+  if (mix) console.log(`  BGM: ${mix.bgm}（声より ${mix.belowVoiceDb} LU 下）`);
+  const { filter: audioFilter } = await loudnormFilter(mix?.file ?? paths.cutFinal, -14, -1.5);
+  const used = await burnRange(paths, plan, from, to, output, { audioFilter, audioInput: mix?.file });
+  if (mix) fs.rmSync(path.dirname(mix.file), { recursive: true, force: true });
   for (const c of used) console.log(`  ${c.id}  ${fmtTime(c.start)}–${fmtTime(c.end)}  ${c.lines.length}行  「${c.lines.join(" ／ ")}」`);
   console.log(`→ ${path.relative(paths.root, output)}`);
 });

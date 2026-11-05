@@ -61,7 +61,7 @@ await runCli(async () => {
           { kind: "2行", cue: two },
           { kind: "長い字幕", cue: longest },
           { kind: "短い字幕", cue: short },
-        ];
+        ].filter((s) => s.cue); // an all-one-line video has no two-line scene
       })();
 
   const outDir = args.get("out") ? path.join(designDir, args.get("out")!) : variant ? path.join(designDir, variant) : designDir;
