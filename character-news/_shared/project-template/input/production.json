@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "narration": { "speedScale": 1.12 },
+  "loudness": { "targetLufs": -16, "truePeakCeilingDb": -1.5, "loudnessRange": 11 }
+}
