@@ -1,0 +1,58 @@
+{
+  "id": "__ID__",
+  "pattern": "pattern-01",
+  "title": "（YouTubeタイトル。例：〇〇事件／〇〇当局公式発表まとめ）",
+  "titleTop": "（使わない）",
+  "titleMain": "（使わない）",
+  "titleSub": "（使わない）",
+  "background": "bg-opening",
+  "pronunciation": {},
+  "media": {},
+  "scenes": [
+    {
+      "id": "opening",
+      "kind": "opening",
+      "background": "bg-opening",
+      "lines": [
+        { "id": "o1", "visual": { "photo": "p-main", "label": "（帯：何の事件か。例：中国・掲陽市の犬虐待事件）" }, "text": "（台本の1文目）" },
+        { "id": "o2", "text": "（同じ画面のまま続く文）" },
+        { "id": "o3", "visual": { "headline": { "title": "（見出し。例：公式発表を中心に整理）", "sub": "（補足。例：何が確認され、どう対応したのか）" } }, "text": "（この動画で何を整理するか）" }
+      ]
+    },
+    {
+      "id": "c1",
+      "kind": "chapter",
+      "number": 1,
+      "heading": "（章の名前。投稿メモのチャプターに使う）",
+      "background": "c1",
+      "lines": [
+        { "id": "c1a", "visual": { "data": { "items": [{ "label": "（項目）", "value": "（値）" }, { "label": "（項目）", "value": "（値）" }] }, "label": "（帯）" }, "text": "（数字・場所・日付を見せる文）" },
+        { "id": "c1b", "visual": { "findings": { "items": [{ "head": "（確認できたこと）", "body": "（中身）" }, { "head": "（確認できたこと）", "body": "（中身）" }] }, "label": "（帯。例：公式発表で確認できること）" }, "text": "（公式発表で確認できることを言う文）" },
+        { "id": "c1c", "visual": { "headline": { "title": "（見出し\n2行目）", "sub": "（補足）" } }, "text": "（ポイントを言い切る文）" }
+      ]
+    },
+    {
+      "id": "c2",
+      "kind": "chapter",
+      "number": 2,
+      "heading": "（章の名前）",
+      "background": "c2",
+      "lines": [
+        { "id": "c2a", "visual": { "photo": "p-c2", "label": "（帯）" }, "text": "（写真で見せる文）" },
+        { "id": "c2b", "visual": { "list": { "photo": "p-c2b", "items": [{ "head": "（1）", "body": "（説明）" }, { "head": "（2）", "body": "（説明）" }, { "head": "（3）", "body": "（説明）" }] }, "label": "（帯）" }, "text": "（3つにまとめる文）" }
+      ]
+    },
+    {
+      "id": "ending",
+      "kind": "ending",
+      "lines": [
+        { "id": "e1", "visual": { "headline": { "title": "（まとめの見出し）", "sub": "（補足）" } }, "text": "（まとめ）" },
+        { "id": "e2", "visual": { "photo": "p-main", "label": "あなたはどう考えますか？" }, "text": "（ぜひコメントで教えてください）" },
+        { "id": "e3", "text": "高評価とチャンネル登録も、よろしくお願いします。" }
+      ]
+    }
+  ],
+  "thumbnails": [
+    { "id": "A", "photo": "p-main", "imagePosition": "center", "ribbon": "（場所。例：中国・掲陽市）", "lines": ["（1行目）"], "accent": "（黄色の強調語）", "after": ["（補足の白文字）"], "question": "（問いかけ。例：当局の公式発表は？）", "note": "（※画像はイメージです／出典：〇〇）" }
+  ]
+}

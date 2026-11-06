@@ -5,6 +5,7 @@ import { BrushTag, Words } from "./film";
 import { DIAGRAMS } from "./current-diagrams";
 import { PATTERN } from "./pattern";
 import { Board, ChapterCard, Ending, Footage, Points, StatCard, Title } from "./scenes";
+import { StageVideo } from "./stage";
 import { AUDIO_SRC, lineStart, SCRIPT, Segment, segments, Shown } from "./timeline";
 import { color } from "./theme";
 
@@ -56,6 +57,8 @@ const SegmentView: React.FC<{ seg: Segment; startFrame: number; footageFrom: num
     case "board":
       body = <Board opened={s.opened} />;
       break;
+    case "panel":
+      throw new Error("panel segments are drawn by StageVideo (src/stage.tsx)");
     case "ending": {
       const ending = SCRIPT.scenes[SCRIPT.scenes.length - 1];
       body = <Ending lineFrames={ending.lines.map((l) => Math.round((lineStart(l.id) - seg.from) * fps))} />;
@@ -78,7 +81,10 @@ const SegmentView: React.FC<{ seg: Segment; startFrame: number; footageFrom: num
 };
 
 /** withAudio=false renders silent frames (the MP4 gets the narration in mt.mjs encode). */
-export const TriviaVideo: React.FC<{ withAudio: boolean }> = ({ withAudio }) => {
+export const TriviaVideo: React.FC<{ withAudio: boolean }> = (props) => (PATTERN.design.stage ? <StageVideo {...props} /> : <ClassicVideo {...props} />);
+
+/** Every pattern without design.stage (pattern-02, pattern-03). */
+const ClassicVideo: React.FC<{ withAudio: boolean }> = ({ withAudio }) => {
   const { fps } = useVideoConfig();
   // where each footage clip continues from (frames already shown of that clip)
   const used: Record<string, number> = {};

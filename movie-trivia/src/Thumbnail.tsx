@@ -61,6 +61,14 @@ export const Thumbnail: React.FC<{ variant: string }> = ({ variant }) => {
             </div>
           ))}
           <div style={{ ...outlined(def.accent.length > A.longOver ? A.sizeIfLong : A.size, C.accentWord ?? C.yellow, A.outline), marginTop: 4 }}>{def.accent}</div>
+          {def.after?.map((l) => (
+            <div key={l} style={{ ...outlined(L.after?.size ?? L.lines.size * 0.7, C.text, L.after?.outline ?? L.lines.outline), marginTop: 6 }}>
+              {l}
+            </div>
+          ))}
+          {def.question ? (
+            <div style={{ ...outlined(L.question?.size ?? 46, C.question ?? C.yellow, L.question?.outline ?? 8), marginTop: 22 }}>{def.question}</div>
+          ) : null}
         </div>
       </div>
       {def.badge ? (
@@ -107,6 +115,22 @@ export const Thumbnail: React.FC<{ variant: string }> = ({ variant }) => {
           }}
         >
           {def.small}
+        </div>
+      ) : null}
+      {def.note ? (
+        <div
+          style={{
+            position: "absolute",
+            right: L.note?.right ?? 26,
+            bottom: L.note?.bottom ?? 18,
+            fontFamily: font.body,
+            fontWeight: 700,
+            fontSize: L.note?.size ?? 17,
+            color: C.text,
+            textShadow: "0 1px 4px rgba(0,0,0,0.9)",
+          }}
+        >
+          {def.note}
         </div>
       ) : null}
     </AbsoluteFill>

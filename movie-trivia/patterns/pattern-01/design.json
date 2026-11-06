@@ -1,0 +1,76 @@
+{
+  "style": "panel",
+  "hud": false,
+  "decorations": [
+    "背景：実際の映像（ユーザー提供）を全面に敷き、ぼかして暗くする。章ごとに替えられる（stage.background）",
+    "中央のパネル：暗い半透明の箱に水色の細い枠。写真カード・見出しカード・FINDINGS・DATA・番号リスト（stage.*）",
+    "下の帯：横いっぱいの暗い帯（上に水色の線）に水色の太字で今の話題（visual.label）",
+    "字幕：黒い角丸の箱に白い極太。1文を短い区切りで1行ずつ（subtitle.json chunk）",
+    "見出し：水色の極太に水色の光（stage.glow）",
+    "フォント：Noto Sans JP（500・700・900）"
+  ],
+  "noDecorations": [
+    "章タイトル画面・タイトル画面・エンディング画面（帯の見出しと見出しカードで代わりにする）",
+    "暴力の瞬間・遺体・未成年の顔がはっきり分かる映像（ぼかすか使わない）",
+    "グリッチ・走査線・粒子"
+  ],
+  "font": {
+    "family": "NotoSansJP",
+    "weights": ["500", "700", "900"]
+  },
+  "color": {
+    "bg": "#0A1117",
+    "card": "#0F1C27",
+    "ink": "#FFFFFF",
+    "inkSoft": "#B4BEC8",
+    "inkFaint": "#7A8794",
+    "line": "rgba(90,210,255,0.28)",
+    "accent": "#5AD2FF",
+    "accentSoft": "rgba(90,210,255,0.16)",
+    "accentOnDark": "#5AD2FF",
+    "cool": "#FFD84A",
+    "coolSoft": "rgba(255,216,74,0.16)",
+    "onAccent": "#06121A"
+  },
+  "paper": { "glow": "radial-gradient(ellipse at 50% 40%, rgba(90,210,255,0.08) 0%, rgba(10,17,23,0) 60%)" },
+  "glow": { "blur": 14 },
+  "stage": {
+    "background": { "blur": 14, "saturate": 0.9, "dim": 0.5, "zoomPerFrame": 0.00005, "fadeFrames": 24 },
+    "note": { "size": 20, "right": 82, "top": 16, "label": "背景映像：", "illustrative": "※背景はイメージ映像です" },
+    "panel": { "left": 81, "right": 81, "top": 50, "bottom": 720, "fill": "rgba(10,20,30,0.62)", "edge": "rgba(90,210,255,0.6)", "edgeWidth": 2 },
+    "band": { "top": 720, "height": 108, "size": 54, "fill": "rgba(8,16,24,0.74)", "line": "#5AD2FF", "lineWidth": 3 },
+    "glow": "0 0 14px rgba(90,210,255,0.65), 0 0 34px rgba(90,210,255,0.3)",
+    "headline": { "titleSize": 128, "subSize": 64, "maxWidth": 1720, "padding": "46px 72px 56px", "centerY": 420, "gap": 22 },
+    "photo": { "maxWidth": 1500, "creditSize": 22, "illustrative": "※画像はイメージです", "generated": "AI生成画像", "source": "出典：" },
+    "findings": { "tag": "FINDINGS", "tagSize": 36, "headSize": 64, "bodySize": 50, "badge": "確認", "badgeSize": 32 },
+    "data": { "tag": "LOCATION DATA", "tagSize": 36, "labelSize": 44, "valueSize": 76 },
+    "list": { "headSize": 56, "bodySize": 44, "circle": 54 },
+    "staggerFrames": 6
+  },
+  "dim": { "title": 0.5, "chapter": 0.6, "stat": 0.55 },
+  "title": {
+    "topSize": 50,
+    "mainSize": 104,
+    "subSize": 44,
+    "left": 140,
+    "top": 300,
+    "barWidth": 300,
+    "accentDiscWhenNoFootage": false,
+    "accentDiscHighlight": "#5AD2FF"
+  },
+  "chapterCard": { "labelFormat": "第{n}章", "labelSize": 44, "headingSize": 110, "barWidth": 240, "progressDots": false },
+  "chapterTag": { "left": 72, "top": 56, "size": 30, "badge": 46 },
+  "statCard": { "valueSize": 260, "unitSize": 96, "labelSize": 46, "countUpSeconds": 1 },
+  "pointsCard": { "titleSize": 60, "itemSize": 48, "width": 1240, "staggerFrames": 12 },
+  "footageCredit": { "size": 22, "right": 72, "top": 62, "label": "映像：" },
+  "ending": {
+    "title": "ご視聴ありがとうございました",
+    "titleSize": 96,
+    "buttons": [
+      { "icon": "💬", "label": "コメント", "atLine": 2 },
+      { "icon": "👍", "label": "高評価", "atLine": 3 },
+      { "icon": "🔔", "label": "チャンネル登録", "atLine": 3, "accent": true }
+    ],
+    "voiceCredit": "VOICEVOX:{speakerName}"
+  }
+}

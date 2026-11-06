@@ -1,0 +1,39 @@
+{
+  "inherits": "design.json（フォント：Noto Sans JP）。左を暗くして文字、右に主役の写真",
+  "size": { "width": 1280, "height": 720 },
+  "variants": ["A", "B", "C"],
+  "color": {
+    "red": "#D8282E",
+    "yellow": "#FFE23B",
+    "text": "#FFFFFF",
+    "outline": "#000000",
+    "accentWord": "#FFE23B",
+    "question": "#5AD2FF"
+  },
+  "layout": {
+    "image": {
+      "videoFrame": 90,
+      "note": "写真（または映像の1コマ）を全面に敷く。主役が右に来るように imagePosition で調整"
+    },
+    "shade": {
+      "gradient": "linear-gradient(90deg, rgba(0,0,0,0.66) 0%, rgba(0,0,0,0.62) 58%, rgba(0,0,0,0) 58.3%)",
+      "note": "左の約6割だけを暗くする（境目ははっきり）"
+    },
+    "left": 40,
+    "ribbon": { "size": 40, "top": 48, "rotate": 0, "note": "赤い帯に白文字（場所など。例：中国・掲陽市）" },
+    "lines": { "size": 88, "outline": 12, "note": "白文字に黒の縁取り。1〜2行" },
+    "accentWord": { "size": 150, "sizeIfLong": 118, "longOver": 4, "outline": 16, "note": "黄色の特大の1語（例：虐待）" },
+    "after": { "size": 66, "outline": 10, "note": "強調語の下の白文字（例：4人全員14歳未満）。任意" },
+    "question": { "size": 46, "outline": 8, "note": "いちばん下の水色の問いかけ（例：中国当局の公式発表は？）。任意" },
+    "note": { "size": 17, "right": 26, "bottom": 18, "note": "右下の小さな注記（例：※画像はイメージです（AI生成）／出典：〇〇）" },
+    "badge": { "size": 300, "right": 40, "bottom": 40, "rotate": 6, "topSize": 40, "bigSize": 96, "bigSizeIfLong": 76, "bigLongOver": 4, "bottomSize": 34, "note": "使わない（任意）" },
+    "small": { "size": 36, "bottom": 44, "barWidth": 8, "note": "使わない（任意）" },
+    "textGlow": "0 4px 10px rgba(0,0,0,0.55)"
+  },
+  "rules": [
+    "文言は少なく大きく（帯＋1〜2行＋黄色の強調語＋補足1行＋問いかけ1行）",
+    "強調語・数字は公式発表など台本の根拠と同じものだけ。根拠のないあおりは使わない",
+    "実際の画像を使うときは右下に出典、イメージ画像なら「※画像はイメージです」",
+    "未成年・被害者の顔、暴力の場面はサムネイルに使わない"
+  ]
+}

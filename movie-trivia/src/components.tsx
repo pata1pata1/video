@@ -1,7 +1,7 @@
 import React from "react";
 import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { PATTERN } from "./pattern";
-import { captionCues } from "./timeline";
+import { captionCues, chunkCues } from "./timeline";
 import { color, font, onAccent, rankColor, SUBTITLE_AREA } from "./theme";
 
 /** Spring from 0 to 1 that starts at `startFrame`. */
@@ -39,7 +39,7 @@ export const Subtitle: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = frame / fps;
-  const cue = captionCues.find((c) => t >= c.start && t < c.until);
+  const cue = (SUB.chunk ? chunkCues : captionCues).find((c) => t >= c.start && t < c.until);
   if (!cue) return null;
   return (
     <div
@@ -74,7 +74,7 @@ export const Subtitle: React.FC = () => {
           letterSpacing: SUB.letterSpacing,
         }}
       >
-        {splitCaption(cue.caption).map((row) => (
+        {(SUB.chunk ? [cue.caption] : splitCaption(cue.caption)).map((row) => (
           <div key={row}>{row}</div>
         ))}
       </div>

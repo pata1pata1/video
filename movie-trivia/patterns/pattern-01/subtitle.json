@@ -1,0 +1,21 @@
+{
+  "area": 230,
+  "bottom": 72,
+  "chunk": true,
+  "maxRowChars": 17,
+  "wrapAt": "、",
+  "wrapRule": "1文を短い区切り（約17字まで）に分け、読みの長さで時間を割り振って1行ずつ出す。分け方は「、」→ 助詞の後ろ。台本の line に chunks（区切りの配列）を書けばそれを使う",
+  "manualBreak": "うまく分かれない文は、台本の line に \"chunks\": [\"今回は\", \"中国・広東省掲陽市で起きた\"] のように書く（つなげると読み上げの文と同じになるように）",
+  "fontSize": 86,
+  "fontWeight": 900,
+  "lineHeight": 1.25,
+  "letterSpacing": "0.02em",
+  "color": "#FFFFFF",
+  "background": "rgba(0,0,0,0.84)",
+  "border": "none",
+  "shadow": "0 6px 18px rgba(0,0,0,0.35)",
+  "radius": 14,
+  "padding": "12px 36px 16px",
+  "maxWidth": 1760,
+  "dropTrailingPeriod": true
+}

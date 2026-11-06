@@ -1,0 +1,36 @@
+{
+  "id": "pattern-01",
+  "name": "公式発表まとめ・パネル（実際の映像を背景に）",
+  "basedOn": "旺旺親子虐殺事件／中国当局公式発表まとめ（https://youtu.be/p2-J1qmUlsk、2026-10-30 公開）の画面。背景はユーザー提供の実際の映像に置き換える",
+  "video": { "width": 1920, "height": 1080, "fps": 30 },
+  "structure": {
+    "targetMinutes": [5, 8],
+    "chapters": "ユーザーの台本の区切りに合わせる（章の数は固定しない）。章タイトル画面は出さず、下の帯の見出しで今の話題を示す",
+    "scenes": ["opening", "chapter × N", "ending"],
+    "openingSeconds": 20,
+    "openingRule": "写真カード＋帯の見出し（何の事件か）で始め、見出しカードで「この動画で何を整理するか」を示す。タイトル画面は出さない",
+    "chapterRule": "章の背景（scene.background）を替え、写真カード・見出しカード・FINDINGS・DATA・番号リストを1〜3文ごとに切り替える",
+    "endingLines": 3,
+    "endingRule": "写真カードに問いかけの見出し（例：あなたはどう考えますか？）。コメント・高評価・チャンネル登録のお願いはナレーションと字幕だけ（エンディング画面は出さない）",
+    "tooShort": "台本はユーザーが用意する。足りないときはユーザーに相談する（勝手に事実を足さない）"
+  },
+  "pacing": {
+    "linesPerCaption": 1,
+    "footageLinesPerShot": [1, 3],
+    "diagramStepsPerDiagram": [2, 5],
+    "statPerLine": 1,
+    "pointsMax": 3
+  },
+  "transition": {
+    "visualLeadSeconds": 0.3,
+    "fadeFrames": 10,
+    "captionHoldSeconds": 0.3
+  },
+  "media": {
+    "fit": "背景：実際の映像を全面に敷き、ぼかして暗くする（章ごとに替えられる）。写真カード：画像の全体を見せる（contain）",
+    "loop": "pingpong",
+    "continueAcrossUses": true,
+    "sharedClipMaxSeconds": 20,
+    "credit": "背景の出典は右上に小さく。写真カードの出典は画像の右下（イメージ画像は「※画像はイメージです」）"
+  }
+}

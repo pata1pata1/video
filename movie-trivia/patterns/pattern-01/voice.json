@@ -1,0 +1,10 @@
+{
+  "engine": "VOICEVOX",
+  "engineUrl": "http://127.0.0.1:50021",
+  "speaker": 2,
+  "speakerName": "四国めたん",
+  "style": "ノーマル",
+  "speedScale": 1.15,
+  "timing": { "leadIn": 0.5, "linePause": 0.3, "scenePause": 0.8, "tailOut": 2.0 },
+  "credit": "VOICEVOX:四国めたん（説明文に入れる）"
+}
