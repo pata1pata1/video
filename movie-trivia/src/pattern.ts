@@ -1,6 +1,11 @@
 // The look, pacing and voice credit fixed by the script's pattern
 // (patterns/<pattern>/*.json). Add an entry here when a new pattern is made.
 import { script } from "./current";
+import config01 from "../patterns/pattern-01/config.json";
+import design01 from "../patterns/pattern-01/design.json";
+import subtitle01 from "../patterns/pattern-01/subtitle.json";
+import thumbnail01 from "../patterns/pattern-01/thumbnail.json";
+import voice01 from "../patterns/pattern-01/voice.json";
 import config02 from "../patterns/pattern-02/config.json";
 import design02 from "../patterns/pattern-02/design.json";
 import subtitle02 from "../patterns/pattern-02/subtitle.json";
@@ -41,20 +46,47 @@ type Design = Common<typeof design02, typeof design03> & {
   words?: { colors: string[]; size: number; staggerFrames: number };
   /** The ranking board (visual.board). */
   board?: { title: string; hidden: string; rowSize: number };
+  /**
+   * Panel look (pattern-01): real footage blurred behind everything, one
+   * panel at a time above a heading band, short one-row subtitles (src/stage.tsx).
+   */
+  stage?: Stage;
+};
+export type Stage = {
+  background: { blur: number; saturate: number; dim: number; zoomPerFrame: number; fadeFrames: number };
+  note: { size: number; right: number; top: number; label: string; illustrative: string };
+  panel: { left: number; right: number; top: number; bottom: number; fill: string; edge: string; edgeWidth: number };
+  band: { top: number; height: number; size: number; fill: string; line: string; lineWidth: number };
+  glow: string;
+  headline: { titleSize: number; subSize: number; maxWidth: number; padding: string; centerY: number; gap: number };
+  photo: { maxWidth: number; creditSize: number; illustrative: string; generated: string; source: string };
+  findings: { tag: string; tagSize: number; headSize: number; bodySize: number; badge: string; badgeSize: number };
+  data: { tag: string; tagSize: number; labelSize: number; valueSize: number };
+  list: { headSize: number; bodySize: number; circle: number };
+  staggerFrames: number;
 };
 type Pattern = {
   config: Common<typeof config02, typeof config03>;
   design: Design;
-  subtitle: Common<typeof subtitle02, typeof subtitle03> & { border?: string; shadow?: string };
+  /** chunk: a line is shown as short one-row pieces timed by their reading length (pattern-01). */
+  subtitle: Common<typeof subtitle02, typeof subtitle03> & { border?: string; shadow?: string; chunk?: boolean };
   thumbnail: Common<typeof thumbnail02, typeof thumbnail03> & {
     /** Accent word and badge number colors (yellow if not set); a glow on the text; red specks. */
-    color: { accentWord?: string; badgeBig?: string };
-    layout: { textGlow?: string; splatter?: { count: number; color: string } };
+    color: { accentWord?: string; badgeBig?: string; question?: string };
+    /** after: white lines under the accent word; question: one line in color.question; note: small text bottom-right (pattern-01). */
+    layout: {
+      textGlow?: string;
+      splatter?: { count: number; color: string };
+      after?: { size: number; outline: number };
+      question?: { size: number; outline: number };
+      note?: { size: number; right: number; bottom: number };
+    };
   };
   voice: Common<typeof voice02, typeof voice03>;
 };
 
 const PATTERNS: Record<string, Pattern> = {
+  "pattern-01": { config: config01, design: design01, subtitle: subtitle01, thumbnail: thumbnail01, voice: voice01 },
   "pattern-02": { config: config02, design: design02, subtitle: subtitle02, thumbnail: thumbnail02, voice: voice02 },
   "pattern-03": { config: config03, design: design03, subtitle: subtitle03, thumbnail: thumbnail03, voice: voice03 },
 };

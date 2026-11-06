@@ -1,0 +1,7 @@
+{
+  "bgm": { "file": "bgm/pattern-01.mp3" },
+  "bgmNote": "落ち着いたBGMを bgm/pattern-01.mp3 に置く（DOVA-SYNDROME などから選ぶ。Git管理外）。置くまで書き出しは「BGM not found」で止まる。曲を変えるときは台本に \"bgm\": { \"file\": \"bgm/<name>.mp3\" }、なしにするときは \"bgm\": null。曲名と作者は投稿メモの説明文に入れる",
+  "belowVoiceDb": 20,
+  "sfx": null,
+  "sfxNote": "効果音なし"
+}

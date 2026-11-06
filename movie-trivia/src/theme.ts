@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { loadFont as loadOrbitron } from "@remotion/google-fonts/Orbitron";
 import { loadFont as loadZenKaku } from "@remotion/google-fonts/ZenKakuGothicNew";
 import { loadFont as loadZenOldMincho } from "@remotion/google-fonts/ZenOldMincho";
+import { loadFont as loadNotoSansJP } from "@remotion/google-fonts/NotoSansJP";
 import { PATTERN } from "./pattern";
 
 // Colors, font and sizes come from the pattern (patterns/<pattern>/design.json,
@@ -18,6 +19,12 @@ const FONTS = {
     }),
   ZenOldMincho: () =>
     loadZenOldMincho("normal", {
+      weights: design.font.weights as ("500" | "700" | "900")[],
+      subsets: ["japanese", "latin"],
+      ignoreTooManyRequestsWarning: true,
+    }),
+  NotoSansJP: () =>
+    loadNotoSansJP("normal", {
       weights: design.font.weights as ("500" | "700" | "900")[],
       subsets: ["japanese", "latin"],
       ignoreTooManyRequestsWarning: true,
