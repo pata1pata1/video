@@ -17,6 +17,13 @@
 
 - remotion の共通基盤（`../../remotion/src/core/media`・`core/speech`・`core/render/nodeApi.mts`）を `src/engine.ts` から import している（remotion への入口はこの1か所。`src/render.ts` も engine.ts 経由）。コピーしない。Remotion の描画（字幕PNG）も `../../remotion/node_modules` を Node API で使う（自前でインストールしない。webpack のキャッシュも remotion 側）
 
+## 環境（Mac）：FFmpeg（2026-11-10）
+
+- Mac では cut・字幕の焼き込み・最終書き出し（render）など、共通 core の ffmpeg を使う工程は Homebrew の `ffmpeg@7`（`/opt/homebrew/opt/ffmpeg@7/bin/ffmpeg`）を使う。ffmpeg@7 7.1.5 で transcribe → cut --final → subtitles → subtitle-stills → render まで確認済み
+- 使わないもの：PATH の Homebrew ffmpeg 9.x（`-filter_complex_script` が削除されている）、remotion 同梱の ffmpeg-static 6.0（`-enc_time_base demux` に未対応）
+- 指定は各コマンドだけに付ける：`FFMPEG_PATH=/opt/homebrew/opt/ffmpeg@7/bin/ffmpeg npm run cut -- --project=<id> --final`（subtitles・subtitle-stills・subtitle-clip・render も同じ）。**`FFMPEG_PATH` を Mac 全体のグローバル環境変数にしない**（short-movie は引き続き PATH の ffmpeg を使う）
+- Windows の ffmpeg 設定・挙動は変えない
+
 ## 共通remotionとの関係（2026-10-30決定、恒久方針）
 
 - `../../remotion` は全動画プロジェクト共通の動画制作エンジン（`../../remotion/docs/video-platform-architecture.md` の13章・20章）。ffmpeg/ffprobe・音量・STT・Remotionの描画・project管理（lifecycle・cleanup）は core を使い、ここで新しく独自実装しない。remotion への入口は `src/engine.ts` だけ
