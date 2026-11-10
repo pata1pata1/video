@@ -61,7 +61,7 @@ bgm/                        パターンが使う共通BGM（Git管理外）
 - Pexels：`node scripts/mt.mjs pexels candidates --project=<id> [--scene=<キー>] [--kind=video|photo] [--query="..."] [--per=9]` → `<id>/intermediate/candidates/<キー>-<kind>.png`。採用は `node scripts/mt.mjs pexels pick --project=<id> --scene=<キー> --video=<pexels id>`（写真は `--photo=`、差し替えは `--force`）。動画は横長で長辺1920px以下の最大のファイル（共通remotionの `pickPexelsVideoFile`）
 - 連番化：`node scripts/mt.mjs prepare-media --project=<id>`（往復ループ。台本の media キーの素材は最大20秒分）
 - 書き出し・サムネイル・チャプター・クレジット：`common/render.md`
-- 確認：代表コマ `node scripts/mt.mjs render --project=<id> --still=<png> --frame=N [--frame=M …]`、型チェック `npm.cmd run typecheck:engine`（共通remotionの型だけで確認）・`npm.cmd run lint`（自前の node_modules を使う。残っている間だけ）。Studio（`npm.cmd run dev`）は自前の node_modules を使い、置き換え方は未決定なので、代表コマで確認する
+- 確認：代表コマ `node scripts/mt.mjs render --project=<id> --still=<png> --frame=N [--frame=M …]`、型チェック `npm.cmd run typecheck:engine`（共通remotionの型だけで確認）・`npm.cmd run lint`（自前の node_modules を使う。残っている間だけ。`scripts/lint.mjs`：eslint は常に実行し、`src/current.ts`・`current-diagrams.ts` が指す案件のファイルがこのPCに無いとき〈fresh clone など〉だけ tsc を省略して理由を表示する）。Studio（`npm.cmd run dev`）は自前の node_modules を使い、置き換え方は未決定なので、代表コマで確認する
 - 完成・公開・後片付け：共通remotionの `npm run video:mark-completed` / `video:mark-published` / `video:cleanup -- --type=movie-trivia --project=<id>`（下の「YouTube投稿後の後片付け」）
 
 ## 方針

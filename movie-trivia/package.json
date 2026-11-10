@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "dev": "remotion studio src/index.ts",
-    "lint": "eslint src && tsc",
+    "lint": "node scripts/lint.mjs",
     "mt": "node scripts/mt.mjs",
     "typecheck:engine": "node ../../remotion/node_modules/typescript/bin/tsc -p tsconfig.engine.json"
   },
