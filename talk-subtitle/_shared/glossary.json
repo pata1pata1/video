@@ -1,1 +1,89 @@
-{ "version": 1, "entries": [] }
+{
+  "version": 1,
+  "entries": [
+    {
+      "id": "person-09e56efa",
+      "surface": "ちぃもも",
+      "readings": [
+        "ちぃもも"
+      ],
+      "readingConfirmed": true,
+      "kind": "person",
+      "aliases": [],
+      "misrecognitions": [
+        "ちーもも",
+        "チーモモ"
+      ],
+      "contextHints": [],
+      "matchPolicy": "auto",
+      "source": "user-instruction",
+      "addedAt": "2026-11-09T06:23:37.061Z"
+    },
+    {
+      "id": "person-43c08762",
+      "surface": "ゆたてぃ",
+      "readings": [
+        "ゆたてぃ"
+      ],
+      "readingConfirmed": true,
+      "kind": "person",
+      "aliases": [],
+      "misrecognitions": [
+        "ユタティ"
+      ],
+      "contextHints": [],
+      "matchPolicy": "auto",
+      "source": "user-instruction",
+      "addedAt": "2026-11-09T06:23:37.856Z"
+    },
+    {
+      "id": "person-1113d633",
+      "surface": "旺旺",
+      "readings": [
+        "わんわん"
+      ],
+      "readingConfirmed": true,
+      "kind": "person",
+      "aliases": [],
+      "misrecognitions": [
+        "ワンワン"
+      ],
+      "contextHints": [],
+      "matchPolicy": "auto",
+      "source": "user-instruction",
+      "addedAt": "2026-11-09T07:52:24.360Z"
+    },
+    {
+      "id": "other-144a4a57",
+      "surface": "レンタルゆたてぃ",
+      "readings": [
+        "れんたるゆたてぃ"
+      ],
+      "readingConfirmed": true,
+      "kind": "other",
+      "aliases": [],
+      "misrecognitions": [],
+      "contextHints": [],
+      "matchPolicy": "auto",
+      "source": "user-instruction",
+      "addedAt": "2026-11-09T08:08:33.374Z"
+    },
+    {
+      "id": "other-a982bf88",
+      "surface": "Cの民",
+      "readings": [
+        "しーのたみ"
+      ],
+      "readingConfirmed": true,
+      "kind": "other",
+      "aliases": [],
+      "misrecognitions": [
+        "主義の民"
+      ],
+      "contextHints": [],
+      "matchPolicy": "auto",
+      "source": "user-instruction",
+      "addedAt": "2026-11-09T08:08:34.366Z"
+    }
+  ]
+}

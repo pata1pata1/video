@@ -6,7 +6,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import { approvedBurnCues, burnRange, loudnormFilter, prepareRenderAudio } from "../src/burn.ts";
+import { approvedBurnCues, burnWhole, loudnormFilter, prepareRenderAudio } from "../src/burn.ts";
 import { fmtTime, parseArgs, runCli, UserError } from "../src/cli.ts";
 import { audioLagMs, frameTimestamps, grayFrame, monoFloat, outToSrc, readWav16, type Timemap } from "../src/cut.ts";
 import { probeMedia, runTool } from "../src/engine.ts";
@@ -16,6 +16,8 @@ import { loadSettings } from "../src/config.ts";
 
 const TARGET_LUFS = -14;
 const TARGET_TP = -1.5;
+/** The final check: true peak at or under this. */
+const TP_LIMIT = -1.0;
 
 await runCli(async () => {
   const args = parseArgs();
@@ -47,7 +49,10 @@ await runCli(async () => {
   console.log("全編を書き出し中（字幕の画像を作ってから H.264 で書き出し。数分かかります）…");
   const t0 = Date.now();
   fs.rmSync(partial, { force: true });
-  await burnRange(paths, plan, 0, plan.duration, partial, { audioFilter, audioInput: mix?.file, timeoutMs: 3 * 60 * 60 * 1000 });
+  const { parts } = await burnWhole(paths, plan, partial, { audioFilter, audioInput: mix?.file, timeoutMs: 3 * 60 * 60 * 1000, log: (s) => console.log(s), // A long video in parts: the shared engine's encoder lowers the peak until the AAC is under the check's
+    // limit; with -1.5 here it overshot to -2.1 dBTP and -14.6 LUFS (live-talk).
+    loudness: { targetLufs: TARGET_LUFS, truePeakDb: TP_LIMIT } });
+  if (parts > 1) console.log(`  ${parts} 区間に分けて焼き込み、つなぎました`);
   if (mix) fs.rmSync(path.dirname(mix.file), { recursive: true, force: true });
   console.log(`  書き出し ${((Date.now() - t0) / 1000).toFixed(0)}秒`);
 
@@ -62,7 +67,8 @@ await runCli(async () => {
   if (!a) problems.push("音声がない");
   const width = Number(v.width);
   const height = Number(v.height);
-  if (width !== 1920 || height !== 1080) problems.push(`解像度が ${width}×${height}`);
+  // Same size as cut.mp4 (the subtitles are drawn for it); not always 1920×1080 (live-talk is 720×406).
+  if (width !== plan.width || height !== plan.height) problems.push(`解像度が ${width}×${height}（cut.mp4 は ${plan.width}×${plan.height}）`);
   const rotation = Number((v.side_data_list as { rotation?: number }[] | undefined)?.find((d) => d.rotation !== undefined)?.rotation ?? 0);
   if (rotation !== 0) problems.push(`回転情報が付いている（${rotation}°）`);
 
@@ -93,7 +99,7 @@ await runCli(async () => {
   const truePeak = Number(summary.match(/Peak:\s*(-?[\d.]+|-inf) dBFS/)?.[1]);
   const lraOut = Number(summary.match(/LRA:\s*(-?[\d.]+) LU/)?.[1]);
   if (!(Math.abs(integrated - TARGET_LUFS) <= 0.5)) problems.push(`ラウドネスが ${integrated} LUFS（目標 ${TARGET_LUFS}）`);
-  if (!(truePeak <= -1.0)) problems.push(`true peak が ${truePeak} dBTP（-1.0 を超える）`);
+  if (!(truePeak <= TP_LIMIT)) problems.push(`true peak が ${truePeak} dBTP（${TP_LIMIT} を超える）`);
 
   // Sync: final audio against the source audio through the timemap (end to end), and frames against cut.mp4.
   const work = fs.mkdtempSync(path.join(paths.intermediate, "render-verify-"));

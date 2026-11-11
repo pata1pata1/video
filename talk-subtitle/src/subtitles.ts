@@ -54,6 +54,8 @@ export type SubtitlePreset = {
      * e.g. ["はい", "ね"]. A word glued to others (ですね・ますね) is kept.
      */
     dropWords?: string[];
+    /** Optional: a subtitle with fewer characters than this (punctuation and spaces not counted) is not shown, e.g. 2 = no one-character subtitles. */
+    minCueChars?: number;
   };
   /**
    * Optional: how a subtitle appears / goes. Absent = cut (on and off at once).
@@ -62,7 +64,20 @@ export type SubtitlePreset = {
    * dissolve into each other).
    */
   transition?: { fadeInSeconds?: number; fadeInFromOpacity?: number; fadeOutSeconds?: number };
+  /**
+   * Optional: per-speaker look, keyed by the speaker name given with `npm run subtitles -- speaker`
+   * (e.g. { "男": { "strokeColor": "#000000" }, "女": { "strokeColor": "#FF69B4" } }).
+   * When present, every subtitle must have one of these speakers before approval.
+   */
+  speakers?: Record<string, { strokeColor?: string; color?: string }>;
 };
+
+/** The preset with the speaker's colors (outline / text). No speaker or no entry: the preset as is. */
+export function presetForSpeaker<P extends Pick<SubtitlePreset, "color" | "stroke" | "speakers">>(p: P, speaker: string | undefined): P {
+  const sp = speaker ? p.speakers?.[speaker] : undefined;
+  if (!sp) return p;
+  return { ...p, color: sp.color ?? p.color, stroke: { ...p.stroke, color: sp.strokeColor ?? p.stroke.color } };
+}
 
 /** _shared/subtitle-presets/default.json, overridden key by key by input/subtitle-style.json. */
 export function loadPreset(paths: ProjectPaths): SubtitlePreset {
@@ -106,6 +121,8 @@ export type Cue = {
   review: boolean;
   /** Filler words left out of the subtitle (still in the audio). */
   fillersRemoved?: string[];
+  /** Who speaks (from input/subtitles.json; preset.speakers gives the look). */
+  speaker?: string;
 };
 
 export type SubtitleDraft = {
@@ -138,7 +155,9 @@ export type SubtitleEdit = {
   /** End time override (seconds in the cut video). */
   end?: number;
   /** A cue added just before this one (a voice the transcript has no words for), shown as "<id>a". */
-  before?: { text: string; start: number; end: number };
+  before?: { text: string; start: number; end: number; speaker?: string };
+  /** Who speaks this cue (npm run subtitles -- speaker). */
+  speaker?: string;
   deleted?: true;
   /** Reviewed and fine as is. */
   ok?: true;
@@ -423,7 +442,10 @@ export function buildDraft(input: {
   const maxLines = preset.layout.maxLines;
   const commaStyle = preset.layout.commaStyle ?? "space";
   // Strong fillers (えー・あのー…) and the preset's dropWords (はい・ね…) stay in the audio but not in the subtitle.
-  const strongFillers = new Set([...DEFAULT_SETTINGS.candidates.strongFillers, ...(preset.layout.dropWords ?? [])]);
+  // A dropWords entry ending in punctuation (「その、」) matches only that exact word with that punctuation
+  // (the filler use), so 「その人」 stays.
+  const exactDrop = new Set((preset.layout.dropWords ?? []).filter((w) => /[、。！？!?]$/.test(w)));
+  const strongFillers = new Set([...DEFAULT_SETTINGS.candidates.strongFillers, ...(preset.layout.dropWords ?? []).filter((w) => !exactDrop.has(w))]);
 
   const quotes = loadQuotes(input.paths.quotes);
   const alignment = alignQuotes(corrected, raw, quotes, timemap);
@@ -436,8 +458,25 @@ export function buildDraft(input: {
   // Strong fillers (えー・あのー…) stay in the audio but not in the subtitle.
   const fillerAt: { out: number; text: string }[] = [];
   const dropWords = new Set(preset.layout.dropWords ?? []);
+  // The transcript sometimes splits a filler into pieces (え|っと・う|ーん。). Pieces that together make a
+  // filler and start a word (after punctuation, a pause, or at the start) are dropped together; 言|う|ん|だ is not.
+  const pieceDrop = new Set<number>();
+  for (let i = 0; i < units.length; i++) {
+    const prev = units[i - 1];
+    const startsWord = !prev || /[、。！？!?\s]$/.test(prev.text) || units[i].outStart - prev.outEnd > 0.25;
+    if (!startsWord || units[i].quote) continue;
+    for (let n = 2; n <= 3 && i + n <= units.length; n++) {
+      const piece = units.slice(i, i + n);
+      if (piece.some((u) => u.quote) || piece.slice(0, -1).some((u) => /[、。！？!?]$/.test(u.text))) break;
+      if (strongFillers.has(strip(piece.map((u) => u.text).join("")))) {
+        for (let k = i; k < i + n; k++) pieceDrop.add(k);
+        break;
+      }
+    }
+  }
   units = units.filter((u, i) => {
-    if (u.quote || !strongFillers.has(strip(u.text))) return true;
+    if (u.quote) return true;
+    if (!pieceDrop.has(i) && !strongFillers.has(strip(u.text)) && !exactDrop.has(u.text.trim())) return true;
     dropped.push({ srcStart: u.srcStart, srcEnd: u.srcEnd, text: u.text, reason: "filler" });
     fillerAt.push({ out: u.outStart, text: strip(u.text) });
     // A dropped sentence-end word (ありますね、) keeps its punctuation, so the sentence break stays.
@@ -485,6 +524,16 @@ export function buildDraft(input: {
     cur.push(u);
   }
   flush();
+  // layout.minCueChars: a subtitle shorter than this (「で」「う」…) is not shown (the voice stays).
+  const minChars = preset.layout.minCueChars ?? 0;
+  if (minChars > 1) {
+    for (let i = groups.length - 1; i >= 0; i--) {
+      const g = groups[i];
+      if (g.some((u) => u.quote) || Array.from(strip(g.map((u) => u.text).join(""))).length >= minChars) continue;
+      for (const u of g) dropped.push({ srcStart: u.srcStart, srcEnd: u.srcEnd, text: u.text, reason: "filler" });
+      groups.splice(i, 1);
+    }
+  }
 
   // ---- cues ----
   const cues: Cue[] = groups.map((g, i) => {
@@ -687,10 +736,10 @@ export function effectiveCues(draft: SubtitleDraft, s: SubtitlesJson, opts: { te
   return draft.cues.flatMap((c) => {
     const e = s.edits[c.id];
     const added = e?.before
-      ? [{ ...c, id: `${c.id}a`, text: rule(c, e.before.text), start: e.before.start, end: e.before.end, srcEnd: c.srcStart, heard: "", flags: [], review: false, note: "追加（文字起こしに無い声）", edited: true, ok: true }]
+      ? [{ ...c, id: `${c.id}a`, text: rule(c, e.before.text), start: e.before.start, end: e.before.end, srcEnd: c.srcStart, heard: "", flags: [], review: false, note: "追加（文字起こしに無い声）", speaker: e.before.speaker, edited: true, ok: true }]
       : [];
     if (e?.deleted) return added;
     const edited = e?.text !== undefined || e?.start !== undefined || e?.end !== undefined;
-    return [...added, { ...c, text: rule(c, e?.text ?? c.text), start: e?.start ?? c.start, end: e?.end ?? c.end, edited, ok: !!e?.ok || edited }];
+    return [...added, { ...c, text: rule(c, e?.text ?? c.text), start: e?.start ?? c.start, end: e?.end ?? c.end, speaker: e?.speaker, edited, ok: !!e?.ok || edited }];
   });
 }

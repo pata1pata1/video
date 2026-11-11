@@ -27,6 +27,7 @@ export function writeSubtitleReview(project: Project, draft: SubtitleDraft, edit
       return {
         ...c,
         draftText: c.text,
+        speaker: e?.speaker ?? null,
         edit: e ? { ...(e.text !== undefined ? { text: e.text } : {}), ...(e.deleted ? { deleted: true } : {}), ...(e.ok ? { ok: true } : {}) } : null,
       };
     }),

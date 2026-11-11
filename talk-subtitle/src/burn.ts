@@ -12,14 +12,14 @@ import fs from "node:fs";
 import path from "node:path";
 import { UserError } from "./cli.ts";
 import { loadSettings } from "./config.ts";
-import { burnOverlayGraph, extractAudio, loudnormApplyFilter, measureLoudness, mixVoiceWithBgm } from "./engine.ts";
+import { burnOverlayGraph, concatMedia, encodeAacLoudnorm, extractAudio, loudnormApplyFilter, measureLoudness, mixVoiceWithBgm, muxVideoAudio } from "./engine.ts";
 import type { ProjectPaths } from "./paths.ts";
 import { readJson, readJsonIfExists } from "./project.ts";
 import { bundleCompositions, measureTextEm, renderStillPng } from "./render.ts";
-import { effectiveCues, layoutCues, loadPreset, loadSubtitleEdits, type SubtitleDraft, type SubtitlePreset } from "./subtitles.ts";
+import { effectiveCues, layoutCues, loadPreset, presetForSpeaker, loadSubtitleEdits, type SubtitleDraft, type SubtitlePreset } from "./subtitles.ts";
 import { resolvePreset } from "../remotion/presetMath.ts";
 
-export type BurnCue = { id: string; start: number; end: number; lines: string[] };
+export type BurnCue = { id: string; start: number; end: number; lines: string[]; speaker?: string };
 
 export type BurnPlan = { cues: BurnCue[]; preset: SubtitlePreset; width: number; height: number; duration: number };
 
@@ -78,9 +78,73 @@ export async function approvedBurnCues(paths: ProjectPaths, project: string): Pr
     // The project's display delay (settings.json render.subtitleDelaySeconds) shifts every cue alike.
     cues: cues
       .map((c) => ({ c, d: loadSettings(paths).render.subtitleDelaySeconds }))
-      .map(({ c, d }) => ({ id: c.id, start: Math.max(0, c.start + d), end: Math.min(c.end + d, duration), lines: lines.get(c.id) ?? c.text.split("\n") }))
+      .map(({ c, d }) => ({ id: c.id, start: Math.max(0, c.start + d), end: Math.min(c.end + d, duration), lines: lines.get(c.id) ?? c.text.split("\n"), speaker: c.speaker }))
       .filter((c) => c.end > c.start),
   };
+}
+
+/** Cues per part when a long video is burned in parts (each part is one ffmpeg run with this many PNG inputs). */
+const CUES_PER_PART = 40;
+
+/**
+ * The whole of cut.mp4 with the cues burned in → output. A short video is one burnRange. A long one
+ * (more than CUES_PER_PART cues) is burned in parts — one ffmpeg run with hundreds of PNG inputs exceeds
+ * Windows' command-line limit and memory (live-talk, 785 cues, 2026-11-10). Parts are cut at whole
+ * seconds (whole frames at 30/60 fps) where no subtitle is on screen, written video-only (an audio stream
+ * in each part shifts the joined video by the AAC priming, 21 ms), joined by stream copy, and the audio
+ * (cut.mp4's or the BGM mix) is normalised once for the whole video by the shared engine's
+ * encodeAacLoudnorm (re-encodes until the AAC true peak is under the ceiling).
+ */
+export async function burnWhole(
+  paths: ProjectPaths,
+  plan: BurnPlan,
+  output: string,
+  opts: { audioFilter?: string; audioInput?: string; timeoutMs?: number; log?: (s: string) => void; loudness: { targetLufs: number; truePeakDb: number } },
+): Promise<{ parts: number }> {
+  if (plan.cues.length <= CUES_PER_PART) {
+    await burnRange(paths, plan, 0, plan.duration, output, opts);
+    return { parts: 1 };
+  }
+  const fadeOut = plan.preset.transition?.fadeOutSeconds ?? 0;
+  const bounds: number[] = [0];
+  let count = 0;
+  for (let i = 0; i < plan.cues.length - 1; i++) {
+    count++;
+    if (count < CUES_PER_PART) continue;
+    // A whole second inside the gap after cue i (after its fade-out, before the next cue).
+    const s = Math.ceil(plan.cues[i].end + fadeOut + 0.001);
+    if (s <= plan.cues[i + 1].start && s > bounds[bounds.length - 1] && s < plan.duration - 1) {
+      bounds.push(s);
+      count = 0;
+    }
+  }
+  bounds.push(plan.duration);
+  const work = path.join(paths.intermediate, "render-parts");
+  fs.rmSync(work, { recursive: true, force: true });
+  fs.mkdirSync(work, { recursive: true });
+  try {
+    const parts: string[] = [];
+    for (let k = 0; k < bounds.length - 1; k++) {
+      const file = path.join(work, `part-${String(k + 1).padStart(3, "0")}.mp4`);
+      opts.log?.(`  ${k + 1}/${bounds.length - 1}: ${bounds[k].toFixed(0)}–${bounds[k + 1].toFixed(0)}秒`);
+      await burnRange(paths, plan, bounds[k], bounds[k + 1], file, { timeoutMs: opts.timeoutMs, audio: false });
+      parts.push(file);
+    }
+    const joined = path.join(work, "joined.mp4");
+    // Exact part lengths (whole seconds): the demuxer's own per-file durations were ~0.7 ms short each (live-talk).
+    await concatMedia(parts, joined, { overwrite: true, durations: bounds.slice(1).map((b, k) => b - bounds[k]) });
+    for (const p of parts) fs.rmSync(p, { force: true });
+    const wav = path.join(work, "audio.wav");
+    await extractAudio(opts.audioInput ?? paths.cutFinal, wav, { sampleRate: 48000, channels: 2, overwrite: true });
+    const aac = path.join(work, "audio.m4a");
+    const r = await encodeAacLoudnorm(wav, aac, { targetLufs: opts.loudness.targetLufs, truePeakCeiling: opts.loudness.truePeakDb, overwrite: true });
+    opts.log?.(`  音声: ${r.result.integratedLufs} LUFS／true peak ${r.result.truePeakDb} dBTP（${r.attempts} 回目で上限内）`);
+    // -t to the video's length (-shortest ended the copied AAC 49 ms early on live-talk).
+    await muxVideoAudio(joined, aac, output, { overwrite: true, durationSeconds: plan.duration, timeoutMs: opts.timeoutMs });
+    return { parts: parts.length };
+  } finally {
+    fs.rmSync(work, { recursive: true, force: true });
+  }
 }
 
 /**
@@ -93,7 +157,7 @@ export async function burnRange(
   from: number,
   to: number,
   output: string,
-  opts: { audioFilter?: string; timeoutMs?: number; /** Audio file to use instead of cut.mp4's (same timeline, e.g. the BGM mix). */ audioInput?: string } = {},
+  opts: { audioFilter?: string; timeoutMs?: number; /** Audio file to use instead of cut.mp4's (same timeline, e.g. the BGM mix). */ audioInput?: string; /** false = video only. */ audio?: boolean } = {},
 ): Promise<BurnCue[]> {
   const inRange = plan.cues.filter((c) => c.end > from && c.start < to);
   const stage = path.join(paths.intermediate, "render-overlay");
@@ -104,7 +168,7 @@ export async function burnRange(
     const pngs: string[] = [];
     for (const c of inRange) {
       const png = path.join(stage, `${c.id}.png`);
-      await renderStillPng(serveUrl, "SubtitleOverlay", { text: c.lines.join("\n"), preset: plan.preset, width: plan.width, height: plan.height }, png);
+      await renderStillPng(serveUrl, "SubtitleOverlay", { text: c.lines.join("\n"), preset: presetForSpeaker(plan.preset, c.speaker), width: plan.width, height: plan.height }, png);
       pngs.push(png);
     }
     // Brightness first (the picture only, not the subtitles): luma scaled up from black (limited range 16–235).
@@ -200,6 +264,7 @@ export async function burnRange(
       graph: outLabel ? { filterGraph: chain.join(";\n"), outLabel } : null,
       pngInputArgs: fade > 0 ? ["-loop", "1", "-framerate", "60"] : [],
       audioInput: opts.audioInput,
+      audio: opts.audio,
       from,
       duration: to < plan.duration ? to - from : undefined,
       audioFilter: opts.audioFilter,

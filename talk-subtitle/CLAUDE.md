@@ -103,8 +103,10 @@
 - `input/subtitle-style.json`：`layout.maxLines: 1`（必ず1行）・`layout.dropWords`（単独の「はい」「ね」などを字幕に出さない。音声は残す）・`transition`（`fadeInSeconds`・`fadeInFromOpacity`・`fadeOutSeconds`）
 - `input/settings.json` の `render`：`brightness`（1.2＝20%明るく。字幕は変えない）・`bgmBelowVoiceDb`（BGM を声より何 LU 下げるか。既定 20）・`subtitleDelaySeconds`（字幕を全部ずらす秒）
 - BGM：`input/bgm/` に1曲置くと、subtitle-clip・render が共通エンジンの `mixVoiceWithBgm` で声の下に混ぜる（繰り返し・フェード・話す間は下げる）。subtitle-clip も完成版と同じ -14 LUFS
+- **話者ごとの字幕の色（2026-11-09、男女の対談）**：`input/subtitle-style.json` に `"speakers": { "男": { "strokeColor": "#000000" }, "女": { "strokeColor": "#FF69B4" } }`（文字色も変えるなら `color`）。割り当ては `npm run subtitles -- speaker --project=<id> --name=女 --cues=s002,s005-s009`（追加した字幕は `s003a`）／`--name=男 --rest`（まだ話者の無い字幕すべて）／`--clear --cues=…`。speakers がある案件は、全字幕に話者が付くまで approve できない。焼き込み・静止画・review/subtitles.html に反映
+- **字幕に出さない語の追加（2026-11-09、live-talk）**：`layout.dropWords` に句読点付きで書いた語（`"その、"`）は、その句読点付きの形だけを消す（つなぎ言葉の「その、」は消し、「その人」は残す）。文字起こしで分かれたフィラー（え｜っと・う｜ーん）は、語の始まり（句読点・間の後）なら合わせて消す（全案件の字幕案に効く）。`layout.minCueChars: 2` で1文字だけの字幕を出さない（音声は残す）
 - `_shared/subtitle-text-rules.json`：全動画共通の字幕の表記ルール（例：いただ→頂）。学習の記録（style observe）には当てない
-- ユーザーの字幕と仕上げの見本は `_shared/project-template/`（`subtitle-style.json`：1行・はい／ね無し・字幕大きめ 0.077・半透明から表示、`settings.json`：明るさ1.2・字幕0.1秒遅らせ）。`npm run new` が新しい制作案件の `input/` にコピーする（reference・evaluation にはコピーしない）。長い字幕は言葉の区切りで短く分ける
+- ユーザーの字幕と仕上げの見本は `_shared/project-template/`（`subtitle-style.json`：1行・はい／ね／うん／うーん／えっと／つなぎの「その、」「あ、」無し・1文字の字幕無し・字幕大きめ 0.077・半透明から表示、`settings.json`：明るさ1.2・字幕0.1秒遅らせ）。`npm run new` が新しい制作案件の `input/` にコピーする（reference・evaluation にはコピーしない）。長い字幕は言葉の区切りで短く分ける
 
 ## 未実装
 

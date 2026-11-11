@@ -43,6 +43,13 @@
   video.src = DATA.videoSrc;
   video.addEventListener("error", () => { $("video-error").textContent = "動画を読み込めません: " + DATA.videoSrc + "（このページは案件フォルダの review/ に置いたまま開いてください）"; });
   const P = DATA.preset;
+  let strokePx = 0;
+  // Per-speaker colors (preset.speakers), as in the burned-in subtitles.
+  function applySpeaker(c) {
+    const sp = c && c.speaker && P.speakers ? P.speakers[c.speaker] : null;
+    subEl.style.color = (sp && sp.color) || P.color;
+    if (P.stroke.enabled) subEl.style.webkitTextStroke = strokePx + "px " + ((sp && sp.strokeColor) || P.stroke.color);
+  }
   function layoutOverlay() {
     const r = video.getBoundingClientRect();
     const vw = video.videoWidth || 16, vh = video.videoHeight || 9;
@@ -59,7 +66,8 @@
     subEl.style.letterSpacing = P.font.letterSpacingEm + "em";
     subEl.style.color = P.color;
     subEl.style.maxWidth = w * P.position.maxWidthRatio + "px";
-    if (P.stroke.enabled) subEl.style.webkitTextStroke = size * P.stroke.widthRatio + "px " + P.stroke.color;
+    strokePx = size * P.stroke.widthRatio;
+    if (P.stroke.enabled) subEl.style.webkitTextStroke = strokePx + "px " + P.stroke.color;
     subEl.style.paintOrder = "stroke fill";
     if (P.shadow.enabled) subEl.style.textShadow = "0 0 " + P.shadow.blurEm + "em rgba(0,0,0," + P.shadow.opacity + ")";
     if (P.background.enabled) {
@@ -81,6 +89,7 @@
     $("time").textContent = fmt(t);
     const c = DATA.cues.find((x) => t >= x.start && t < x.end && !isDeleted(x));
     subEl.textContent = c ? textOf(c) : "";
+    applySpeaker(c);
     subEl.style.visibility = c ? "visible" : "hidden";
     const id = c ? c.id : null;
     if (id !== activeId) {
@@ -116,6 +125,7 @@
     const id = document.createElement("span"); id.className = "id"; id.textContent = c.id;
     const tm = document.createElement("span"); tm.className = "time"; tm.textContent = fmt(c.start) + " – " + fmt(c.end);
     head.append(id, tm);
+    if (c.speaker) { const sp = document.createElement("span"); sp.className = "time"; sp.textContent = "［" + c.speaker + "］"; head.append(sp); }
     const badges = document.createElement("span");
     head.append(badges);
     const ta = document.createElement("textarea");

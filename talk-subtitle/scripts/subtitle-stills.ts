@@ -16,7 +16,7 @@ import { fmtTime, parseArgs, runCli, UserError } from "../src/cli.ts";
 import { runTool } from "../src/engine.ts";
 import { assertWritable, loadProject, readJson, readJsonIfExists } from "../src/project.ts";
 import { bundleCompositions, measureTextEm, renderStillPng } from "../src/render.ts";
-import { effectiveCues, layoutCues, loadPreset, mergePreset, loadSubtitleEdits, textWidth, type SubtitleDraft } from "../src/subtitles.ts";
+import { effectiveCues, layoutCues, loadPreset, mergePreset, presetForSpeaker, loadSubtitleEdits, textWidth, type SubtitleDraft } from "../src/subtitles.ts";
 import { resolvePreset, type SubtitlePreset } from "../remotion/presetMath.ts";
 
 await runCli(async () => {
@@ -97,7 +97,7 @@ await runCli(async () => {
   const outputs: string[] = [];
   for (const [i, s] of chosen.entries()) {
     const file = path.join(outDir, `${i + 1}-${s.kind ? `${s.kind}-` : ""}${s.cue.id}.png`);
-    await renderStillPng(serveUrl, "SubtitleStill", { frame: `frame-${i + 1}.png`, text: textOf(s.cue), preset, width, height }, file);
+    await renderStillPng(serveUrl, "SubtitleStill", { frame: `frame-${i + 1}.png`, text: textOf(s.cue), preset: presetForSpeaker(preset, s.cue.speaker), width, height }, file);
     outputs.push(file);
     const t = (s as unknown as { t: number }).t;
     console.log(`  ${path.relative(paths.root, file)}  ${s.cue.id}  cut.mp4 ${fmtTime(t)}（字幕 ${fmtTime(s.cue.start)}–${fmtTime(s.cue.end)}）「${textOf(s.cue).replace(/\n/g, " ／ ")}」`);

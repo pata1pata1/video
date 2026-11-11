@@ -6,6 +6,8 @@
 //   npm run subtitles -- edit   --project=<id> --cue=s001 --start=0.28   （開始時刻をカット後の秒で。文字起こしに無い声の分）
 //   npm run subtitles -- edit   --project=<id> --cue=s001 --before="文" --before-start=0.28 --before-end=1.6   （前に字幕を1つ追加）
 //   npm run subtitles -- edit   --project=<id> --cue=s012 --delete | --ok | --reset
+//   npm run subtitles -- speaker --project=<id> --name=女 --cues=s002,s005-s009   （話者。色は subtitle-style.json の speakers）
+//   npm run subtitles -- speaker --project=<id> --name=男 --rest   （まだ話者の無い字幕をすべて）／ --clear --cues=…
 //   npm run subtitles -- import --project=<id> --file=<subtitles.html から書き出した JSON>
 //   npm run subtitles -- approve --project=<id>       （要確認がすべて確認済みのときだけ）
 
@@ -93,7 +95,7 @@ await runCli(async () => {
     for (const c of effectiveCues(draft, s)) {
       if (args.has("review") && !c.review) continue;
       const mark = c.review ? (c.ok ? "[確認済]" : "[要確認]") : "        ";
-      console.log(`${c.id} ${mark} ${fmtTime(c.start)}–${fmtTime(c.end)}  ${c.text.replace(/\n/g, " ／ ")}${c.edited ? "  (編集)" : ""}`);
+      console.log(`${c.id} ${mark} ${fmtTime(c.start)}–${fmtTime(c.end)}  ${c.speaker ? `［${c.speaker}］` : preset.speakers ? "［話者なし］" : ""}${c.text.replace(/\n/g, " ／ ")}${c.edited ? "  (編集)" : ""}`);
       if (args.has("review") || args.has("verbose")) for (const f of c.flags) console.log(`      ${f.review ? "・要確認" : "・"} ${f.note}`);
     }
     const n = counts(draft, s);
@@ -114,6 +116,8 @@ await runCli(async () => {
     const e = { ...prev, by, at: new Date().toISOString() };
     if (args.has("reset")) {
       delete s.edits[id];
+      // The speaker is not part of the text edit: keep it.
+      if (prev.speaker || prev.before?.speaker) s.edits[id] = { origText: cue.text, ...(prev.speaker ? { speaker: prev.speaker } : {}), by, at: e.at };
       console.log(`${id}: 元の案に戻しました「${cue.text.replace(/\n/g, " ／ ")}」`);
     } else {
       if (args.get("text") !== undefined) e.text = args.get("text")!.replace(/\\n/g, "\n");
@@ -144,7 +148,7 @@ await runCli(async () => {
         const prevEnd = draft.cues.slice(0, i).filter((c) => !s.edits[c.id]?.deleted).at(-1)?.end ?? 0;
         const start = e.start ?? cue.start;
         if (!Number.isFinite(a) || !Number.isFinite(b) || a < prevEnd || b <= a || b > start) throw new UserError(`--before-start／--before-end は ${prevEnd.toFixed(2)}〜${start.toFixed(2)} 秒の間で指定してください。`);
-        e.before = { text: args.get("before")!, start: Math.round(a * 1000) / 1000, end: Math.round(b * 1000) / 1000 };
+        e.before = { ...(prev.before?.speaker ? { speaker: prev.before.speaker } : {}), text: args.get("before")!, start: Math.round(a * 1000) / 1000, end: Math.round(b * 1000) / 1000 };
       }
       if (args.has("delete")) e.deleted = true;
       if (args.has("ok")) e.ok = true;
@@ -178,9 +182,65 @@ await runCli(async () => {
       if (e.text === undefined && !e.deleted && !e.ok) continue;
       next[id] = { origText: cue.text, ...(e.text !== undefined ? { text: e.text } : {}), ...(e.deleted ? { deleted: true as const } : {}), ...(e.ok ? { ok: true as const } : {}), by: "html", at };
     }
+    // Speakers are set from the chat only (not in the HTML export): keep them.
+    for (const [id, e] of Object.entries(s.edits)) {
+      if (!e.speaker && !e.before?.speaker) continue;
+      next[id] = { ...(next[id] ?? { origText: e.origText, by: e.by, at: e.at }), ...(e.speaker ? { speaker: e.speaker } : {}), ...(e.before ? { before: e.before } : {}) };
+    }
     s.edits = next;
     s.approved = null;
     console.log(`取り込みました（修正・確認 ${Object.keys(next).length} 件）。`);
+    refresh(draft, s);
+    return;
+  }
+
+  if (cmd === "speaker") {
+    assertWritable(project);
+    const draft = loadDraft();
+    const s = loadSubtitleEdits(paths, json.id);
+    carryEdits(s, draft);
+    const clear = args.has("clear");
+    const name = clear ? undefined : requireOpt(args, "name");
+    const names = Object.keys(preset.speakers ?? {});
+    if (name && !names.includes(name)) throw new UserError(`話者「${name}」は subtitle-style.json の speakers にありません（${names.length ? names.join("・") : "speakers が未設定"}）。`);
+    const order = effectiveCues(draft, s).map((c) => c.id);
+    let ids: string[];
+    if (args.has("rest")) {
+      if (clear) throw new UserError("--clear と --rest は同時に指定できません。");
+      ids = effectiveCues(draft, s).filter((c) => !c.speaker).map((c) => c.id);
+    } else {
+      ids = [];
+      for (const tok of args.all("cues", true)) {
+        const [a, b] = tok.split("-");
+        const i = order.indexOf(a);
+        const j = b === undefined ? i : order.indexOf(b);
+        if (i < 0 || j < 0 || j < i) throw new UserError(`--cues の「${tok}」が字幕にありません（npm run subtitles -- show で確認。範囲は s003-s010 の形）。`);
+        ids.push(...order.slice(i, j + 1));
+      }
+      if (!ids.length) throw new UserError("--cues=s001,s003-s010 か --rest を指定してください。");
+    }
+    const by: By = "chat";
+    const at = new Date().toISOString();
+    for (const id of ids) {
+      const added = /a$/.test(id) && !draft.cues.some((c) => c.id === id);
+      const baseId = added ? id.slice(0, -1) : id;
+      const cue = draft.cues.find((c) => c.id === baseId)!;
+      const e = { ...(s.edits[baseId] ?? { origText: cue.text, by, at }), by, at };
+      if (added) e.before = { ...e.before!, speaker: name };
+      else e.speaker = name;
+      if (!name) {
+        if (added) delete e.before!.speaker;
+        else delete e.speaker;
+      }
+      s.edits[baseId] = e;
+    }
+    console.log(`${ids.length} 件を${name ? `「${name}」` : "話者なし"}にしました: ${ids.length > 12 ? `${ids.slice(0, 12).join(", ")}…` : ids.join(", ")}`);
+    const left = effectiveCues(draft, s).filter((c) => !c.speaker).length;
+    if (names.length) console.log(`話者がまだ無い字幕: ${left} 件`);
+    if (s.approved) {
+      s.approved = null;
+      console.log("（承認を取り消しました。もう一度 approve してください）");
+    }
     refresh(draft, s);
     return;
   }
@@ -192,11 +252,15 @@ await runCli(async () => {
     carryEdits(s, draft);
     const open = effectiveCues(draft, s).filter((c) => c.review && !c.ok);
     if (open.length) throw new UserError(`未確認の要確認が ${open.length} 件あります（${open.slice(0, 10).map((c) => c.id).join(", ")}…）。確認OK・修正・削除のどれかにしてから承認してください。`);
+    if (preset.speakers) {
+      const none = effectiveCues(draft, s).filter((c) => !c.speaker || !preset.speakers![c.speaker]);
+      if (none.length) throw new UserError(`話者が無い字幕が ${none.length} 件あります（${none.slice(0, 10).map((c) => c.id).join(", ")}…）。npm run subtitles -- speaker で割り当ててから承認してください。`);
+    }
     s.approved = { at: new Date().toISOString(), by: "chat", draftFingerprint: draft.fingerprint };
     console.log("字幕を承認しました（input/subtitles.json）。");
     refresh(draft, s);
     return;
   }
 
-  throw new UserError("サブコマンド: draft | show | edit | import | approve");
+  throw new UserError("サブコマンド: draft | show | edit | speaker | import | approve");
 });
