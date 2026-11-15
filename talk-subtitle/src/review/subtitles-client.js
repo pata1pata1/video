@@ -74,14 +74,33 @@
   window.addEventListener("resize", layoutOverlay);
   video.addEventListener("loadedmetadata", layoutOverlay);
 
+  // "a|b|c": the part shown at time t (the saved split times when the parts are unchanged, else shared by width).
+  function partAt(c, t) {
+    const texts = textOf(c).split("|").map((x) => x.trim()).filter(Boolean);
+    if (texts.length < 2) return texts[0] || "";
+    if (c.parts && c.parts.length === texts.length) {
+      const k = c.parts.findIndex((p) => t >= p.start && t < p.end);
+      return k >= 0 ? texts[k] : "";
+    }
+    const total = texts.reduce((n, x) => n + Math.max(width(x), 0.5), 0);
+    let t0 = c.start;
+    for (const x of texts) {
+      t0 += ((c.end - c.start) * Math.max(width(x), 0.5)) / total;
+      if (t < t0) return x;
+    }
+    return texts[texts.length - 1];
+  }
+
   let activeId = null;
   let stopAt = null;
   function tick() {
     const t = video.currentTime;
     $("time").textContent = fmt(t);
     const c = DATA.cues.find((x) => t >= x.start && t < x.end && !isDeleted(x));
-    subEl.textContent = c ? textOf(c) : "";
-    subEl.style.visibility = c ? "visible" : "hidden";
+    const added = !c && DATA.cues.find((x) => x.added && t >= x.added.start && t < x.added.end);
+    const shown = c ? partAt(c, t) : added ? added.added.text : "";
+    subEl.textContent = shown;
+    subEl.style.visibility = shown ? "visible" : "hidden";
     const id = c ? c.id : null;
     if (id !== activeId) {
       const prev = activeId && document.querySelector('[data-id="' + activeId + '"]');
@@ -159,7 +178,7 @@
       ta.classList.toggle("edited", isEdited(c));
       okBtn.textContent = state[c.id] && state[c.id].ok ? "確認OKを外す" : "確認OK";
       delBtn.textContent = isDeleted(c) ? "削除を取り消す" : "削除";
-      const lines = textOf(c).split("\n");
+      const lines = textOf(c).split(/\n|\|/);
       const over = lines.length > DATA.maxLines || lines.some((l) => width(l) > DATA.maxChars);
       w.textContent = lines.map((l) => width(l)).join(" / ") + " 文字（1行 " + DATA.maxChars + " 文字・" + DATA.maxLines + " 行まで）";
       w.classList.toggle("over", over);

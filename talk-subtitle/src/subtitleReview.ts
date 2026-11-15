@@ -24,10 +24,17 @@ export function writeSubtitleReview(project: Project, draft: SubtitleDraft, edit
     preset,
     cues: draft.cues.map((c) => {
       const e = edits.edits[c.id];
+      // Split cues: one card, the parts joined with "|" (typing "|" on the page splits a cue too).
+      const parts = e?.split?.length ? e.split : null;
+      const text = parts ? parts.map((p) => p.text).join("|") : e?.text;
       return {
         ...c,
+        start: parts ? parts[0].start : (e?.start ?? c.start),
+        end: parts ? parts[parts.length - 1].end : (e?.end ?? c.end),
+        parts,
+        added: e?.before ?? null,
         draftText: c.text,
-        edit: e ? { ...(e.text !== undefined ? { text: e.text } : {}), ...(e.deleted ? { deleted: true } : {}), ...(e.ok ? { ok: true } : {}) } : null,
+        edit: e ? { ...(text !== undefined ? { text } : {}), ...(e.deleted ? { deleted: true } : {}), ...(e.ok ? { ok: true } : {}) } : null,
       };
     }),
     dropped: draft.dropped,
@@ -49,6 +56,7 @@ export function writeSubtitleReview(project: Project, draft: SubtitleDraft, edit
 <header>
   <h1>字幕案の確認：${escapeHtml(json.id)}</h1>
   <div class="meta">intermediate/cut.mp4（カット後 ${draft.inputs.cutOutputSeconds.toFixed(2)}秒）　字幕 ${draft.cues.length} 件・要確認 ${flagged} 件　preset: ${escapeHtml(draft.inputs.preset)}（1行 ${draft.inputs.maxCharsPerLine} 文字・${draft.inputs.maxLines} 行まで）　まだ焼き込みはしていません</div>
+  <div class="meta">字幕を分けるときは、文字の欄で分けたい所に「|」を入れる（例：今日はね|動物虐待問題で）。表示時間は文字数で分けます。</div>
   <div class="summary" id="summary"></div>
   <div class="hint" id="restored" hidden>ブラウザに保存されていた編集途中の状態を復元しました。<button class="btn" id="reset-draft">承認ファイルの状態に戻す</button></div>
 </header>

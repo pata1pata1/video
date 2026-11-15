@@ -139,6 +139,8 @@ export type SubtitleEdit = {
   end?: number;
   /** A cue added just before this one (a voice the transcript has no words for), shown as "<id>a". */
   before?: { text: string; start: number; end: number };
+  /** The cue split into several (subtitles edit --split="a|b|c"): shown as <id>, <id>.2, <id>.3 … in this order. Replaces text/start/end. */
+  split?: { text: string; start: number; end: number }[];
   deleted?: true;
   /** Reviewed and fine as is. */
   ok?: true;
@@ -670,6 +672,36 @@ export function carryEdits(s: SubtitlesJson, draft: SubtitleDraft): { carried: n
   return { carried: Object.keys(next).length, lost };
 }
 
+/** Splits a span into parts by text width (subtitles edit --split, and "a|b" typed on the review page). */
+export function splitByWidth(texts: string[], a: number, b: number): { text: string; start: number; end: number }[] {
+  const r3 = (x: number) => Math.round(x * 1000) / 1000;
+  const total = texts.reduce((n, t) => n + Math.max(textWidth(t), 0.5), 0);
+  let t0 = a;
+  const parts = texts.map((t) => {
+    const len = ((b - a) * Math.max(textWidth(t), 0.5)) / total;
+    const p = { text: t, start: r3(t0), end: r3(t0 + len) };
+    t0 += len;
+    return p;
+  });
+  parts[parts.length - 1].end = r3(b);
+  return parts;
+}
+
+/**
+ * A text from the review page applied to a cue: "a|b|c" splits it (keeping the old split times when
+ * the number of parts is the same, else sharing the cue's time by text width); text without "|"
+ * on a split cue makes it one cue over the same time.
+ */
+export function editFromPageText(cue: Cue, old: SubtitleEdit | undefined, text: string): Pick<SubtitleEdit, "text" | "split" | "start" | "end"> {
+  const texts = text.split("|").map((t) => t.trim()).filter(Boolean);
+  const a = old?.split?.length ? old.split[0].start : (old?.start ?? cue.start);
+  const b = old?.split?.length ? old.split[old.split.length - 1].end : (old?.end ?? cue.end);
+  if (texts.length < 2 && !old?.split) return { text, ...(old?.start !== undefined ? { start: old.start } : {}), ...(old?.end !== undefined ? { end: old.end } : {}) };
+  if (!texts.length) return { text: "" };
+  if (old?.split && old.split.length === texts.length) return { split: old.split.map((p, k) => ({ ...p, text: texts[k] })) };
+  return { split: splitByWidth(texts, a, b) };
+}
+
 /** Draft + edits → the cues that would be burned in. */
 /** _shared/subtitle-text-rules.json: plain replacements applied, in order, to every subtitle's text. */
 export function applyTextRules(text: string): string {
@@ -690,6 +722,9 @@ export function effectiveCues(draft: SubtitleDraft, s: SubtitlesJson, opts: { te
       ? [{ ...c, id: `${c.id}a`, text: rule(c, e.before.text), start: e.before.start, end: e.before.end, srcEnd: c.srcStart, heard: "", flags: [], review: false, note: "追加（文字起こしに無い声）", edited: true, ok: true }]
       : [];
     if (e?.deleted) return added;
+    if (e?.split?.length) {
+      return [...added, ...e.split.map((p, k) => ({ ...c, id: k === 0 ? c.id : `${c.id}.${k + 1}`, text: rule(c, p.text), start: p.start, end: p.end, edited: true, ok: true }))];
+    }
     const edited = e?.text !== undefined || e?.start !== undefined || e?.end !== undefined;
     return [...added, { ...c, text: rule(c, e?.text ?? c.text), start: e?.start ?? c.start, end: e?.end ?? c.end, edited, ok: !!e?.ok || edited }];
   });
