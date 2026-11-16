@@ -28,6 +28,8 @@
 
 # Logs
 **/*.log
+# Per-PC cleanup history written by `video:cleanup` (kept locally, never uploaded)
+**/.cleanup-log.jsonl
 
 # OS / editor
 .DS_Store
