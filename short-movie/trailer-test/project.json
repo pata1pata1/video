@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "type": "short-movie",
+  "name": "trailer-test",
+  "created": "2026-11-03T11:13:54.592Z",
+  "status": "active",
+  "locked": false,
+  "published": false
+}

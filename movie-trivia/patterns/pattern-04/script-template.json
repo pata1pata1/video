@@ -1,0 +1,52 @@
+{
+  "id": "__ID__",
+  "pattern": "pattern-04",
+  "title": "（YouTubeタイトル・エンディングにも表示）",
+  "titleTop": "（サムネイル・説明用の小見出し）",
+  "titleMain": "（番組名に使う短いタイトル）",
+  "titleSub": "（補足の一言）",
+  "program": "（ヘッダーの番組名。例：〇〇界隈 逮捕者まとめ）",
+  "asOf": "（ヘッダー右。例：2026年11月16日時点）",
+  "pronunciation": {},
+  "media": {
+    "hook1": { "query": "（冒頭の映像の検索語・英語）" },
+    "c1": { "query": "（第1章の映像）" }
+  },
+  "roster": [
+    { "id": "p1", "date": "2024.03", "name": "（通称）", "role": "（立場。例：BreakingDown 出場）", "charge": "（容疑）", "status": "dropped", "result": "（その後。例：不起訴）", "source": "（報道機関）" }
+  ],
+  "scenes": [
+    {
+      "id": "opening",
+      "kind": "opening",
+      "lines": [
+        { "id": "o1", "visual": { "footage": "hook1", "headline": { "title": "（見出し）", "sub": "（補足）" }, "ticker": "（速報テロップ）" }, "text": "（最新のできごと）" },
+        { "id": "o2", "visual": { "clear": true }, "text": "（何をまとめるか）" },
+        { "id": "o3", "visual": { "points": { "title": "この動画の注意", "items": ["逮捕は有罪の確定ではありません", "（中心人物）本人に容疑はありません"] } }, "text": "（注意書き）" }
+      ]
+    },
+    {
+      "id": "c1",
+      "kind": "chapter",
+      "number": 1,
+      "heading": "（章の見出し。例：2024年）",
+      "lines": [
+        { "id": "c1a", "visual": { "footage": "c1", "headline": { "title": "（章の見出し）" }, "tag": "解説", "ticker": "（テロップ）" }, "text": "（章の1文目）" },
+        { "id": "c1b", "visual": { "reveal": ["p1"], "profile": "p1" }, "text": "（人物を一覧に足し、人物カードを出す）" },
+        { "id": "c1c", "visual": { "footage": "c1" }, "text": "（映像で経緯）" }
+      ]
+    },
+    {
+      "id": "ending",
+      "kind": "ending",
+      "lines": [
+        { "id": "e1", "visual": { "stat": { "value": "0", "unit": "件", "label": "（例：逮捕が報じられた件数）" } }, "text": "（一覧を数字で振り返る）" },
+        { "id": "e2", "visual": { "headline": { "title": "あなたはどう考えますか？" } }, "text": "（コメントで教えてください）" },
+        { "id": "e3", "text": "高評価とチャンネル登録も、よろしくお願いします。" }
+      ]
+    }
+  ],
+  "thumbnails": [
+    { "id": "A", "photo": "hook1", "ribbon": "（帯）", "lines": ["（1行目）"], "accent": "（強調語）", "badge": { "top": "（例：逮捕報道）", "big": "（例：19件）", "bottom": "" } }
+  ]
+}

@@ -24,6 +24,38 @@ export type Visual = {
 } & PanelDef & {
   /** pattern-01: the background footage from this line on (else the scene's, else the script's). */
   background?: string;
+} & NewsDef;
+/**
+ * pattern-04 (src/news.tsx). footage/stat/points/headline are shared with the
+ * other patterns; a card (headline/profile/stat/points) stays until another
+ * card, `clear`, or a line that sets only footage.
+ */
+export type NewsDef = {
+  /** Roster ids added to the list from this line on (the last one is highlighted). */
+  reveal?: string[];
+  /** The ticker text from this line on (and its tag, the pattern's default if not set). */
+  ticker?: string;
+  tag?: string;
+  /** A roster entry's card over the footage. */
+  profile?: string;
+  /** Removes the card (the footage shows alone). */
+  clear?: boolean;
+};
+/** pattern-04: one person (or one case) in the list. */
+export type RosterEntry = {
+  id: string;
+  /** "2024.03" */
+  date: string;
+  name: string;
+  /** Where they appeared (e.g. "BreakingDown 出場"). */
+  role: string;
+  charge: string;
+  /** A key of design.news.status (guilty / dropped / open / unknown). */
+  status: string;
+  /** The outcome in words (e.g. "懲役1年6月の実刑判決"). */
+  result: string;
+  /** Who reported it (shown small on the card). */
+  source: string;
 };
 /**
  * pattern-01 panels (src/stage.tsx), one per segment, above the heading band.
@@ -72,6 +104,9 @@ export type ThumbnailDef = {
   after?: string[];
   question?: string;
   note?: string;
+  /** pattern-04 face layout: photos side by side across the top (key + CSS object-position), a yellow kicker on a red band, white lines, and a red accent line. */
+  faces?: { key: string; position?: string }[];
+  kicker?: string;
 };
 /** A media file recorded in assets/asset-sources.json. */
 export type MediaSource = {
@@ -103,6 +138,10 @@ export const SCRIPT = script as unknown as {
   background?: string;
   scenes: SceneDef[];
   thumbnails: ThumbnailDef[];
+  /** pattern-04: the people in the list, and the header text. */
+  roster?: RosterEntry[];
+  program?: string;
+  asOf?: string;
 };
 const MEDIA = mediaSources as Record<string, MediaSource>;
 export const mediaFor = (key: string): MediaSource | undefined => MEDIA[key];
@@ -205,6 +244,8 @@ const sameShown = (a: Shown, b: Shown) => JSON.stringify(a) === JSON.stringify(b
 /** The whole video as a list of on-screen segments: [from, to) in seconds. */
 export const segments: Segment[] = (() => {
   const out: Segment[] = [];
+  // pattern-04 lays out its own screen (src/news.tsx)
+  if (PATTERN.design.news) return out;
   let prev: Shown | undefined;
   for (const scene of SCRIPT.scenes) {
     scene.lines.forEach((line, i) => {

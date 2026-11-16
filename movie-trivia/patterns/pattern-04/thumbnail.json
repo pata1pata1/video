@@ -1,0 +1,74 @@
+{
+  "inherits": "design.json（フォント：Noto Sans JP）。映像を全面に敷き、白の縁取り文字＋黄色の強調語＋赤い帯・丸バッジ（ニュース速報の色）",
+  "size": {
+    "width": 1280,
+    "height": 720
+  },
+  "variants": [
+    "A",
+    "B",
+    "C"
+  ],
+  "color": {
+    "red": "#E5262E",
+    "yellow": "#FFE23B",
+    "text": "#FFFFFF",
+    "outline": "#000000",
+    "accentWord": "#FFE23B",
+    "badgeBig": "#FFFFFF"
+  },
+  "layout": {
+    "image": {
+      "videoFrame": 90,
+      "note": "映像を全面に敷く（動画素材なら連番の90コマ目。台本の frame で変更、imagePosition で位置調整）"
+    },
+    "shade": {
+      "gradient": "linear-gradient(90deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.45) 50%, rgba(0,0,0,0.1) 80%)",
+      "note": "全体を暗くし、四隅と文字の側（左）をさらに暗くする"
+    },
+    "left": 52,
+    "ribbon": {
+      "size": 50,
+      "top": 44,
+      "rotate": -2,
+      "note": "暗い赤の帯に白文字（例：「未解決」「実話」「判決」）"
+    },
+    "lines": {
+      "size": 112,
+      "outline": 16,
+      "note": "白文字に黒の太縁取り。1〜2行"
+    },
+    "accentWord": {
+      "size": 168,
+      "sizeIfLong": 130,
+      "longOver": 6,
+      "outline": 20,
+      "note": "赤い特大の文字＋赤い光（色は color.accentWord）"
+    },
+    "badge": {
+      "size": 300,
+      "right": 40,
+      "bottom": 40,
+      "rotate": 6,
+      "topSize": 40,
+      "bigSize": 96,
+      "bigSizeIfLong": 76,
+      "bigLongOver": 4,
+      "bottomSize": 34,
+      "note": "右下の暗い赤の丸。「懲役」「〇年」など（任意）"
+    },
+    "small": {
+      "size": 36,
+      "bottom": 44,
+      "barWidth": 8,
+      "note": "左下に黒地の補足（任意）"
+    },
+    "textGlow": "0 4px 10px rgba(0,0,0,0.55)"
+  },
+  "rules": [
+    "文言は少なく大きく（帯＋1〜2行＋黄色の強調語＋バッジ）",
+    "件数などの数字は台本の一覧と同じもの。根拠のないあおりは使わない",
+    "逮捕されただけの人を犯人と断定しない。中心人物（界隈の名前の人）が容疑者のように見える文言にしない",
+    "本人の写真は、使うかを動画ごとにユーザーと決める"
+  ]
+}

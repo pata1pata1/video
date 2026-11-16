@@ -1,0 +1,9 @@
+{
+  "name": "short-news-template",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "remotion studio src/index.ts",
+    "voice": "node scripts/build-narration.mjs"
+  }
+}

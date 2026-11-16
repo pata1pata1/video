@@ -14,10 +14,11 @@
 - `analysis/<id>/frames/` … 抽出フレーム（git管理外）
 - `STYLE.md` … 全動画から抽出した作風ガイド（タイプ別）。分析のたびに更新する
 - `templates/news-short-top/` … ニュースショート動画（上部字幕固定型）の**アプリ**（縦型レイアウト・テロップ・`cards.mjs`〈モーラ長からのテロップ時刻〉・`template.json`〈連番・書き出し・-14 LUFS・声のみ〉）。**動画ごとにコピーしない**
+- `templates/movie-trailer/` … 映画予告編（縦型・アクション／壮大）の**アプリ**（2026-11-03）。画像＋VOICEVOXナレーション＋明朝の字幕＋最後に無音のタイトルカード。字幕の時刻は news-short-top の `cards.mjs` をそのまま使う。`sm.mjs new --template=movie-trailer` で使う。作り方はテンプレートの README
 - `scripts/sm.mjs` … 制作コマンド（new・narration・render・encode）。`scripts/lib/engine.mjs` を通して共通remotionを使う
 - `<id>/` … こちらで制作する動画1本ごとのフォルダ（2026-11-03〜、データだけ）：`project.json`・`input/script.json`（Git 管理）、`assets/images/`・`assets/video/`・`audio/`・`intermediate/`・`output/<id>.mp4`（Git 管理外）
 - `productions/<id>/` … 旧方式（テンプレートをコピーして作った動画）。今は制作中の `robot-ai-20261030` だけ（旧方式の `sm-engine-test` は2026-11-03に削除）。新しい動画では使わない
-  - ※最初の1本 `gmo-20261028/`（N001）は short-movie の直下にある（ルールを決める前に作ったため）
+  - ※最初の1本 `gmo-20261028`（N001）は short-movie の直下に作っていた（アップロード後に削除済み）
 
 ## 分析手順
 1. `ffprobe` で尺・解像度・fps を取得
