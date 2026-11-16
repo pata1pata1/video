@@ -17,7 +17,7 @@ export type Visual = {
   step?: number;
   stat?: Stat;
   points?: Points;
-  /** The ranking board (pattern-02): every rank, with the ones already introduced opened. */
+  /** The ranking board (old ranking pattern-02; no pattern uses it now): every rank, with the ones already introduced opened. */
   board?: boolean;
   /** Glowing keywords over the footage (pattern-03); without `footage`, over the footage already on screen. */
   words?: string[];
@@ -26,7 +26,7 @@ export type Visual = {
   background?: string;
 } & NewsDef;
 /**
- * pattern-04 (src/news.tsx). footage/stat/points/headline are shared with the
+ * pattern-02 (src/news.tsx). footage/stat/points/headline are shared with the
  * other patterns; a card (headline/profile/stat/points) stays until another
  * card, `clear`, or a line that sets only footage.
  */
@@ -41,7 +41,7 @@ export type NewsDef = {
   /** Removes the card (the footage shows alone). */
   clear?: boolean;
 };
-/** pattern-04: one person (or one case) in the list. */
+/** pattern-02: one person (or one case) in the list. */
 export type RosterEntry = {
   id: string;
   /** "2024.03" */
@@ -104,7 +104,7 @@ export type ThumbnailDef = {
   after?: string[];
   question?: string;
   note?: string;
-  /** pattern-04 face layout: photos side by side across the top (key + CSS object-position), a yellow kicker on a red band, white lines, and a red accent line. */
+  /** pattern-02 face layout: photos side by side across the top (key + CSS object-position), a yellow kicker on a red band, white lines, and a red accent line. */
   faces?: { key: string; position?: string }[];
   kicker?: string;
 };
@@ -138,7 +138,7 @@ export const SCRIPT = script as unknown as {
   background?: string;
   scenes: SceneDef[];
   thumbnails: ThumbnailDef[];
-  /** pattern-04: the people in the list, and the header text. */
+  /** pattern-02: the people in the list, and the header text. */
   roster?: RosterEntry[];
   program?: string;
   asOf?: string;
@@ -244,7 +244,7 @@ const sameShown = (a: Shown, b: Shown) => JSON.stringify(a) === JSON.stringify(b
 /** The whole video as a list of on-screen segments: [from, to) in seconds. */
 export const segments: Segment[] = (() => {
   const out: Segment[] = [];
-  // pattern-04 lays out its own screen (src/news.tsx)
+  // pattern-02 lays out its own screen (src/news.tsx)
   if (PATTERN.design.news) return out;
   let prev: Shown | undefined;
   for (const scene of SCRIPT.scenes) {

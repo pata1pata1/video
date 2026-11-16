@@ -84,7 +84,7 @@ const SegmentView: React.FC<{ seg: Segment; startFrame: number; footageFrom: num
 /** withAudio=false renders silent frames (the MP4 gets the narration in mt.mjs encode). */
 export const TriviaVideo: React.FC<{ withAudio: boolean }> = (props) => PATTERN.design.news ? <NewsVideo {...props} /> : PATTERN.design.stage ? <StageVideo {...props} /> : <ClassicVideo {...props} />;
 
-/** Every pattern without design.stage (pattern-02, pattern-03). */
+/** Every pattern without design.stage (pattern-03). */
 const ClassicVideo: React.FC<{ withAudio: boolean }> = ({ withAudio }) => {
   const { fps } = useVideoConfig();
   // where each footage clip continues from (frames already shown of that clip)

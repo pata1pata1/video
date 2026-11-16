@@ -1,7 +1,0 @@
-{
-  "pipeline": "common/render.md（movie-trivia 共通の書き出し基盤）",
-  "frames": { "imageFormat": "jpeg", "jpegQuality": 95 },
-  "video": { "codec": "libx264", "crf": 18, "preset": "slow" },
-  "loudness": { "integratedLufs": -16, "truePeakCeiling": -1.5, "lra": 11 },
-  "audio": { "sampleRate": 48000, "codec": "aac", "bitrate": "192k" }
-}

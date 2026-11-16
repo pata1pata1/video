@@ -16,11 +16,6 @@ import design03 from "../patterns/pattern-03/design.json";
 import subtitle03 from "../patterns/pattern-03/subtitle.json";
 import thumbnail03 from "../patterns/pattern-03/thumbnail.json";
 import voice03 from "../patterns/pattern-03/voice.json";
-import config04 from "../patterns/pattern-04/config.json";
-import design04 from "../patterns/pattern-04/design.json";
-import subtitle04 from "../patterns/pattern-04/subtitle.json";
-import thumbnail04 from "../patterns/pattern-04/thumbnail.json";
-import voice04 from "../patterns/pattern-04/voice.json";
 
 /** The settings every pattern has: keys found in both A and B, nested. */
 type Common<A, B> = A extends readonly unknown[] ? A : A extends object ? (B extends object ? { [K in keyof A & keyof B]: Common<A[K], B[K]> } : A) : A;
@@ -56,7 +51,7 @@ type Design = Common<typeof design02, typeof design03> & {
    * panel at a time above a heading band, short one-row subtitles (src/stage.tsx).
    */
   stage?: Stage;
-  /** pattern-04: one big picture, a small name label and big subtitles (src/news.tsx). */
+  /** pattern-02: one big picture, a small name label and big subtitles (src/news.tsx). */
   news?: News;
 };
 export type NewsStatus = { label: string; color: string };
@@ -84,7 +79,7 @@ type Pattern = {
   design: Design;
   /** chunk: a line is shown as short one-row pieces timed by their reading length (pattern-01). */
   subtitle: Common<typeof subtitle02, typeof subtitle03> & { border?: string; shadow?: string; chunk?: boolean };
-  thumbnail: Common<typeof thumbnail02, typeof thumbnail03> & {
+  thumbnail: Common<Common<typeof thumbnail02, typeof thumbnail03>, typeof thumbnail01> & {
     /** Accent word and badge number colors (yellow if not set); a glow on the text; red specks. */
     color: { accentWord?: string; badgeBig?: string; question?: string };
     /** after: white lines under the accent word; question: one line in color.question; note: small text bottom-right (pattern-01). */
@@ -103,7 +98,6 @@ const PATTERNS: Record<string, Pattern> = {
   "pattern-01": { config: config01, design: design01, subtitle: subtitle01, thumbnail: thumbnail01, voice: voice01 },
   "pattern-02": { config: config02, design: design02, subtitle: subtitle02, thumbnail: thumbnail02, voice: voice02 },
   "pattern-03": { config: config03, design: design03, subtitle: subtitle03, thumbnail: thumbnail03, voice: voice03 },
-  "pattern-04": { config: config04, design: design04, subtitle: subtitle04, thumbnail: thumbnail04, voice: voice04 },
 };
 
 const id = (script as { pattern?: string }).pattern;

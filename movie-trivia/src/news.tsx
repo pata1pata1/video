@@ -6,7 +6,7 @@ import { AUDIO_SRC, captionCues, lineStart, mediaFor, type MediaSource, NARRATIO
 import { color, font } from "./theme";
 
 /**
- * pattern-04 (design.news): one big picture (the person's photo, or footage),
+ * pattern-02 (design.news): one big picture (the person's photo, or footage),
  * a small name label top-left, and big subtitles. Nothing else on screen, so
  * the viewer does not tire (the user's rule, 2026-11-16).
  */

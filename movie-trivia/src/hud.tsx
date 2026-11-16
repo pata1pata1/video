@@ -5,7 +5,7 @@ import { PATTERN } from "./pattern";
 import { color, font, neon } from "./theme";
 
 /**
- * HUD parts for a pattern with design.hud (pattern-02): panels with cut
+ * HUD parts for a pattern with design.hud (the old ranking pattern-02, overwritten 2026-11-16; no pattern uses it now): panels with cut
  * corners, corner brackets, rotating rings and a scan line. A pattern without
  * design.panel gets a plain rounded card from <Box>.
  */

@@ -1,7 +1,7 @@
 {
   "bgm": null,
-  "bgmNote": "BGMなし。使う場合は台本に \"bgm\": { \"file\": \"bgm/<name>.mp3\", \"belowVoiceDb\": 18 } を書けば共通の書き出し処理が混ぜる",
-  "belowVoiceDb": 18,
+  "bgmNote": "標準はBGMなし（ニュース番組らしく声だけ）。使うときは台本に \"bgm\": { \"file\": \"bgm/<name>.mp3\" }。曲名と作者は投稿メモの説明文に入れる",
+  "belowVoiceDb": 22,
   "sfx": null,
   "sfxNote": "効果音なし"
 }
