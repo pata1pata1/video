@@ -262,7 +262,10 @@ export async function burnRange(
     await burnOverlayGraph(paths.cutFinal, pngInputs, output, {
       overwrite: true,
       graph: outLabel ? { filterGraph: chain.join(";\n"), outLabel } : null,
-      pngInputArgs: fade > 0 ? ["-loop", "1", "-framerate", "60"] : [],
+      // One decoder thread per PNG: with ~180 subtitles ffmpeg's default (a thread pool per input)
+      // passes macOS's 2048 threads per process (EAGAIN "Resource temporarily unavailable", talk-002).
+      pngInputArgs: [...(fade > 0 ? ["-loop", "1", "-framerate", "60"] : []), "-threads", "1"],
+      filterComplexThreads: 1,
       audioInput: opts.audioInput,
       audio: opts.audio,
       from,
