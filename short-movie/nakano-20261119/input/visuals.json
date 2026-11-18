@@ -1,0 +1,14 @@
+{
+  "policy": "news-crime-safe/1",
+  "images": [
+    { "file": "01.png", "category": "night-city", "description": "抽象的な夜の街のシルエット（実在の場所ではない）＋「東京・中野区」のテキスト。『イメージ（実際の現場ではありません）』と表示", "showsIncidentLocation": false },
+    { "file": "02.png", "category": "date-card", "description": "日付カード「11月16日 夜」＋分かっていること（allowedFacts の incident・victim-age）", "showsIncidentLocation": false },
+    { "file": "03.png", "category": "text-card", "description": "「逮捕」のテキストカード＋ぼかした赤と青の抽象的な光（車両・人物なし）。容疑の段階の注記", "showsIncidentLocation": false },
+    { "file": "04.png", "category": "timeline-card", "description": "時系列カード（事件→逮捕→容疑の切り替え。切り替えは共同通信による、と注記）", "showsIncidentLocation": false },
+    { "file": "05.png", "category": "text-card", "description": "「報じられている供述」「捜査関係者への取材による情報」「動機は確定していません」のテキストカード＋抽象的な光", "showsIncidentLocation": false },
+    { "file": "06.png", "category": "text-card", "description": "「まだ分かっていないこと」（動機・起訴／判決）のテキストカード", "showsIncidentLocation": false },
+    { "file": "07.png", "category": "abstract-news-bg", "description": "抽象的な夜の街＋「中野区の事件 報道の要点」「出典は概要欄に」", "showsIncidentLocation": false }
+  ],
+  "rules": ["人物写真・AI 生成の人物・刃物・血・刺傷・遺体・犯行の再現・実際の現場・現場を特定できる画像を使わない", "画像はすべて Pillow で図形と文字だけから作った（写真素材なし）"],
+  "prohibited": ["被害者を想起させる女性の人物写真", "容疑者を想起させる男性の人物写真", "刃物のクローズアップ", "血", "刺傷の表現", "遺体", "犯行の再現", "実際の被害者の写真", "実際の容疑者の写真", "特定できる事件現場の写真"]
+}

@@ -1,0 +1,9 @@
+{
+  "contractVersion": "content-ops.production-request/1",
+  "campaignId": "topic-20261118-2a00425b",
+  "key": "main",
+  "requestId": "pr-topic-20261118-2a00425b-main-202611182121",
+  "requestPath": "campaigns/topic-20261118-2a00425b/production/video-main.json",
+  "productionId": "nakano-20261119",
+  "importedAt": "2026-11-18T21:22:01.457Z"
+}
