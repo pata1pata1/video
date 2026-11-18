@@ -3,6 +3,7 @@ import { AbsoluteFill, Img, random, staticFile } from "remotion";
 import { PATTERN } from "./pattern";
 import { mediaFor, SCRIPT, videoFrameFile } from "./timeline";
 import { font } from "./theme";
+import { loadFont as loadZenOldMincho } from "@remotion/google-fonts/ZenOldMincho";
 
 /** Thumbnail colors and layout (patterns/<pattern>/thumbnail.json); font from the video's design. */
 const { color: C, layout: L } = PATTERN.thumbnail;
@@ -29,6 +30,7 @@ const outlined = (size: number, fill: string, stroke: number): React.CSSProperti
 export const Thumbnail: React.FC<{ variant: string }> = ({ variant }) => {
   const def = SCRIPT.thumbnails.find((t) => t.id === variant);
   if (!def) throw new Error(`no thumbnail "${variant}" in script.thumbnails`);
+  if (def.case) return <CaseThumbnail c={def.case} />;
   if (def.faces) return <FacesThumbnail def={def} />;
   const media = mediaFor(def.photo);
   const src = media?.mediaType === "video" ? videoFrameFile(def.photo, def.frame ?? L.image.videoFrame) : media?.file;
@@ -219,6 +221,117 @@ const FacesThumbnail: React.FC<{ def: (typeof SCRIPT.thumbnails)[number] }> = ({
           </div>
         ))}
         <div style={{ ...stroked(def.accent.length > 8 ? 128 : 150, "#E8141B", "#FFFFFF", 14), marginTop: -6 }}>{def.accent}</div>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+// ---------------------------------------------------------------- case layout
+
+const caseFont = loadZenOldMincho("normal", { weights: ["900"], subsets: ["japanese", "latin"], ignoreTooManyRequestsWarning: true }).fontFamily;
+
+/** Speckled holes (an SVG noise mask) so big letters look worn, like a stamped poster. */
+const WORN_MASK = `url("data:image/svg+xml,${encodeURIComponent(
+  `<svg xmlns='http://www.w3.org/2000/svg' width='600' height='600'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='7'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -4.2 3.35'/></filter><rect width='600' height='600' filter='url(#n)'/></svg>`,
+)}")`;
+
+/** "事件の{経緯}と{真相}" -> spans, {…} in red. */
+const redMarked = (text: string, red: string, base: string) =>
+  text.split(/(\{[^}]+\})/).filter(Boolean).map((part, i) =>
+    part.startsWith("{") ? (
+      <span key={i} style={{ color: red }}>{part.slice(1, -1)}</span>
+    ) : (
+      <span key={i} style={{ color: base }}>{part}</span>
+    ),
+  );
+
+const caseText = (size: number, stroke: number): React.CSSProperties => ({
+  fontFamily: caseFont,
+  fontWeight: 900,
+  fontSize: size,
+  WebkitTextStroke: `${stroke}px #000`,
+  paintOrder: "stroke fill",
+  textShadow: "0 6px 0 #000, 0 10px 24px rgba(0,0,0,0.85)",
+  whiteSpace: "nowrap",
+  lineHeight: 1.0,
+  letterSpacing: "-0.03em",
+});
+
+/** A ragged brush band: jagged ends, a slight tilt. */
+const BrushBand: React.FC<{ fill: string; tilt: number; children: React.ReactNode; padding: string }> = ({ fill, tilt, children, padding }) => (
+  <div style={{ position: "relative", display: "inline-block", transform: `rotate(${tilt}deg)` }}>
+    <div
+      style={{
+        position: "absolute",
+        inset: "-4px -26px -6px -20px",
+        background: fill,
+        clipPath: "polygon(2% 12%, 6% 0, 40% 6%, 72% 0, 97% 8%, 100% 35%, 96% 55%, 100% 82%, 93% 100%, 55% 94%, 20% 100%, 3% 92%, 0 64%, 4% 40%)",
+        WebkitMaskImage: WORN_MASK,
+        WebkitMaskSize: "300px 300px",
+      }}
+    />
+    <div style={{ position: "relative", padding }}>{children}</div>
+  </div>
+);
+
+const CaseThumbnail: React.FC<{ c: NonNullable<(typeof SCRIPT.thumbnails)[number]["case"]> }> = ({ c }) => {
+  const RED = "#E8141B";
+  const bg = mediaFor(c.background);
+  if (!bg) throw new Error(`no media "${c.background}"`);
+  const bgSrc = bg.mediaType === "video" ? videoFrameFile(c.background, L.image.videoFrame) : bg.file;
+  const police = c.police ?? true;
+  const panelW = 590;
+  const faceW = (panelW - 16) / c.faces.length;
+  const worn: React.CSSProperties = { WebkitMaskImage: WORN_MASK, WebkitMaskSize: "260px 260px" };
+  return (
+    <AbsoluteFill style={{ background: "#07070A", overflow: "hidden" }}>
+      {bgSrc ? (
+        <Img src={staticFile(bgSrc)} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: c.backgroundPosition ?? "center", filter: "brightness(0.6) contrast(1.2) saturate(0.55)" }} />
+      ) : null}
+      {/* red smoke at the edges, darker toward the text */}
+      <AbsoluteFill
+        style={{
+          background:
+            "radial-gradient(ellipse 520px 260px at 0 0, rgba(190,0,10,0.55), rgba(0,0,0,0) 70%), radial-gradient(ellipse 700px 240px at 50% 112%, rgba(200,0,12,0.75), rgba(0,0,0,0) 70%), radial-gradient(ellipse 380px 300px at 108% 50%, rgba(160,0,10,0.45), rgba(0,0,0,0) 70%), linear-gradient(90deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 55%, rgba(0,0,0,0.35) 100%)",
+        }}
+      />
+      {police ? (
+        <>
+          <AbsoluteFill style={{ background: "radial-gradient(ellipse 150px 46px at 90px 610px, rgba(255,40,40,0.95), rgba(255,40,40,0) 75%), radial-gradient(ellipse 120px 40px at 250px 615px, rgba(70,120,255,0.9), rgba(70,120,255,0) 75%), radial-gradient(ellipse 330px 150px at 150px 620px, rgba(255,30,30,0.35), rgba(0,0,0,0) 75%)" }} />
+          <div style={{ position: "absolute", left: -60, top: 652, width: 560, height: 46, background: "#F5C400", transform: "rotate(7deg)", boxShadow: "0 6px 14px rgba(0,0,0,0.6)", display: "flex", alignItems: "center", gap: 44, paddingLeft: 70, fontFamily: font.body, fontWeight: 900, fontSize: 26, color: "#111", whiteSpace: "nowrap", overflow: "hidden" }}>
+            <span>警察</span><span>立入禁止</span><span>POLICE</span><span>立入禁止</span>
+          </div>
+        </>
+      ) : null}
+      {/* faces in a white-framed panel */}
+      <div style={{ position: "absolute", right: 22, top: 20, width: panelW, height: 412, background: "#F4F4F4", padding: 8, boxShadow: "0 12px 34px rgba(0,0,0,0.8)", display: "flex", gap: 0 }}>
+        {c.faces.map((f) => {
+          const m = mediaFor(f.key);
+          if (!m) throw new Error(`no media "${f.key}"`);
+          return (
+            <div key={f.key} style={{ width: faceW, height: "100%", overflow: "hidden", position: "relative" }}>
+              <Img src={staticFile(m.file)} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: f.position ?? "center 30%", transform: `scale(${f.zoom ?? 1})`, transformOrigin: f.position ?? "center 30%" }} />
+            </div>
+          );
+        })}
+      </div>
+      {/* place, then the two-line title */}
+      <div style={{ position: "absolute", left: 34, top: 24 }}>
+        <BrushBand fill="linear-gradient(90deg, #8E0007, #D9111A 60%, #B0060D)" tilt={-4} padding="0 18px 4px 6px">
+          <span style={{ ...caseText(70, 10), color: "#FFFFFF" }}>{c.place}</span>
+        </BrushBand>
+        {c.title.map((t, i) => (
+          <div key={t} style={{ ...caseText(i === 0 ? 172 : 168, 16), ...worn, marginTop: i === 0 ? 8 : -4 }}>
+            {redMarked(t, RED, "#FFFFFF")}
+          </div>
+        ))}
+      </div>
+      {/* question on a white brush band, then the facts line */}
+      <div style={{ position: "absolute", left: 0, right: 0, bottom: 22, display: "flex", flexDirection: "column", alignItems: "center", paddingLeft: 230 }}>
+        <BrushBand fill="linear-gradient(90deg, rgba(255,255,255,0.75), #FFFFFF 15%, #FFFFFF 85%, rgba(255,255,255,0.75))" tilt={-1} padding="0 26px 2px 26px">
+          <span style={{ ...caseText(60, 0), color: "#111", textShadow: "none" }}>{c.question}</span>
+        </BrushBand>
+        <div style={{ ...caseText(96, 12), marginTop: 6 }}>{redMarked(c.bottom, RED, "#FFFFFF")}</div>
       </div>
     </AbsoluteFill>
   );

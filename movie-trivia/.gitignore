@@ -12,3 +12,8 @@ bgm
 # per-video production folders (script, posting memo) stay local; mt-engine-test is the regression fixture and stays tracked
 mizoguchi-kaiwai/
 egg-model-case/
+hirakata-abuse/
+
+# user-made thumbnail samples (real faces; keep local)
+images
+patterns/pattern-02/samples/

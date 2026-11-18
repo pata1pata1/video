@@ -107,6 +107,24 @@ export type ThumbnailDef = {
   /** pattern-02 face layout: photos side by side across the top (key + CSS object-position), a yellow kicker on a red band, white lines, and a red accent line. */
   faces?: { key: string; position?: string }[];
   kicker?: string;
+  /**
+   * Case layout (learned from the user's ChatGPT thumbnail, 2026-11-18): a dark
+   * night scene behind, a place name on a red brush band, a huge 2-line title in
+   * distressed heavy Mincho, the people's faces in a white-framed panel on the
+   * right, and a question + "the facts" line at the bottom on a white brush band.
+   * In title/bottom text, {word} is drawn in red.
+   */
+  case?: {
+    background: string;
+    backgroundPosition?: string;
+    place: string;
+    title: string[];
+    faces: { key: string; position?: string; zoom?: number }[];
+    question: string;
+    bottom: string;
+    /** police tape across the bottom-left and red/blue light glow (default true) */
+    police?: boolean;
+  };
 };
 /** A media file recorded in assets/asset-sources.json. */
 export type MediaSource = {
