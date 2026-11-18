@@ -14,7 +14,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { HandoffError, SUPPORTED_CONTRACT, checkReadiness, contentOpsRoot, readRequest } from "./lib/production/contract.mjs";
+import { HandoffError, SUPPORTED_CONTRACT, checkContinuation, checkReadiness, contentOpsRoot, readRequest } from "./lib/production/contract.mjs";
 import { projectDir } from "./lib/production/paths.mjs";
 import { buildResult, writeResult } from "./lib/production/result.mjs";
 import { buildDraftScript, precheckScript } from "./lib/production/script.mjs";
@@ -142,7 +142,7 @@ const COMMANDS = {
   gate(o) {
     const id = req(o, "project");
     const { f, request: r } = linked(id);
-    const rd = checkReadiness(r);
+    const rd = checkContinuation(r, id);
     const checks = [...rd.checks];
     const v = fs.existsSync(f.validation) ? readJson(f.validation) : null;
     checks.push({ name: "validation", passed: !!v?.proceed, reason: v ? `台本の検証 ${v.status}（${v.validatedAt}）${v.proceed ? "" : "・進めない"}` : "台本の検証がまだ（production.mjs validate）" });

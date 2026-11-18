@@ -95,3 +95,21 @@ export function checkReadiness(r, now = new Date()) {
   }
   return { ready: checks.every((c) => c.passed), checks };
 }
+
+/**
+ * 制作を続けてよいか（ナレーション・レンダリング・書き出しの前の関所）。始めるとき（import・prepare-script）は checkReadiness（ready が必要）。
+ * 始めた後は content-ops が制作開始を記録して in-production になるので、in-production でも、その制作（handoff.productionId）が
+ * この動画のときだけ続けてよい。ready の期限（readyExpiresAt）は、続けるときも守る（ready にしてから制作完了まで）。
+ * @param {any} r @param {string} projectId @param {Date} [now]
+ */
+export function checkContinuation(r, projectId, now = new Date()) {
+  /** @type {{ name: string, passed: boolean, reason: string }[]} */
+  const checks = [];
+  const mine = r.status === "in-production" && r.handoff?.productionId === projectId;
+  checks.push({ name: "status", passed: r.status === "ready" || mine, reason: r.status === "in-production" ? `status in-production（制作 ${r.handoff?.productionId ?? "?"}${mine ? "＝この動画" : "。この動画ではない"}）` : `status ${r.status}（ready、またはこの動画の in-production のときだけ続ける）` });
+  const exp = r.factCheck?.readyExpiresAt;
+  const expOk = typeof exp === "string" && now.getTime() <= Date.parse(exp);
+  checks.push({ name: "readyExpiresAt", passed: expOk, reason: exp ? `ready の期限 ${exp}${expOk ? "（有効）" : "（期限切れ。content-ops で production check をやり直す）"}` : "期限がない（制作直前の事実確認がまだ）" });
+  if (r.factCheck?.requiresRefreshBeforeProduction) checks.push({ name: "refresh", passed: !!r.factCheck.lastRefresh, reason: r.factCheck.lastRefresh ? `制作直前の事実確認 ${r.factCheck.lastRefresh.checkedAt}` : "制作直前の事実確認がまだ" });
+  return { ready: checks.every((c) => c.passed), checks };
+}

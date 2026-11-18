@@ -272,3 +272,27 @@ test("content-ops 側のファイルを変更しない（mock の依頼・実際
   assert.deepEqual(Object.keys(link).sort(), ["campaignId", "contractVersion", "importedAt", "key", "productionId", "requestId", "requestPath"].sort(), "紐付けは場所と requestId だけ（依頼のコピーではない）");
   assert.ok(HandoffError);
 });
+
+test("関所：制作を始めた後（content-ops が in-production に進めた後）も、この動画の制作なら続けられる。別の制作・期限切れは止める", { skip }, async () => {
+  const { checkContinuation } = await import("../lib/production/contract.mjs");
+  const base = mockRequest("c-cont", READY);
+  const inProd = (pid, exp = iso(5)) => ({ ...base, status: "in-production", handoff: { ...base.handoff, productionId: pid }, factCheck: { ...base.factCheck, readyExpiresAt: exp } });
+  assert.equal(checkContinuation(base, "p-cont").ready, true, "ready");
+  assert.equal(checkContinuation(inProd("p-cont"), "p-cont").ready, true, "この動画の in-production");
+  assert.equal(checkContinuation(inProd("p-other"), "p-cont").ready, false, "別の動画の in-production");
+  assert.equal(checkContinuation(inProd("p-cont", iso(-1)), "p-cont").ready, false, "期限切れ");
+  assert.equal(checkContinuation({ ...base, status: "prepared" }, "p-cont").ready, false);
+  assert.equal(checkReadiness(inProd("p-cont")).ready, false, "始める（import・prepare-script）は ready だけ");
+  // CLI の gate：in-production（この動画）でも検証済みなら通る
+  mockRequest("c-cont2", READY);
+  project("p-cont2");
+  await run(["import", "--campaign=c-cont2", "--project=p-cont2"]);
+  await run(["prepare-script", "--project=p-cont2"]);
+  await run(["validate", "--project=p-cont2"]);
+  const f = path.join(CAMPAIGNS, "c-cont2", "production", "video-main.json");
+  const r = JSON.parse(fs.readFileSync(f, "utf8"));
+  fs.writeFileSync(f, JSON.stringify({ ...r, status: "in-production", handoff: { ...r.handoff, productionId: "p-cont2" } }));
+  assert.equal((await run(["gate", "--project=p-cont2"])).code, 0);
+  fs.writeFileSync(f, JSON.stringify({ ...r, status: "in-production", handoff: { ...r.handoff, productionId: "someone-else" } }));
+  assert.equal((await run(["gate", "--project=p-cont2"])).code, 1);
+});
