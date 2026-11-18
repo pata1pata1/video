@@ -35,6 +35,12 @@
   - **例外：制作中の `productions/robot-ai-20261030` には触らず、旧方式（自分のコピー＋ジャンクション）のまま完成させる**（変更・移動・変換・cleanup をしない）。この案件の公開・再生確認・cleanup でジャンクションが外れる（リンクだけを外し、中身は消さない）までは、movie-trivia の `node_modules` を消せない
   - 旧方式の実装（`scripts/render.mjs`〈Phase 2-0〉、テンプレートの `scripts/build-narration.mjs`・`scripts/encode.sh`・`remotion.config.ts`・`package.json`・`public/`、`productions/sm-engine-test`）は2026-11-03にユーザーの承認を得て削除した（`../../remotion/docs/migration/phase3-short-movie.md`）。`productions/` と `.gitignore` の `productions/**`・`node_modules` の行は robot-ai-20261030 の cleanup まで残す
 
+## content-ops の制作依頼（2026-11-19）
+- content-ops（運用）が campaign に作る制作依頼（`content-ops.production-request/1`）を `scripts/production.mjs` で**読むだけ**（依頼をコピー・書き換えしない。content-ops のファイルに書かない）。手順は `PRODUCTION-HANDOFF.md`
+- 依頼の status が ready で readyExpiresAt 内のときだけ本制作に進む。台本は allowedFacts だけから作り、文ごとに `kind`・`factIds`・`attribution` を付け、`production.mjs validate`（content-ops の validate-script を含む）を通す。fail ならナレーション・字幕・レンダリングをしない（依頼に紐付いた動画は sm.mjs の narration・render・encode の前に gate が自動で止める）
+- 事件ニュースの画像は `input/visuals.json` に種類つきで登録し、安全な種類だけを使う（人物写真・刃物・血・現場の特定をしない）
+- 結果は `<id>/output/production-result.json` を作り、content-ops 側で `production record-result` に渡す
+
 ## 共通remotionとの関係（2026-10-30決定、恒久方針）
 - `../../remotion` を共通の動画制作エンジンとして使う（`../../remotion/docs/video-platform-architecture.md` の13章）。VOICEVOX・WAV・FFmpeg/ffprobe・音量・字幕・project管理・cleanup・書き出し基盤は remotion の core を使い、このフォルダで新しく独自実装しない。移行計画は `../../remotion/docs/video-migration-plan.md` の **Phase 3**
 - type名は **`short-movie`**（縦型ショート専用。1080×1920）。横長の movie-trivia・talk-subtitle・claude-course・character-news と混ぜない（adapter・設定・テンプレートを共有しない。共有するのは remotion の core の関数だけ）

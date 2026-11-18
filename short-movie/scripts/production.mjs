@@ -1,0 +1,183 @@
+// @ts-check
+// content-ops の制作依頼（production request）を読む consumer。依頼は content-ops の campaign にあり、ここでは読むだけ。
+// 説明：../PRODUCTION-HANDOFF.md（契約は ../../../content-ops/docs/production-handoff.md）
+//
+//   node scripts/production.mjs show --campaign=<id> [--key=main] [--json]          依頼の中身と、本制作に進めるか
+//   node scripts/production.mjs import --campaign=<id> [--key=main] --project=<id>    ready で期限内なら動画フォルダに紐付け（<id>/input/production.json。依頼のコピーは作らない）
+//   node scripts/production.mjs prepare-script --project=<id> [--force]             allowedFacts と creative だけから台本の下書き（input/script.json）と画像の登録（input/visuals.json）
+//   node scripts/production.mjs validate --project=<id>                             事前確認 → 画像の種類 → content-ops の production validate-script（fail なら先に進めない）
+//   node scripts/production.mjs gate --project=<id>                                 ナレーション・レンダリングの前の関所（sm.mjs が呼ぶ）
+//   node scripts/production.mjs result --project=<id> --render-status=started|rendered|failed|published [--started-at=] [--completed-at=]
+//                                                                                    content-ops へ返す結果（output/production-result.json）
+
+import crypto from "node:crypto";
+import fs from "node:fs";
+import path from "node:path";
+import { pathToFileURL } from "node:url";
+import { HandoffError, SUPPORTED_CONTRACT, checkReadiness, contentOpsRoot, readRequest } from "./lib/production/contract.mjs";
+import { projectDir } from "./lib/production/paths.mjs";
+import { buildResult, writeResult } from "./lib/production/result.mjs";
+import { buildDraftScript, precheckScript } from "./lib/production/script.mjs";
+import { runContentOpsValidation } from "./lib/production/validate.mjs";
+import { checkVisuals, draftVisuals } from "./lib/production/visuals.mjs";
+
+/** @param {string[]} argv */
+function parse(argv) {
+  /** @type {Record<string, string>} */
+  const o = {};
+  const pos = [];
+  for (const a of argv) {
+    if (a.startsWith("--")) {
+      const eq = a.indexOf("=");
+      o[eq < 0 ? a.slice(2) : a.slice(2, eq)] = eq < 0 ? "true" : a.slice(eq + 1);
+    } else pos.push(a);
+  }
+  return { cmd: pos[0], o };
+}
+/** @param {Record<string, string>} o @param {string} k */
+const req = (o, k) => {
+  if (!o[k] || o[k] === "true") throw new HandoffError(`--${k}=<値> が必要です`);
+  return o[k];
+};
+
+const files = (/** @type {string} */ id) => {
+  const dir = projectDir(id);
+  return {
+    dir,
+    projectJson: path.join(dir, "project.json"),
+    link: path.join(dir, "input", "production.json"),
+    script: path.join(dir, "input", "script.json"),
+    visuals: path.join(dir, "input", "visuals.json"),
+    validation: path.join(dir, "input", "production-validation.json"),
+  };
+};
+const readJson = (/** @type {string} */ f) => JSON.parse(fs.readFileSync(f, "utf8"));
+const writeJson = (/** @type {string} */ f, /** @type {any} */ v) => {
+  fs.mkdirSync(path.dirname(f), { recursive: true });
+  fs.writeFileSync(f, `${JSON.stringify(v, null, 2)}\n`);
+};
+const sha = (/** @type {string} */ f) => crypto.createHash("sha256").update(fs.readFileSync(f)).digest("hex");
+
+/** 動画フォルダの紐付けから、依頼を読み直す（毎回 content-ops の依頼を読む）。 @param {string} id */
+function linked(id) {
+  const f = files(id);
+  if (!fs.existsSync(f.link)) throw new HandoffError(`${id} は制作依頼に紐付いていません（production.mjs import が先）`);
+  const link = readJson(f.link);
+  const { request } = readRequest(link.campaignId, link.key);
+  if (request.requestId !== link.requestId) throw new HandoffError(`制作依頼が作り直されています（${link.requestId} → ${request.requestId}）。import をやり直す`);
+  return { f, link, request };
+}
+
+/** @param {{ name: string, passed: boolean, reason: string }[]} checks */
+const printChecks = (checks) => {
+  for (const c of checks) console.log(`  ${c.passed ? "✓" : "✗"} ${c.name.padEnd(15)} ${c.reason}`);
+};
+
+/** @type {Record<string, (o: Record<string, string>) => number>} */
+const COMMANDS = {
+  show(o) {
+    const { file, request: r } = readRequest(req(o, "campaign"), o.key ?? "main");
+    if (o.json === "true") {
+      console.log(JSON.stringify(r, null, 2));
+      return 0;
+    }
+    const rd = checkReadiness(r);
+    console.log(`${path.relative(contentOpsRoot(), file)}（${r.contractVersion}・読み取り専用）`);
+    console.log(`制作      : ${r.productionType} → ${r.targetProject}/templates/${r.targetTemplate}・${r.video.width}×${r.video.height}・${r.video.fps}fps・${r.video.durationTargetSec.min}〜${r.video.durationTargetSec.max}秒（目標 ${r.video.durationTargetSec.target}）`);
+    console.log(`声        : ${r.video.voice.name}（speaker ${r.video.voice.speaker}・speedScale ${r.video.voice.speedScale}）・字幕 ${r.video.subtitleStyle}`);
+    console.log(`事実      : allowedFacts ${r.scriptRules.allowedFacts.length}・出典の明示が要る ${r.scriptRules.attributionRequired.length}・禁止表現 ${r.scriptRules.prohibitedClaims.length}・分かっていない ${r.scriptRules.unknownFacts.length}`);
+    for (const f of r.scriptRules.allowedFacts) console.log(`  [${f.id}] ${f.statement}${f.attribution ? `  ※「${f.attribution.phrases.join("」か「")}」` : ""}`);
+    console.log(`構成      : ${r.creative.structure.map((/** @type {any} */ s) => `${s.startSec}-${s.endSec}秒 ${s.section}`).join(" / ")}`);
+    console.log(`本制作    : ${rd.ready ? "進められる" : "まだ進められない"}`);
+    printChecks(rd.checks);
+    return 0;
+  },
+  import(o) {
+    const campaignId = req(o, "campaign");
+    const key = o.key ?? "main";
+    const id = req(o, "project");
+    const { file, request: r } = readRequest(campaignId, key);
+    const rd = checkReadiness(r);
+    printChecks(rd.checks);
+    if (!rd.ready) throw new HandoffError("本制作に進めないので紐付けません（content-ops で production check --refresh を通して ready にする）");
+    const f = files(id);
+    if (!fs.existsSync(f.projectJson)) throw new HandoffError(`${id}/project.json がありません。先に node scripts/sm.mjs new --project=${id} --template=${r.targetTemplate}`);
+    writeJson(f.link, { contractVersion: SUPPORTED_CONTRACT, campaignId, key, requestId: r.requestId, requestPath: path.relative(contentOpsRoot(), file).split(path.sep).join("/"), productionId: id, importedAt: new Date().toISOString() });
+    console.log(`紐付けました：${path.relative(projectDir(""), f.link)}（依頼のコピーではなく、場所と requestId だけ）`);
+    return 0;
+  },
+  "prepare-script"(o) {
+    const id = req(o, "project");
+    const { f, request: r } = linked(id);
+    const rd = checkReadiness(r);
+    printChecks(rd.checks);
+    if (!rd.ready) throw new HandoffError("本制作に進めないので台本を作りません");
+    if (fs.existsSync(f.script) && o.force !== "true" && !readJson(f.script).production?.draft) throw new HandoffError(`${id}/input/script.json は手で直した台本です（作り直すなら --force）`);
+    const script = buildDraftScript(r, id);
+    writeJson(f.script, script);
+    writeJson(f.visuals, draftVisuals(script, r));
+    console.log(`下書きを作りました：input/script.json（${script.sentences.length} 文）・input/visuals.json（画像 ${draftVisuals(script, r).images.length} 枚の種類）`);
+    console.log("次：読みやすく直す（allowedFacts 以外を足さない）→ 画像を安全な種類で作る → node scripts/production.mjs validate --project=" + id);
+    return 0;
+  },
+  validate(o) {
+    const id = req(o, "project");
+    const { f, link, request: r } = linked(id);
+    if (!fs.existsSync(f.script)) throw new HandoffError(`${id}/input/script.json がありません`);
+    const script = readJson(f.script);
+    const pre = precheckScript(script, r);
+    const vis = fs.existsSync(f.visuals) ? checkVisuals(script, readJson(f.visuals), r) : [`${id}/input/visuals.json がない（画像の種類を登録する）`];
+    for (const p of pre) console.log(`  ✗ 事前確認（文 ${p.sentence}）${p.problem}`);
+    for (const v of vis) console.log(`  ✗ 画像 ${v}`);
+    const co = pre.length || vis.length ? null : runContentOpsValidation({ campaignId: link.campaignId, key: link.key, scriptPath: f.script });
+    if (co) process.stdout.write(co.output.split("\n").filter((l) => /台本の検証|✗|!/u.test(l)).map((l) => `  ${l.trim()}\n`).join(""));
+    const status = pre.length || vis.length ? "fail" : co?.status ?? "error";
+    const proceed = !pre.length && !vis.length && !!co?.proceed;
+    writeJson(f.validation, { validatedAt: new Date().toISOString(), requestId: r.requestId, scriptSha256: sha(f.script), status, proceed, precheck: pre, visuals: vis, contentOps: co ? { status: co.status, problems: co.problems, safeWarnings: co.safeWarnings, blockingWarnings: co.blockingWarnings } : null });
+    if (co?.safeWarnings.length) console.log(`  warning（安全上の問題なし・進められる）：${co.safeWarnings.join(" / ")}`);
+    if (co?.blockingWarnings.length) console.log(`  warning（出典の明示など安全に関わる・進めない）：${co.blockingWarnings.join(" / ")}`);
+    console.log(`検証：${status}・${proceed ? "ナレーション・字幕・レンダリングに進める" : "進めない（VOICEVOX・字幕・レンダリングをしない）"}`);
+    return proceed ? 0 : 1;
+  },
+  gate(o) {
+    const id = req(o, "project");
+    const { f, request: r } = linked(id);
+    const rd = checkReadiness(r);
+    const checks = [...rd.checks];
+    const v = fs.existsSync(f.validation) ? readJson(f.validation) : null;
+    checks.push({ name: "validation", passed: !!v?.proceed, reason: v ? `台本の検証 ${v.status}（${v.validatedAt}）${v.proceed ? "" : "・進めない"}` : "台本の検証がまだ（production.mjs validate）" });
+    const same = !!v && fs.existsSync(f.script) && v.scriptSha256 === sha(f.script) && v.requestId === r.requestId;
+    checks.push({ name: "scriptUnchanged", passed: same, reason: same ? "検証した台本のまま" : "検証の後に台本・依頼が変わった（validate をやり直す）" });
+    printChecks(checks);
+    const ok = checks.every((c) => c.passed);
+    console.log(ok ? "関所：通過" : "関所：止める（VOICEVOX・字幕・レンダリングをしない）");
+    return ok ? 0 : 1;
+  },
+  result(o) {
+    const id = req(o, "project");
+    const { f } = linked(id);
+    const v = fs.existsSync(f.validation) ? readJson(f.validation) : null;
+    const r = buildResult(id, { renderStatus: req(o, "render-status"), startedAt: o["started-at"] ?? new Date().toISOString(), completedAt: o["completed-at"] ?? null, validationStatus: v?.status ?? null });
+    const out = writeResult(id, r);
+    console.log(JSON.stringify(r, null, 2));
+    console.log(`書きました：${out}（content-ops 側で npm run co -- production record-result --campaign=… --key=… --result=<このファイル>）`);
+    return 0;
+  },
+};
+
+export async function main(/** @type {string[]} */ argv) {
+  const { cmd, o } = parse(argv);
+  const fn = cmd ? COMMANDS[cmd] : undefined;
+  if (!fn) {
+    console.log("使い方: node scripts/production.mjs show|import|prepare-script|validate|gate|result …（ファイル先頭のコメント）");
+    return cmd ? 1 : 0;
+  }
+  try {
+    return fn(o);
+  } catch (err) {
+    console.error(err instanceof HandoffError ? `止めました：${err.message}` : err instanceof Error ? (err.stack ?? err.message) : String(err));
+    return 1;
+  }
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) process.exitCode = await main(process.argv.slice(2));

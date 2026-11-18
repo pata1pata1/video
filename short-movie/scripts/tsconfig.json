@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "target": "es2022",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "strict": false,
+    "skipLibCheck": true,
+    "types": ["node"],
+    "typeRoots": ["../../../remotion/node_modules/@types"]
+  },
+  "include": ["production.mjs", "lib/production/**/*.mjs"]
+}
