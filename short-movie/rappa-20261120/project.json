@@ -5,5 +5,9 @@
   "created": "2026-11-19T18:20:45.873Z",
   "status": "completed",
   "locked": true,
-  "published": false
+  "published": true,
+  "publishedAt": "2026-11-19T20:22:16Z",
+  "publishedUrls": [
+    "https://youtu.be/LYXq4vefwuQ"
+  ]
 }
