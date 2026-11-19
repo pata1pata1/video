@@ -15,7 +15,7 @@
 - `STYLE.md` … 全動画から抽出した作風ガイド（タイプ別）。分析のたびに更新する
 - `templates/news-short-top/` … ニュースショート動画（上部字幕固定型）の**アプリ**（縦型レイアウト・テロップ・`cards.mjs`〈モーラ長からのテロップ時刻〉・`template.json`〈連番・書き出し・-14 LUFS・声のみ〉）。**動画ごとにコピーしない**
 - `templates/movie-trailer/` … 映画予告編（縦型・アクション／壮大）の**アプリ**（2026-11-03）。画像＋VOICEVOXナレーション＋明朝の字幕＋最後に無音のタイトルカード。字幕の時刻は news-short-top の `cards.mjs` をそのまま使う。`sm.mjs new --template=movie-trailer` で使う。作り方はテンプレートの README
-- `templates/x-clip-narration/` … X動画＋ナレーション（ユーザーのチャンネル @news_mt の過去のショート3本から学んだ型、2026-11-20）の**アプリ**。Xの動画1本を主役にし、元の音を残して要所だけナレーション・字幕を入れる。共通remotionの `"audio": "voice-over-clip"` と文ごとの `at`（秒）を使う。作り方はテンプレートの README、型は `STYLE.md` の同名の章。**news-short-top とは別の制作パターン（混ぜない）**。**素材の利用確認が必要**（他人のX動画を自由に転載できるとは扱わない）。content-ops の自動運用にはつないでいない。最初の検証サンプルは `rappa-20261120`（公開していない）
+- `templates/x-clip-narration/` … X動画＋ナレーション（ユーザーのチャンネル @news_mt の過去のショート3本から学んだ型、2026-11-20）の**アプリ**。Xの動画1本を主役にし、元の音を残して要所だけナレーション・字幕を入れる。共通remotionの `"audio": "voice-over-clip"` と文ごとの `at`（秒）を使う。作り方はテンプレートの README、型は `STYLE.md` の同名の章。**news-short-top とは別の制作パターン（混ぜない）**。**素材の利用確認が必要**（他人のX動画を自由に転載できるとは扱わない）。content-ops の自動運用にはつないでいない。最初の検証サンプルは `rappa-20261120`（2026-11-20 公開 https://youtu.be/LYXq4vefwuQ・cleanup 済み。記録は content-ops の campaign `xclip-rappa-20261120`、台本は Git の履歴）
 - `scripts/sm.mjs` … 制作コマンド（new・narration・render・encode）。`scripts/lib/engine.mjs` を通して共通remotionを使う
 - `<id>/` … こちらで制作する動画1本ごとのフォルダ（2026-11-03〜、データだけ）：`project.json`・`input/script.json`（Git 管理）、`assets/images/`・`assets/video/`・`audio/`・`intermediate/`・`output/<id>.mp4`（Git 管理外）
 - `productions/<id>/` … 旧方式（テンプレートをコピーして作った動画）。今は制作中の `robot-ai-20261030` だけ（旧方式の `sm-engine-test` は2026-11-03に削除）。新しい動画では使わない
@@ -54,20 +54,22 @@
 ## 完成後のファイル管理（アップロード後の整理）
 **制作中**：画像・音声・字幕・連番画像などのレンダリングデータは全部残し、いつでも修正・再書き出しできる状態にしておく。
 
-**全動画プロジェクト共通の方針（2026-10-30）**：video配下を完成動画の保存庫にしない。アップロードと再生確認が終わったら、その動画固有の制作物（その動画専用の画像・映像素材・音声・BGM/SE・中間生成物・キャッシュ・連番・一時ファイル・完成MP4・出典メモなど、動画フォルダ `<id>/` の中身すべて）を毎回削除する。自動で即削除せず、下の手順で承認を得てから消す。共通の対象一覧は `../../remotion/docs/video-migration-plan.md` の「cleanupの対象」
+**全動画プロジェクト共通の方針（2026-10-30）**：video配下を完成動画の保存庫にしない。アップロードと再生確認が終わったら、その動画固有の制作物（その動画専用の画像・映像素材・音声・BGM/SE・中間生成物・キャッシュ・連番・一時ファイル・完成MP4・出典メモなど、動画フォルダ `<id>/` の中身すべて）を毎回削除する。**2026-11-20 から、公開と再生の確認・安全確認が済んだら人の追加指示を待たずに自動で消す**（下の手順。`../CLAUDE.md` の cleanup）。共通の対象一覧は `../../remotion/docs/video-migration-plan.md` の「cleanupの対象」
 
-**アップロード後**（この順で進める）：
-1. ユーザーからアップロード完了の報告を受ける
-2. アップロード先で正常に再生できることを確認する（ユーザーに確認してもらう）
-3. 共通remotionで `npm run video:mark-completed -- --type=short-movie --project=<id>` → `npm run video:mark-published -- --type=short-movie --project=<id> --url=<URL>`
-4. `npm run video:cleanup -- --type=short-movie --project=<id>`（dry-run：①削除対象の一覧〈SIZE〉・②残るもの〈REMAINS〉・FINGERPRINT）→ ユーザーに見せる
-5. ユーザーが削除を承認してから `--confirm-delete=<id> --expect-fingerprint=<表示された値>` で消す（動画フォルダ `<id>/` 全体。完成MP4も含む）
+**アップロード後**（この順で進める。標準フロー）：
+1. アップロード成功（content-ops の承認フロー、または人の報告）
+2. 公開記録を確認：content-ops の campaign に video ID・URL・公開日時（`co youtube sync`）、`co production snapshot` 済み
+3. アップロード先で正常に再生できることを確認する（YouTube：`co youtube video` で public・processed、ログインなしの oEmbed で埋め込みが返る）
+4. 共通remotionで `npm run video:mark-completed -- --type=short-movie --project=<id>` → `npm run video:mark-published -- --type=short-movie --project=<id> --url=<URL> --at=<公開日時>`
+5. `npm run video:cleanup -- --type=short-movie --project=<id> --dry-run`（①削除対象の一覧〈SIZE〉・②残るもの〈REMAINS〉・FINGERPRINT・DELETABLE）。共通ファイル・他案件・テンプレート・fixture が含まれず `DELETABLE: YES` なら、そのまま `--confirm-delete=<id> --expect-fingerprint=<表示された値>` で消す（動画フォルダ `<id>/` 全体。完成MP4も含む）
+6. Git 管理の `<id>/project.json`・`input/*.json` の削除を video で commit・push し、campaign の brief.md に cleanup の結果（日時・ファイル数・サイズ）を残す。他の文書が `<id>/` を指していれば「cleanup 済み・記録は content-ops の campaign」に直す
+- 2〜5 のどれかが満たせない（再生できない・`DELETABLE: NO`・想定外のファイル）ときは消さずに報告する
 
 **必ず残すもの**：`CLAUDE.md`、`STYLE.md`、`templates/`（アプリ・共通設定）、`scripts/`、`samples/`、`analysis/`、`_shared/`（再利用する共通素材）
 
 **注意**
-- アップロード前に素材を消さない。ユーザーの承認なしに消さない
-- 完成MP4（`<id>/output/<id>.mp4`）も削除対象（2026-10-30の共通方針）。一覧に含めて、承認を得てから消す
+- アップロード前・再生確認の前に素材を消さない。`video:cleanup` を使えない削除（下の `productions/` など）はユーザーの承認なしに消さない
+- 完成MP4（`<id>/output/<id>.mp4`）も削除対象（2026-10-30の共通方針）。dry-run の一覧に含めて確認してから消す
 - 移行用テスト動画 `sm-engine-test` は移行が終わるまで対象外
 - 旧方式の `productions/<id>/` は `video:cleanup` の対象外（同じ4段階を手作業で行う）。`robot-ai-20261030` の cleanup はこの方法で、公開・再生確認の後に行う
 - 他の動画やテンプレートから参照されているファイルは消さない

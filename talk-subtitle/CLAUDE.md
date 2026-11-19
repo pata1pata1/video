@@ -37,8 +37,8 @@
 ## 公開後のcleanup（全動画プロジェクト共通、2026-10-30）
 
 - video配下を完成動画の保存庫にしない。アップロードと再生確認が終わったら、その動画固有の制作物（`projects/<id>/` の元動画・音声・中間生成物・確認用動画・完成MP4・その案件の承認ファイルや固有名詞辞書など）を毎回削除する
-- 手順：①削除対象の一覧 → ②削除後に残るもの → ③ユーザー確認 → ④承認後に削除（自動で即削除しない）
-- コマンド（remotion で実行。2026-11-05〜）：`npm run video:mark-completed -- --type=talk-subtitle --project=<id>` → アップロードと再生確認の後 `npm run video:mark-published -- --type=talk-subtitle --project=<id> --url=<公開URL>` → `npm run video:cleanup -- --type=talk-subtitle --project=<id> --dry-run`（①一覧・②残るもの・fingerprint）→ ユーザーの承認 → `--confirm-delete=<id> --expect-fingerprint=<fingerprint>`。`projects/<id>/` ごと削除する。mark-completed で `locked: true` になり、talk-subtitle のコマンドは書き込まなくなる
+- 手順（2026-11-20 改定）：公開と再生の確認・`video:cleanup` の安全確認が済んだら、人の追加指示を待たずに自動で削除する（条件の詳細は `../CLAUDE.md` の cleanup。1つでも満たさなければ消さずに報告）
+- コマンド（remotion で実行。2026-11-05〜）：`npm run video:mark-completed -- --type=talk-subtitle --project=<id>` → アップロードと再生確認の後 `npm run video:mark-published -- --type=talk-subtitle --project=<id> --url=<公開URL>` → `npm run video:cleanup -- --type=talk-subtitle --project=<id> --dry-run`（①一覧・②残るもの・fingerprint・`DELETABLE: YES`）→ `--confirm-delete=<id> --expect-fingerprint=<fingerprint>`。`projects/<id>/` ごと削除する。mark-completed で `locked: true` になり、talk-subtitle のコマンドは書き込まなくなる
 - 残すもの：コード・`docs/`・`python/`・`remotion/`・共通辞書（`_shared/glossary.json`）・字幕プリセット（`_shared/subtitle-presets`）・学習データ（`style-data/`）・CLAUDE.md。学習に使う案件は、`npm run style -- observe` や reference の結果を `style-data/` に記録してから消す
 - 共通の対象一覧は `../../remotion/docs/video-migration-plan.md` の「cleanupの対象」
 - **回帰fixture（恒久、2026-11-06 Phase 7で決定）**：`talking-test-01` は共通エンジンの回帰確認に使う（最終全体ゲート `remotion/docs/migration/phase7/gate.sh`：字幕の静止画と layout）。**cleanupしない**（`remotion/src/core/projects/typeLayout.mts` の `regressionFixtures`。`video:cleanup` は拒否する）。残すのは元動画・文字起こし・字幕などの JSON・`intermediate/cut.mp4`（静止画の元）・`review/subtitle-design/phase0-baseline/`。作り直せる `output/final.mp4`・`intermediate/cut-preview.mp4` は2026-11-06に削除した（`npm run render`・`npm run cut` で作り直せる）

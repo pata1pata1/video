@@ -14,7 +14,7 @@
 ## cleanup（全プロジェクト共通、2026-10-30）
 
 - video配下を完成動画の保存庫にしない。アップロードと再生確認が終わったら、その動画固有の制作物（元動画・専用の画像／映像／音声／BGM・SE・中間生成物・キャッシュ・連番・一時ファイル・完成MP4・専用の出典台帳・投稿メモ等）を毎回削除する
-- 手順：①削除対象の一覧 → ②削除後に残るもの → ③ユーザー確認 → ④承認後に削除（自動で即削除しない）
+- 手順（2026-11-20 改定、ユーザー指示）：**公開と再生の確認が済んだら、人の追加指示を待たずに既存の `video:cleanup` で自動削除する**。条件は全部そろうこと：①アップロード成功と公開記録（content-ops の campaign に video ID・URL・公開日時、`co production snapshot` 済み、`video:mark-published` 済み）②公開先で再生できる（YouTube なら public・処理完了・ログインなしで見られる）③`video:cleanup --dry-run` で削除対象の一覧・残るもの・`DELETABLE: YES`（共通ファイル・他案件・fixture・リンクなし）を確認 → ④その fingerprint で `--confirm-delete=<id> --expect-fingerprint=` → ⑤結果を報告・記録（`.cleanup-log.jsonl` と campaign）。1つでも満たさない・想定外のファイルがあるときは消さずに報告する。`video:cleanup` を使えない手作業の4段階（移行前のタイプ・short-movie の `productions/`）は、従来どおりユーザー確認の後に削除する
 - 残すもの：共通エンジン・各タイプの共通コード・テンプレート・pattern・STYLE.md・CLAUDE.md・共通素材・共通設定・共通辞書・学習ロジックと学習データ・次回以降も使う設計とルール
 - 対象一覧の詳細：`../remotion/docs/video-migration-plan.md`の「cleanupの対象」
 - 回帰fixture（恒久、2026-11-06）：`character-news/youtube-test-05`・`movie-trivia/mt-engine-test`・`short-movie/sm-engine-test`・`talk-subtitle/projects/talking-test-01`・claude-courseの軽量基準（free-trial・sales-intro）。共通エンジンの回帰確認に使うのでcleanupしない（`video:cleanup`は拒否）。mt・smは公開しない。作り直せる大きなMP4・連番・intermediate・キャッシュは理由なく残さない（`../remotion/docs/video-migration-plan.md`の「回帰fixture」）
