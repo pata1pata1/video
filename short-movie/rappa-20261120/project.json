@@ -3,7 +3,7 @@
   "type": "short-movie",
   "name": "rappa-20261120",
   "created": "2026-11-19T18:20:45.873Z",
-  "status": "active",
-  "locked": false,
+  "status": "completed",
+  "locked": true,
   "published": false
 }
