@@ -349,8 +349,8 @@ test("品質チェック：短い冒頭・3秒ごとの画の切り替え・短�
   ];
   const visuals = { images: kinds.map((k, i) => ({ file: `${String(i + 1).padStart(2, "0")}.jpg`, ...k, onScreenText: i % 2 ? ["39歳の男を逮捕"] : ["11月16日 夜"] })) };
   const tl = timelineOf(sentences);
-  const review = { visual: { thumbStopping: true, visualSurprise: true, understandableWithoutAudio: true, diagramsLookCheap: false } };
-  const q = quality.scoreQuality({ script: { sentences }, timeline: tl, visuals, audio: { lufs: -14.2, truePeak: -1.5, longSilences: 0 }, review });
+  const visualReview = { reviewer: "claude", judgments: { thumbStopping: true, visualImpact: true, understandableWithoutAudio: true, looksLikeSlidesOrCheapDiagram: false, looksAiGeneric: false } };
+  const q = quality.scoreQuality({ script: { sentences }, timeline: tl, visuals, audio: { lufs: -14.2, truePeak: -1.5, longSilences: 0 }, visualReview });
   assert.equal(q.gate, "pass", `${JSON.stringify(q.scores)} ${q.blocking.join(" / ")}`);
   assert.ok(q.scores.visualStrength >= 85, `visualStrength 高評価 ${q.scores.visualStrength}`);
   assert.ok(q.overallQuality >= 85);
@@ -411,4 +411,67 @@ test("自動修正は最大3回。3回目も fail なら人の確認（human-rev
   const third = quality.appendAttempt(f, fail);
   assert.equal(third.latest.attempt, 3);
   assert.equal(third.latest.escalation, "human-review");
+});
+
+const framesLib = await import("../lib/production/frames.mjs");
+/** フレームの測定値（実写らしさ・動き）から frames の要約を作る。 */
+const framesOf = (spec) => framesLib.summarizeFrames(spec.map(([t, photoLike, motion, similarToPrev = 0.2]) => ({ t, photoLike, edge: photoLike ? 0.3 : 0.1, colors: photoLike ? 250 : 90, flat: photoLike ? 0.35 : 0.9, contrast: 0.4, motion, similarToPrev })));
+
+test("フレームの抜き出し：0・1・2・3・5・8 秒、以降 2.5 秒ごと、最後のフレーム。図・カード（平らな塗り）は実写と見なさない。切り替えは動きと数えない", () => {
+  assert.deepEqual(framesLib.sampleTimes(20), [0, 1, 2, 3, 5, 8, 10.5, 13, 15.5, 18, 19.95]);
+  const w = 8, h = 8;
+  const flat = Buffer.alloc(w * h * 3, 40);
+  assert.equal(framesLib.analyzeFrame(flat, w, h).photoLike, false, "一色の画面（カード）");
+  const fr = framesOf([[0, true, 0.02], [1, false, 0.0], [2, false, 0.0, 0.9], [3, false, 0.0, 0.9], [5, false, null, 0.9]]);
+  assert.equal(fr.realFootageRatio, 0.2);
+  assert.equal(fr.motionEvidence.movingFrames, 0, "ゆっくりズーム（0.02）は動く映像ではない");
+  assert.equal(fr.repeatedVisualPatterns[0]?.frames, 4, "似た平らな画面の連続");
+});
+
+test("A・D：人の --review も Claude の目視もなくても、フレームの測定で visualStrength と QUALITY_GATE が確定する", { skip }, () => {
+  const sentences = goodPacing();
+  const visuals = { images: Array.from({ length: 12 }, (_, i) => ({ file: `${String(i + 1).padStart(2, "0")}.png`, category: "photo", layout: i % 2 ? "full" : "zoom", onScreenText: ["短い見出し"] })) };
+  const frames = framesOf(Array.from({ length: 16 }, (_, k) => [k * 2.5, true, k % 3 === 0 ? 0.12 : 0.02]));
+  const q = quality.scoreQuality({ script: { sentences }, timeline: timelineOf(sentences), visuals, audio: { lufs: -14.2, truePeak: -1.5, longSilences: 0 }, frames });
+  assert.equal(q.metrics.visualStrength.evidence.judgmentSource, "frame-metrics");
+  assert.ok(typeof q.scores.visualStrength === "number" && q.scores.visualStrength > 0);
+  assert.ok(["pass", "fail"].includes(q.gate), "人の入力なしで判定が出る");
+  assert.ok(!q.metrics.visualStrength.findings.some((f) => f.includes("目視の点を付けない")));
+});
+
+test("B：画面の切り替えは多くても、フレームが図・カード（平ら）ばかりなら高得点にしない（宣言が写真でも、測定を優先）", { skip }, () => {
+  const sentences = goodPacing();
+  const visuals = { images: Array.from({ length: 12 }, (_, i) => ({ file: `${String(i + 1).padStart(2, "0")}.png`, category: "photo", layout: "full", onScreenText: ["短い見出し"] })) };
+  const frames = framesOf(Array.from({ length: 16 }, (_, k) => [k * 2.5, false, 0.0, 0.9]));
+  const q = quality.scoreQuality({ script: { sentences }, timeline: timelineOf(sentences), visuals, audio: { lufs: -14.2, truePeak: -1.5, longSilences: 0 }, frames });
+  assert.ok(q.scores.visualPacing >= 90);
+  assert.ok(q.scores.visualStrength <= 35, `測定で実写なし（${q.scores.visualStrength}）`);
+  assert.ok(q.overallQuality < 70 && q.gate === "fail");
+});
+
+test("C：実物・実写・動く映像が多い動画は、人の入力なしでも visualStrength が高い", { skip }, () => {
+  const sentences = goodPacing();
+  const kinds = ["footage", "photo", "map-overview", "photo", "footage", "diagram", "photo", "footage", "photo", "photo", "footage", "photo"];
+  const visuals = { images: kinds.map((category, i) => ({ file: `${String(i + 1).padStart(2, "0")}.png`, category, realness: category === "footage" && i % 2 === 0 ? "event" : undefined, layout: category === "map-overview" ? "map" : category === "diagram" ? "photo-overlay" : "full", onScreenText: ["短い見出し"] })) };
+  const frames = framesOf(Array.from({ length: 16 }, (_, k) => [k * 2.5, k !== 3, k % 2 === 0 ? 0.15 : 0.03]));
+  const q = quality.scoreQuality({ script: { sentences }, timeline: timelineOf(sentences), visuals, audio: { lufs: -14.2, truePeak: -1.5, longSilences: 0 }, frames });
+  assert.ok(q.scores.visualStrength >= 75, String(q.scores.visualStrength));
+  assert.equal(q.gate, "pass", q.blocking.join(" / "));
+});
+
+test("E：人の --review は採点に使わず、機械（Claude の目視・測定）との一致／ズレを残す", { skip }, () => {
+  const sentences = goodPacing();
+  const visuals = { images: Array.from({ length: 12 }, (_, i) => ({ file: `${String(i + 1).padStart(2, "0")}.png`, category: i < 4 ? "photo" : "diagram", layout: i < 4 ? "full" : "diagram", onScreenText: ["短い見出し"] })) };
+  const frames = framesOf(Array.from({ length: 16 }, (_, k) => [k * 2.5, k < 5, 0.02, k < 5 ? 0.2 : 0.9]));
+  const visualReview = { judgments: { thumbStopping: false, visualImpact: false, understandableWithoutAudio: true, looksLikeSlidesOrCheapDiagram: true, looksAiGeneric: false } };
+  const base = { script: { sentences }, timeline: timelineOf(sentences), visuals, audio: { lufs: -14.2, truePeak: -1.5, longSilences: 0 }, frames, visualReview };
+  const q = quality.scoreQuality(base);
+  const withHuman = quality.scoreQuality({ ...base, review: { visualVerdict: "strong" } });
+  assert.equal(withHuman.scores.visualStrength, q.scores.visualStrength, "人の評価は点数を変えない");
+  const cmp = quality.compareHumanReview(q, { humanFeedback: "前よりかなり良い。映像が弱い。", visualVerdict: "weak", visual: { thumbStopping: false, diagramsLookCheap: true } }, visualReview);
+  assert.equal(cmp.machineVerdict, "weak");
+  assert.equal(cmp.verdictAgrees, true);
+  assert.equal(cmp.judgmentAgreement, "2/2");
+  assert.equal(quality.compareHumanReview(q, { visualVerdict: "strong" }, visualReview).verdictAgrees, false, "ズレも残す");
+  assert.equal(quality.compareHumanReview(q, null, visualReview), null, "人の評価がなければ比較しない");
 });

@@ -1,0 +1,34 @@
+{
+  "reviewer": "claude",
+  "reviewedAt": "2026-11-20T00:00:00+09:00",
+  "source": "nakano-20261119/intermediate/review-frames/contact-sheet.png（production.mjs frames の抜き出し）",
+  "mp4Sha256": "a1177c83e108a21da3e0006e5874cd5e8c06481f8ab9f97f472f941d6c1936bc",
+  "judgments": {
+    "thumbStopping": false,
+    "visualImpact": false,
+    "understandableWithoutAudio": true,
+    "looksLikeSlidesOrCheapDiagram": true,
+    "looksAiGeneric": true
+  },
+  "strengths": [
+    "画面の文字を読めば題材（中野区・39歳の男を逮捕）は分かる"
+  ],
+  "weaknesses": [
+    "34枚すべてが紺の枠のテキストカード・時系列カードで、実物・場所・人物の代わりになる画がない",
+    "窓をランダムに描いた夜景と、ぼかした赤と青の丸が作り物に見える（AI が作っただけの無機質な画面）",
+    "同じカードが10〜20秒続き、切り替わっても同じデザイン",
+    "音声なしで伝わるのは文字を読んだときだけで、画からは何も伝わらない"
+  ],
+  "strongestFrame": {
+    "t": 13,
+    "reason": "「逮捕」の大きな文字。それでも画ではなくテキスト"
+  },
+  "weakestFrame": {
+    "t": 65.5,
+    "reason": "「まだ分かっていないこと」の空白の多いカード。画として見るものがない"
+  },
+  "visualImpactAssessment": "スライド資料を読み上げている動画に見える。フィードで止まる理由になる画が1枚もない",
+  "notes": [
+    "Claude の目視（フレームの contact sheet）：スライド資料を読み上げている動画に見える。フィードで止まる理由になる画が1枚もない"
+  ]
+}

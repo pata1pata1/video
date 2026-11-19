@@ -1,0 +1,37 @@
+{
+  "reviewer": "claude",
+  "reviewedAt": "2026-11-20T00:00:00+09:00",
+  "source": "tank-20261119/intermediate/review-frames/contact-sheet.png（production.mjs frames の抜き出し）",
+  "mp4Sha256": "835ab4598d35f1d8ed91a82083c5a91b4e5ca6c74c4cb8eabeefa5346b8e97ea",
+  "judgments": {
+    "thumbStopping": false,
+    "visualImpact": false,
+    "understandableWithoutAudio": true,
+    "looksLikeSlidesOrCheapDiagram": true,
+    "looksAiGeneric": false
+  },
+  "strengths": [
+    "冒頭0〜3秒が10式戦車の実物の写真で、何の話かがすぐ分かる",
+    "富士山を背にした戦車の隊列（8秒）は写真として強い",
+    "最後の4枚（40〜50秒）は実物の写真が続く",
+    "見出しが短く、音声なしでも「戦車の中で砲弾が破裂した原因」が伝わる"
+  ],
+  "weaknesses": [
+    "写真はどれも展示・訓練の静止画で、この事故そのものの素材・動く映像がない",
+    "10〜38秒（中盤の約半分）が紺の背景の平面的な模式図と数字カードで、スライド資料に見える",
+    "模式図は同じ構図（横向きの砲身＋下の戦車のシルエット）が5画面続き、変化が小さい",
+    "冒頭の写真は芝生に置かれた戦車の一部の切り抜きで、フィードで止まるほどの驚きはない"
+  ],
+  "strongestFrame": {
+    "t": 8,
+    "reason": "富士山を背にした10式戦車の隊列（陸自の公式写真）"
+  },
+  "weakestFrame": {
+    "t": 15.5,
+    "reason": "「3人死亡 1人重傷」の文字だけの黒い画面"
+  },
+  "visualImpactAssessment": "題材は分かるが、画としての見どころは冒頭と富士山の写真くらい。中盤は図とカードが続き、映像としては弱い",
+  "notes": [
+    "Claude の目視（フレームの contact sheet）：題材は分かるが、画としての見どころは冒頭と富士山の写真くらい。中盤は図とカードが続き、映像としては弱い"
+  ]
+}

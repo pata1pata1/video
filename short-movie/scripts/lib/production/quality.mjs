@@ -105,14 +105,14 @@ export function measureAudio(mp4) {
 /**
  * 採点。入力：script（kind・factIds つき）・timeline（audio/timeline.json）・visuals（images[].onScreenText 必須）・audio（measureAudio）。
  * review（任意）：目視の判断 { visual: { thumbStopping, visualSurprise, understandableWithoutAudio, diagramsLookCheap } }。
- * @param {{ script: any, timeline: any, visuals: any, audio: { lufs: number|null, truePeak: number|null, longSilences: number } | null, review?: any }} i
+ * @param {{ script: any, timeline: any, visuals: any, audio: { lufs: number|null, truePeak: number|null, longSilences: number } | null, review?: any, visualReview?: any, frames?: any }} i
  */
 export function scoreQuality(i) {
   const R = QUALITY_RULES;
   const t = i.timeline;
   const dur = t.duration;
   const seg = imageSegments(t);
-  /** @type {Record<string, { score: number, findings: string[], fixes: string[] }>} */
+  /** @type {Record<string, { score: number, findings: string[], fixes: string[], evidence?: any }>} */
   const m = {};
   const sentenceText = (/** @type {any} */ s) => s.cards.map((/** @type {any} */ c) => c.text).join("");
 
@@ -260,24 +260,34 @@ export function scoreQuality(i) {
     const footage = share((v) => v?.category === "footage" || v?.motion === true);
     const drawnOrAbstract = share((v) => ["drawn", "abstract"].includes(realnessOf(v)));
     const abstract = share((v) => realnessOf(v) === "abstract");
+    // 完成MP4のフレームの測定（i.frames：frames.mjs の analyzeVideo）があれば、宣言（visuals.json）より測定を使う
+    const fr = i.frames ?? null;
+    const realM = fr ? fr.realFootageRatio : real;
+    const footageM = fr ? (fr.motionEvidence.measured ? fr.motionEvidence.movingFrames / fr.motionEvidence.measured : 0) : footage;
     let s = 0;
-    s += 35 * Math.min(1, real / V.realShareFull);
+    s += 35 * Math.min(1, realM / V.realShareFull);
     s += 15 * Math.min(1, event / V.eventShareFull);
-    s += 10 * Math.min(1, footage / V.footageShareFull);
+    s += 10 * Math.min(1, footageM / V.footageShareFull);
     const opening = realnessOf(byFile.get(seg[0]?.image));
-    s += opening === "event" ? 10 : opening === "real-object" ? 7 : opening === "generic-real" ? 3 : 0;
+    s += fr ? (fr.openingPhotoLike >= 0.67 ? (opening === "event" ? 10 : 7) : fr.openingPhotoLike > 0 ? 3 : 0) : opening === "event" ? 10 : opening === "real-object" ? 7 : opening === "generic-real" ? 3 : 0;
     const kind = (/** @type {any} */ v) => (["event", "real-object", "generic-real"].includes(realnessOf(v)) ? "real" : v?.category === "map-overview" ? "map" : v?.category === "diagram" ? "diagram" : v?.layout === "big-number" || v?.category === "icon" ? "number" : realnessOf(v) === "abstract" ? "abstract" : "card");
     const kinds = new Set(seg.map((g) => kind(byFile.get(g.image)))).size;
     s += Math.min(10, (kinds - 1) * 2.5);
-    // 目視の判断（Claude／人。--review の visual）。機械では分からないので、なければ点を付けない
-    const rv = i.review?.visual;
-    if (!rv) f.push("映像を見たくなるかの目視の判断（review.visual：thumbStopping・visualSurprise・understandableWithoutAudio・diagramsLookCheap）がない"), x.push("完成MP4を見て review.visual を付ける");
-    else {
-      if (rv.thumbStopping) s += 7; else f.push("Shorts のフィードで止まって見たくなる画がない（目視）");
-      if (rv.visualSurprise) s += 6; else f.push("視覚的な驚き（見たことのない画・意外な画）がない（目視）");
-      if (rv.understandableWithoutAudio) s += 7; else f.push("音声なしでは何の話か分からない（目視）");
-      if (rv.diagramsLookCheap) (s -= 10), f.push("模式図・カードが安っぽく見える（目視）"), x.push("図解は実写の上に重ねる・立体感や質感のある図にする・画面全体を単純なカードにしない");
-    }
+    // 目視の判断：通常運用は Claude が抜き出したフレームを見て書く visualReview（input/visual-review.json）。
+    // なければフレームの測定から目安を出す（人の入力に頼らない）。人の review は採点に使わず、ズレの学習にだけ使う
+    const cv = i.visualReview?.judgments;
+    let judgmentSource = "frame-metrics";
+    if (cv) {
+      judgmentSource = "claude-visual-review";
+      if (cv.thumbStopping) s += 7; else f.push("Shorts のフィードで止まって見たくなる画がない（Claude の目視）");
+      if (cv.visualImpact) s += 6; else f.push("視覚的なインパクトがない（Claude の目視）");
+      if (cv.understandableWithoutAudio) s += 7; else f.push("音声なしでは何の話か分からない（Claude の目視）");
+      if (cv.looksLikeSlidesOrCheapDiagram) (s -= 10), f.push("安っぽい模式図・スライド資料に見える（Claude の目視）"), x.push("図解は実写の上に重ねる・質感のある図にする・画面全体を単純なカードにしない");
+      if (cv.looksAiGeneric) (s -= 5), f.push("AI が作っただけの無機質な画面に見える（Claude の目視）");
+    } else if (fr) {
+      s += 7 * fr.openingPhotoLike + 6 * Math.min(1, realM / V.realShareFull) + 7 * Math.min(1, realM / 0.5);
+      if (fr.flatRatio >= 0.5) (s -= 10), f.push(`平らな図・カードの画面がフレームの ${Math.round(fr.flatRatio * 100)}%（スライド資料に見える）`);
+    } else f.push("フレームの測定も Claude の目視もない（目視の点を付けない）");
     // 同じデザインの図・カードの連続
     let run = 1, maxRun = 1;
     const d = (/** @type {string} */ file) => { const v = byFile.get(file); return realnessOf(v) === "drawn" ? `${v?.category}/${v?.layout ?? ""}` : null; };
@@ -288,9 +298,12 @@ export function scoreQuality(i) {
     if (event === 0) f.push("この出来事そのものの映像・公式素材がない（同じ型・一般的な画像だけ）"), x.push("公式の映像・会見・公表資料の実物など、その出来事の素材を探す");
     if (footage === 0) f.push("動く映像がない（静止画とズームだけ）");
     if (opening !== "event" && opening !== "real-object") f.push("冒頭の画が実物ではない"), x.push("冒頭1〜3秒には一番強い画（実物・公式素材）を置く");
-    if (real === 0) s = Math.min(s, V.noRealCap), f.push(`実写がない（図・カード・抽象画像だけ。上限 ${V.noRealCap} 点）`);
-    else if (drawnOrAbstract >= V.drawnCapShare) s = Math.min(s, V.drawnCap), f.push(`図・カード・抽象画像が画面時間の ${Math.round(drawnOrAbstract * 100)}%（${V.drawnCapShare * 100}% 以上なので上限 ${V.drawnCap} 点）`);
-    m.visualStrength = { score: clamp(s), findings: f, fixes: [...new Set(x)] };
+    if (fr) for (const r of fr.repeatedVisualPatterns) if (r.frames > 3) (s -= 4), f.push(`似た平らな画面が ${r.from}〜${r.to} 秒に続く（フレームの測定）`);
+    if (realM === 0) s = Math.min(s, V.noRealCap), f.push(`実写がない（図・カード・抽象画像だけ。上限 ${V.noRealCap} 点）`);
+    else if ((fr ? fr.flatRatio : drawnOrAbstract) >= V.drawnCapShare) s = Math.min(s, V.drawnCap), f.push(`図・カード・抽象画像が画面時間の ${Math.round(drawnOrAbstract * 100)}%（${V.drawnCapShare * 100}% 以上なので上限 ${V.drawnCap} 点）`);
+    const cardShare = share((v) => ["text-card", "date-card", "timeline-card", "chapter-title"].includes(v?.category));
+    const evidence = { judgmentSource, realFootageRatio: Math.round(realM * 100) / 100, diagramRatio: Math.round(share((v) => v?.category === "diagram") * 100) / 100, cardRatio: Math.round(cardShare * 100) / 100, motionEvidence: fr?.motionEvidence ?? null, repeatedVisualPatterns: fr?.repeatedVisualPatterns ?? [], sampledFrames: fr?.sampledFrames ?? [], strongestFrame: i.visualReview?.strongestFrame ?? fr?.strongestFrame ?? null, weakestFrame: i.visualReview?.weakestFrame ?? fr?.weakestFrame ?? null, strengths: i.visualReview?.strengths ?? [], weaknesses: i.visualReview?.weaknesses ?? [], visualImpactAssessment: i.visualReview?.visualImpactAssessment ?? null };
+    m.visualStrength = { score: clamp(s), findings: f, fixes: [...new Set(x)], evidence };
   }
 
   // ── retentionRisk（高いほど離脱しにくい） ──
@@ -351,4 +364,33 @@ export function appendAttempt(file, result) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, `${JSON.stringify(rec, null, 2)}\n`);
   return rec;
+}
+
+/**
+ * 人の評価（--review、任意）と機械の判定（Claude の目視の判断・フレームの測定から出した visualStrength）のズレ。採点には使わない（学習用）。
+ * review：{ humanFeedback?, visualVerdict?: "strong"|"weak", visual?: { thumbStopping, visualSurprise, understandableWithoutAudio, diagramsLookCheap } }
+ * @param {any} q scoreQuality の結果 @param {any} review @param {any} visualReview
+ */
+export function compareHumanReview(q, review, visualReview) {
+  if (!review) return null;
+  const vs = q.scores.visualStrength;
+  const machineVerdict = vs >= 60 ? "strong" : "weak";
+  const hv = review.visual ?? {};
+  const humanVerdict = review.visualVerdict ?? (Object.keys(hv).length ? (hv.thumbStopping && !hv.diagramsLookCheap ? "strong" : "weak") : null);
+  const mj = visualReview?.judgments ?? null;
+  /** @type {Record<string, { human: boolean, machine: boolean|null }>} */
+  const items = {};
+  const pairs = [["thumbStopping", "thumbStopping"], ["visualSurprise", "visualImpact"], ["understandableWithoutAudio", "understandableWithoutAudio"], ["diagramsLookCheap", "looksLikeSlidesOrCheapDiagram"]];
+  for (const [h, m] of pairs) if (typeof hv[h] === "boolean") items[h] = { human: hv[h], machine: mj && typeof mj[m] === "boolean" ? mj[m] : null };
+  const compared = Object.values(items).filter((x) => x.machine !== null);
+  return {
+    humanFeedback: review.humanFeedback ?? null,
+    humanVerdict,
+    machineVerdict,
+    machineVisualStrength: vs,
+    machineJudgmentSource: q.metrics.visualStrength.evidence?.judgmentSource ?? null,
+    verdictAgrees: humanVerdict ? humanVerdict === machineVerdict : null,
+    judgments: items,
+    judgmentAgreement: compared.length ? `${compared.filter((x) => x.human === x.machine).length}/${compared.length}` : null,
+  };
 }
