@@ -1,0 +1,9 @@
+{
+  "contractVersion": "content-ops.production-request/1",
+  "campaignId": "topic-20261119-bd6bc2a7",
+  "key": "main",
+  "requestId": "pr-topic-20261119-bd6bc2a7-main-202611191349",
+  "requestPath": "campaigns/topic-20261119-bd6bc2a7/production/video-main.json",
+  "productionId": "tank-20261119",
+  "importedAt": "2026-11-19T13:49:39.990Z"
+}

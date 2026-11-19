@@ -1,0 +1,178 @@
+{
+  "policy": "news-accident-safe/1",
+  "images": [
+    {
+      "file": "01.png",
+      "category": "photo",
+      "description": "10式戦車の全体（展示の写真。事故の車両ではない）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "なぜ？"
+      ],
+      "layout": "photo-full",
+      "credit": "写真：Los688（Wikimedia Commons、CC0） File:JGSDF Type10 tank 20120527-11.JPG"
+    },
+    {
+      "file": "02.png",
+      "category": "photo",
+      "description": "同じ写真の砲身の拡大",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "車内で砲弾が破裂"
+      ],
+      "layout": "photo-zoom",
+      "credit": "写真：Los688（Wikimedia Commons、CC0） File:JGSDF Type10 tank 20120527-11.JPG"
+    },
+    {
+      "file": "03.png",
+      "category": "diagram",
+      "description": "砲弾とゴム製のバンドの模式図（実物の正確な形ではない）＋下段に戦車のどの部分か",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "ゴム製のバンド",
+        "模式図"
+      ],
+      "layout": "diagram"
+    },
+    {
+      "file": "04.png",
+      "category": "photo",
+      "description": "富士山を背に走る10式戦車の隊列（陸自の公式写真。事故とは別）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "陸自が原因を公表"
+      ],
+      "layout": "photo-full",
+      "credit": "写真：陸上自衛隊ホームページ（Wikimedia Commons 経由、CC BY 4.0） File:A convoy of Type 10 tanks ... Mount Fuji in the background.jpg"
+    },
+    {
+      "file": "05.png",
+      "category": "map-overview",
+      "description": "九州の概略地図（Natural Earth、パブリックドメイン）に日出生台演習場のおおよその位置",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "4月21日",
+        "大分・日出生台演習場"
+      ],
+      "layout": "map"
+    },
+    {
+      "file": "06.png",
+      "category": "text-card",
+      "description": "死傷者の数（数字だけ。氏名・写真なし）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "3人死亡",
+        "1人重傷"
+      ],
+      "layout": "big-number"
+    },
+    {
+      "file": "07.png",
+      "category": "diagram",
+      "description": "薬室に高温の破片が残る模式図",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "破片が薬室に残る",
+        "模式図"
+      ],
+      "layout": "diagram"
+    },
+    {
+      "file": "08.png",
+      "category": "icon",
+      "description": "温度の数字と温度計のアイコン",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "約300〜400℃"
+      ],
+      "layout": "big-number"
+    },
+    {
+      "file": "09.png",
+      "category": "diagram",
+      "description": "次の砲弾の薬きょうの損傷の模式図",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "薬きょうが損傷",
+        "模式図"
+      ],
+      "layout": "diagram"
+    },
+    {
+      "file": "10.png",
+      "category": "diagram",
+      "description": "破片が触れて発火する模式図（控えめな火花）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "触れて発火",
+        "模式図"
+      ],
+      "layout": "diagram"
+    },
+    {
+      "file": "11.png",
+      "category": "diagram",
+      "description": "閉鎖機が閉まらずすき間が残る模式図",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "閉鎖機が閉まらず",
+        "模式図"
+      ],
+      "layout": "diagram"
+    },
+    {
+      "file": "12.png",
+      "category": "diagram",
+      "description": "爆風が砲塔の中に逆流する模式図（戦車のシルエット）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "爆風が車内へ",
+        "模式図"
+      ],
+      "layout": "diagram"
+    },
+    {
+      "file": "13.png",
+      "category": "photo",
+      "description": "10式戦車の正面（展示の写真）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "同型弾の射撃を中止"
+      ],
+      "layout": "photo-full",
+      "credit": "写真：Los688（Wikimedia Commons、CC0） File:JGSDF Type10 tank 20120527-16.JPG"
+    },
+    {
+      "file": "14.png",
+      "category": "photo",
+      "description": "訓練展示で走る10式戦車（陸自の公式写真）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "ほかは順次再開"
+      ],
+      "layout": "photo-full",
+      "credit": "写真：陸上自衛隊ホームページ（Wikimedia Commons 経由、CC BY 4.0） File:Training demonstration of the JGSDF 1st Tank Battalion's Type 10 tank ... -01.jpg"
+    },
+    {
+      "file": "15.png",
+      "category": "photo",
+      "description": "第71戦車連隊の10式戦車（陸自の公式写真）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "新しい砲弾を開発へ"
+      ],
+      "layout": "photo-full",
+      "credit": "写真：陸上自衛隊ホームページ（Wikimedia Commons 経由、CC BY 4.0） File:Type 10 tank belonging to JGSDF 71st Tank Regiment.jpg"
+    }
+  ],
+  "rules": [
+    "写真は CC0 と陸自の CC BY 4.0 だけ。出典は概要欄に書く",
+    "模式図は「模式図」と明示",
+    "事故の現場・車両・隊員の写真は使わない",
+    "画面の文字は1画面2要素・20字まで"
+  ],
+  "sources": {
+    "map": "Natural Earth 1:10m Admin 0 Countries v5.1.2（public domain）"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "validatedAt": "2026-11-19T13:54:13.000Z",
+  "requestId": "pr-topic-20261119-bd6bc2a7-main-202611191349",
+  "scriptSha256": "aaed1e46c5dae5372dcde92ad6f4657d83ae63d82014cc48ac4ca179bf091eed",
+  "status": "pass",
+  "proceed": true,
+  "precheck": [],
+  "visuals": [],
+  "contentOps": {
+    "status": "pass",
+    "problems": [],
+    "safeWarnings": [],
+    "blockingWarnings": []
+  }
+}
