@@ -32,6 +32,7 @@ export const Thumbnail: React.FC<{ variant: string }> = ({ variant }) => {
   if (!def) throw new Error(`no thumbnail "${variant}" in script.thumbnails`);
   if (def.case) return <CaseThumbnail c={def.case} />;
   if (def.faces) return <FacesThumbnail def={def} />;
+  if (def.layout === "split") return <SplitThumbnail def={def} />;
   const media = mediaFor(def.photo);
   const src = media?.mediaType === "video" ? videoFrameFile(def.photo, def.frame ?? L.image.videoFrame) : media?.file;
   const A = L.accentWord;
@@ -333,6 +334,88 @@ const CaseThumbnail: React.FC<{ c: NonNullable<(typeof SCRIPT.thumbnails)[number
         </BrushBand>
         <div style={{ ...caseText(96, 12), marginTop: 6 }}>{redMarked(c.bottom, RED, "#FFFFFF")}</div>
       </div>
+    </AbsoluteFill>
+  );
+};
+
+/** Text with a gradient fill: an outlined, shadowed copy behind a clipped gradient copy. */
+const GradientText: React.FC<{ text: string; size: number; gradient: string; stroke: string; width: number; style?: React.CSSProperties }> = ({ text, size, gradient, stroke, width, style }) => {
+  const base: React.CSSProperties = { fontFamily: font.body, fontWeight: 900, fontSize: size, whiteSpace: "nowrap", lineHeight: 1.1, letterSpacing: "-0.02em" };
+  return (
+    <div style={{ position: "relative", ...style }}>
+      <div style={{ ...base, color: stroke, WebkitTextStroke: `${width}px ${stroke}`, textShadow: "0 10px 22px rgba(0,0,0,0.8)" }}>{text}</div>
+      <div style={{ ...base, position: "absolute", left: 0, top: 0, color: "transparent", backgroundImage: gradient, WebkitBackgroundClip: "text", backgroundClip: "text" }}>{text}</div>
+    </div>
+  );
+};
+
+/** A rough red brush stroke (underline under the accent word). */
+const BrushStroke: React.FC<{ width: number }> = ({ width }) => (
+  <svg width={width} height={44} viewBox={`0 0 ${width} 44`} style={{ display: "block" }}>
+    <defs>
+      <linearGradient id="brush" x1="0" x2="1">
+        <stop offset="0" stopColor="#C80A12" stopOpacity="0" />
+        <stop offset="0.08" stopColor="#D8141B" />
+        <stop offset="0.85" stopColor="#E3161D" />
+        <stop offset="1" stopColor="#E3161D" stopOpacity="0" />
+      </linearGradient>
+    </defs>
+    {Array.from({ length: 9 }, (_, i) => {
+      const y = 10 + i * 3 + random(`by${i}`) * 3;
+      const x0 = random(`bx${i}`) * width * 0.08;
+      const x1 = width - random(`bz${i}`) * width * 0.12;
+      return <path key={i} d={`M${x0} ${y + 4} Q ${width * 0.5} ${y - 6} ${x1} ${y}`} stroke="url(#brush)" strokeWidth={4 + random(`bw${i}`) * 4} strokeLinecap="round" fill="none" opacity={0.75 + random(`bo${i}`) * 0.25} />;
+    })}
+  </svg>
+);
+
+/**
+ * Split layout (the user's ChatGPT sample, 2026-11-20): the photo large on the
+ * right, fading into a dark blurred copy on the left; a slanted red ribbon,
+ * white outlined line(s), a huge yellow-gradient accent word over a red brush
+ * stroke, white "after" line(s), a cyan question, and the credit bottom-right.
+ */
+const SplitThumbnail: React.FC<{ def: (typeof SCRIPT.thumbnails)[number] }> = ({ def }) => {
+  const media = mediaFor(def.photo);
+  const src = media?.mediaType === "video" ? videoFrameFile(def.photo, def.frame ?? L.image.videoFrame) : media?.file;
+  const photoWidth = def.photoWidth ?? 700;
+  const white = (size: number): React.CSSProperties => ({ ...stroked(size, "#FFFFFF", "#000000", 12), letterSpacing: "-0.01em" });
+  return (
+    <AbsoluteFill style={{ background: "#0A0A0C" }}>
+      {src ? (
+        <>
+          <Img src={staticFile(src)} style={{ position: "absolute", inset: -40, width: 1360, height: 800, objectFit: "cover", filter: "blur(22px) brightness(0.4) saturate(0.9)" }} />
+          <div style={{ position: "absolute", right: 0, top: 0, width: photoWidth, height: 720, WebkitMaskImage: "linear-gradient(90deg, transparent 0%, #000 26%)", maskImage: "linear-gradient(90deg, transparent 0%, #000 26%)" }}>
+            <Img src={staticFile(src)} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: def.imagePosition ?? "center" }} />
+          </div>
+        </>
+      ) : null}
+      <AbsoluteFill style={{ background: "radial-gradient(ellipse 900px 600px at 20% 50%, rgba(0,0,0,0.55), rgba(0,0,0,0) 75%), linear-gradient(0deg, rgba(0,0,0,0.5), rgba(0,0,0,0) 30%)" }} />
+      <div style={{ position: "absolute", left: 34, top: 56 }}>
+        <div style={{ display: "inline-block", padding: "4px 34px 8px 26px", background: "linear-gradient(90deg, #A8060C, #E3141B)", transform: "skewX(-12deg)", boxShadow: "0 8px 18px rgba(0,0,0,0.6)" }}>
+          <div style={{ transform: "skewX(12deg)", ...stroked(56, "#FFFFFF", "#5A0000", 6), fontStyle: "italic" }}>{def.ribbon}</div>
+        </div>
+        <div style={{ marginTop: 30 }}>
+          {def.lines.map((l) => (
+            <div key={l} style={white(60)}>
+              {l}
+            </div>
+          ))}
+        </div>
+        <GradientText text={def.accent} size={def.accent.length > 5 ? 112 : 132} gradient="linear-gradient(180deg, #FFF7B0 0%, #FFE600 45%, #FFB800 100%)" stroke="#1A1000" width={18} style={{ marginTop: 0 }} />
+        <div style={{ marginTop: -18, marginLeft: -10 }}>
+          <BrushStroke width={680} />
+        </div>
+        {def.after?.map((l) => (
+          <div key={l} style={{ ...white(52), marginTop: 14 }}>
+            {l}
+          </div>
+        ))}
+        {def.question ? <div style={{ ...stroked(48, "#3FE0FF", "#001018", 10), marginTop: 34 }}>{def.question}</div> : null}
+      </div>
+      {def.note ? (
+        <div style={{ position: "absolute", right: 22, bottom: 16, fontFamily: font.body, fontWeight: 700, fontSize: 22, color: "#FFFFFF", textShadow: "0 1px 4px rgba(0,0,0,0.95), 0 0 8px rgba(0,0,0,0.8)" }}>{def.note}</div>
+      ) : null}
     </AbsoluteFill>
   );
 };

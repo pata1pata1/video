@@ -75,7 +75,8 @@ export type PanelDef = {
   list?: { items: { head: string; body?: string }[]; photo?: string };
 };
 const PANEL_KEYS = ["photo", "headline", "findings", "data", "list"] as const;
-export type ScriptLine = { id: string; text: string; visual?: Visual; caption?: string; chunks?: string[] };
+/** mute: each run of 〇 in the text is silence in the narration (the caption keeps the 〇). */
+export type ScriptLine = { id: string; text: string; visual?: Visual; caption?: string; chunks?: string[]; mute?: boolean };
 export type SceneDef = {
   id: string;
   kind: "opening" | "chapter" | "ending";
@@ -106,6 +107,10 @@ export type ThumbnailDef = {
   note?: string;
   /** pattern-02 face layout: photos side by side across the top (key + CSS object-position), a yellow kicker on a red band, white lines, and a red accent line. */
   faces?: { key: string; position?: string }[];
+  /** "split": photo large on the right fading into a blurred copy, text on the left (Thumbnail.tsx SplitThumbnail). */
+  layout?: "split";
+  /** split layout: width of the sharp photo on the right (px of 1280). */
+  photoWidth?: number;
   kicker?: string;
   /**
    * Case layout (learned from the user's ChatGPT thumbnail, 2026-11-18): a dark
@@ -154,6 +159,8 @@ export const SCRIPT = script as unknown as {
   voice?: { speakerName?: string };
   /** pattern-01: background footage for the whole video (scenes and lines may change it). */
   background?: string;
+  /** pattern-01: a small note shown top-left for the whole video (e.g. where the quoted words come from). */
+  quoteCredit?: string;
   scenes: SceneDef[];
   thumbnails: ThumbnailDef[];
   /** pattern-02: the people in the list, and the header text. */

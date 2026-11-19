@@ -53,6 +53,6 @@
     }
   ],
   "thumbnails": [
-    { "id": "A", "photo": "p-main", "imagePosition": "center", "ribbon": "（場所。例：中国・掲陽市）", "lines": ["（1行目）"], "accent": "（黄色の強調語）", "after": ["（補足の白文字）"], "question": "（問いかけ。例：当局の公式発表は？）", "note": "（※画像はイメージです／出典：〇〇）" }
+    { "id": "A", "layout": "split", "photoWidth": 880, "photo": "p-main", "imagePosition": "center", "ribbon": "（場所。例：中国・掲陽市）", "lines": ["（1行目）"], "accent": "（黄色の強調語）", "after": ["（補足の白文字）"], "question": "（問いかけ。例：当局の公式発表は？）", "note": "（※画像はイメージです／出典：〇〇）" }
   ]
 }
