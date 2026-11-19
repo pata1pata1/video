@@ -75,7 +75,8 @@ export type PanelDef = {
   list?: { items: { head: string; body?: string }[]; photo?: string };
 };
 const PANEL_KEYS = ["photo", "headline", "findings", "data", "list"] as const;
-export type ScriptLine = { id: string; text: string; visual?: Visual; caption?: string; chunks?: string[] };
+/** mute: each run of 〇 in the text is silence in the narration (the caption keeps the 〇). */
+export type ScriptLine = { id: string; text: string; visual?: Visual; caption?: string; chunks?: string[]; mute?: boolean };
 export type SceneDef = {
   id: string;
   kind: "opening" | "chapter" | "ending";
@@ -136,6 +137,8 @@ export const SCRIPT = script as unknown as {
   voice?: { speakerName?: string };
   /** pattern-01: background footage for the whole video (scenes and lines may change it). */
   background?: string;
+  /** pattern-01: a small note shown top-left for the whole video (e.g. where the quoted words come from). */
+  quoteCredit?: string;
   scenes: SceneDef[];
   thumbnails: ThumbnailDef[];
   /** pattern-02: the people in the list, and the header text. */

@@ -480,6 +480,22 @@ export const StageVideo: React.FC<{ withAudio: boolean }> = ({ withAudio }) => {
           </Sequence>
         );
       })}
+      {SCRIPT.quoteCredit ? (
+        <div
+          style={{
+            position: "absolute",
+            left: S().note.right,
+            top: S().note.top,
+            fontFamily: font.body,
+            fontWeight: 700,
+            fontSize: S().note.size,
+            color: "rgba(255,255,255,0.78)",
+            textShadow: "0 1px 4px rgba(0,0,0,0.8)",
+          }}
+        >
+          {SCRIPT.quoteCredit}
+        </div>
+      ) : null}
       <Subtitle />
       {withAudio ? <Audio src={staticFile(AUDIO_SRC)} /> : null}
     </AbsoluteFill>

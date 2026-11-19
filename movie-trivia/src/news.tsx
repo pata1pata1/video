@@ -45,6 +45,8 @@ const timeline = (() => {
   const media: { at: number; value: string }[] = [];
   const labels: { at: number; value: Label | null }[] = [];
   let first = true;
+  // built at import, so only for pattern-02 scripts (other patterns import this module too)
+  if (!PATTERN.design.news) return { media: spans(media), labels: spans(labels) };
   for (const scene of SCRIPT.scenes) {
     for (const line of scene.lines) {
       const at = first ? 0 : lineStart(line.id) - LEAD;
