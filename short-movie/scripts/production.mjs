@@ -162,9 +162,16 @@ const COMMANDS = {
     const id = req(o, "project");
     const f = files(id);
     for (const [p, what] of [[f.script, "input/script.json"], [f.timeline, "audio/timeline.json（ナレーションの後）"], [f.visuals, "input/visuals.json"]]) if (!fs.existsSync(p)) throw new HandoffError(`${id}/${what} がありません`);
-    const q = scoreQuality({ script: readJson(f.script), timeline: readJson(f.timeline), visuals: readJson(f.visuals), audio: measureAudio(f.mp4) });
     const review = o.review ? readJson(o.review) : null;
-    const rec = appendAttempt(f.quality, { gate: q.gate, overallQuality: q.overallQuality, scores: q.scores, blocking: q.blocking, metrics: q.metrics, reviewNotes: review?.notes ?? [], rules: q.rules, weights: q.weights });
+    const q = scoreQuality({ script: readJson(f.script), timeline: readJson(f.timeline), visuals: readJson(f.visuals), audio: measureAudio(f.mp4), review });
+    // --reference：今のルールでの参考点（記録しない・試行に数えない）。採点のルールを変えた後に、過去の動画を再評価するとき
+    if (o.reference === "true") {
+      const out = { reference: true, rulesVersion: q.rulesVersion, checkedAt: new Date().toISOString(), gate: q.gate, overallQuality: q.overallQuality, weightedQuality: q.weightedQuality, overallCap: q.overallCap, scores: q.scores, blocking: q.blocking, findings: Object.fromEntries(Object.entries(q.metrics).map(([k, v]) => [k, v.findings])) };
+      if (o.out) writeJson(o.out, out);
+      console.log(JSON.stringify(out, null, 2));
+      return 0;
+    }
+    const rec = appendAttempt(f.quality, { rulesVersion: q.rulesVersion, gate: q.gate, overallQuality: q.overallQuality, scores: q.scores, blocking: q.blocking, metrics: q.metrics, reviewNotes: review?.notes ?? [], reviewVisual: review?.visual ?? null, rules: q.rules, weights: q.weights });
     for (const [k, v] of Object.entries(q.metrics)) {
       console.log(`  ${String(v.score).padStart(3)} ${k}`);
       for (const x of v.findings) console.log(`        - ${x}`);

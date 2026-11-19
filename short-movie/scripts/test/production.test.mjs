@@ -340,12 +340,60 @@ test("品質チェック：短い冒頭・3秒ごとの画の切り替え・短�
     { kind: "unknown", cards: [{ text: "動機はまだ", image: "11.jpg" }, { text: "確定していません" }] },
     { kind: "fact", factIds: ["arrest"], cards: [{ text: "あなたはどう思いますか？", image: "12.jpg" }] },
   ];
-  const cats = ["map-overview", "date-card", "city-street", "photo", "police-generic", "timeline-card", "icon", "diagram", "photo", "police-generic", "text-card", "photo"];
-  const visuals = { images: cats.map((category, i) => ({ file: `${String(i + 1).padStart(2, "0")}.jpg`, category, layout: i % 3 === 0 ? "full" : i % 3 === 1 ? "number" : "map", onScreenText: i % 2 ? ["39歳の男を逮捕"] : ["11月16日 夜"] })) };
+  // B：実写（この出来事の公式素材・実物）・動く映像・地図・数字・図解を組み合わせ、目視でも見たくなる画
+  const kinds = [
+    { category: "footage", realness: "event", layout: "full" }, { category: "photo", realness: "real-object", layout: "full" }, { category: "map-overview", layout: "map" },
+    { category: "photo", realness: "event", layout: "full" }, { category: "icon", layout: "big-number" }, { category: "footage", realness: "real-object", layout: "full" },
+    { category: "diagram", layout: "diagram" }, { category: "photo", realness: "real-object", layout: "full" }, { category: "footage", realness: "event", layout: "full" },
+    { category: "photo", realness: "real-object", layout: "zoom" }, { category: "diagram", layout: "photo-overlay", realness: "real-object" }, { category: "footage", realness: "event", layout: "full" },
+  ];
+  const visuals = { images: kinds.map((k, i) => ({ file: `${String(i + 1).padStart(2, "0")}.jpg`, ...k, onScreenText: i % 2 ? ["39歳の男を逮捕"] : ["11月16日 夜"] })) };
   const tl = timelineOf(sentences);
-  const q = quality.scoreQuality({ script: { sentences }, timeline: tl, visuals, audio: { lufs: -14.2, truePeak: -1.5, longSilences: 0 } });
+  const review = { visual: { thumbStopping: true, visualSurprise: true, understandableWithoutAudio: true, diagramsLookCheap: false } };
+  const q = quality.scoreQuality({ script: { sentences }, timeline: tl, visuals, audio: { lufs: -14.2, truePeak: -1.5, longSilences: 0 }, review });
   assert.equal(q.gate, "pass", `${JSON.stringify(q.scores)} ${q.blocking.join(" / ")}`);
-  assert.ok(q.overallQuality >= 70);
+  assert.ok(q.scores.visualStrength >= 85, `visualStrength 高評価 ${q.scores.visualStrength}`);
+  assert.ok(q.overallQuality >= 85);
+});
+
+/** A・C 用：文字・字幕・尺・テンポは良い台本（12文・各約3.5秒・問いで始まり事実で終わる）。 */
+const goodPacing = () => [
+  { kind: "hook", factIds: ["a"], cards: [{ text: "なぜ車内で破裂したのか？", image: "01.png" }] },
+  ...Array.from({ length: 11 }, (_, i) => ({ kind: "fact", factIds: [`f${i}`], cards: [{ text: `事実${i}の前半を言います`, image: `${String(i + 2).padStart(2, "0")}.png` }, { text: "後半を短く言います" }] })),
+];
+const review0 = { visual: { thumbStopping: false, visualSurprise: false, understandableWithoutAudio: true, diagramsLookCheap: true } };
+
+test("A：文字が少なく・字幕も尺も良く・画面もよく変わるが、模式図とカードだけ → visualStrength が低く、90点台にならない", { skip }, () => {
+  const sentences = goodPacing();
+  const visuals = { images: Array.from({ length: 12 }, (_, i) => ({ file: `${String(i + 1).padStart(2, "0")}.png`, category: i % 3 === 0 ? "text-card" : "diagram", layout: i % 3 === 0 ? "big-number" : "diagram", onScreenText: ["短い見出し"] })) };
+  const q = quality.scoreQuality({ script: { sentences }, timeline: timelineOf(sentences), visuals, audio: { lufs: -14.2, truePeak: -1.5, longSilences: 0 }, review: review0 });
+  assert.ok(q.scores.onScreenTextLoad >= 90 && q.scores.visualPacing >= 90 && q.scores.subtitleReadability >= 90, JSON.stringify(q.scores));
+  assert.ok(q.scores.visualStrength <= 35, `実写なし：上限35（${q.scores.visualStrength}）`);
+  assert.ok(q.overallQuality < 90, `90点台にしない（${q.overallQuality}）`);
+  assert.equal(q.gate, "fail", "visualStrength は重要項目");
+  assert.ok(q.metrics.visualStrength.findings.some((f) => f.includes("実写がない")));
+});
+
+test("C：画面は頻繁に変わるが、同じカードのデザインが続くだけ → visualVariety も visualStrength も高得点にしない", { skip }, () => {
+  const sentences = goodPacing();
+  const visuals = { images: Array.from({ length: 12 }, (_, i) => ({ file: `${String(i + 1).padStart(2, "0")}.png`, category: "text-card", layout: "panel-text", onScreenText: ["短い見出し"] })) };
+  const q = quality.scoreQuality({ script: { sentences }, timeline: timelineOf(sentences), visuals, audio: { lufs: -14.2, truePeak: -1.5, longSilences: 0 } });
+  assert.ok(q.scores.visualPacing >= 90, "切り替えの回数は十分");
+  assert.ok(q.scores.visualVariety < 50, `回数だけで visualVariety を高くしない（${q.scores.visualVariety}）`);
+  assert.ok(q.metrics.visualVariety.findings.some((f) => f.includes("同じデザインの画面")));
+  assert.ok(q.scores.visualStrength <= 35);
+  assert.ok(q.overallQuality < 70 && q.gate === "fail");
+});
+
+test("実物の写真はあるが、図・模式図が画面の半分以上で、目視でも強くない（tank-20261119 の形）→ visualStrength は上限55以下、overall は 50+visualStrength/2 まで", { skip }, () => {
+  const sentences = goodPacing();
+  const cats = ["photo", "photo", "diagram", "photo", "map-overview", "text-card", "diagram", "icon", "diagram", "diagram", "diagram", "photo"];
+  const visuals = { images: cats.map((category, i) => ({ file: `${String(i + 1).padStart(2, "0")}.png`, category, layout: category === "photo" ? "photo-full" : category === "diagram" ? "diagram" : category === "map-overview" ? "map" : "big-number", onScreenText: ["短い見出し"] })) };
+  const q = quality.scoreQuality({ script: { sentences }, timeline: timelineOf(sentences), visuals, audio: { lufs: -14.2, truePeak: -1.5, longSilences: 0 }, review: review0 });
+  assert.ok(q.scores.visualStrength <= 55, String(q.scores.visualStrength));
+  assert.ok(q.overallQuality <= 50 + Math.round(q.scores.visualStrength / 2));
+  assert.ok(q.overallQuality < q.weightedQuality, "他の項目が良くても映像の弱さで抑える");
+  assert.ok(q.metrics.visualStrength.findings.some((f) => f.includes("この出来事そのものの映像")));
 });
 
 test("画面の文字の決まり：onScreenText の登録が必須・長文（12字超）・要素3つ以上・計20字超は validate で止める", { skip }, () => {

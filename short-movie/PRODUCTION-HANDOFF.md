@@ -80,6 +80,19 @@ short-movie の今の形に、文ごとの3つを足す（template の cards.mjs
 - **自動修正ループ**：fail → 指摘（findings）と修正案（fixes）から台本・字幕・画面の構成を直す → validate → narration → render → encode → quality-check。**最大3回**。3回目も fail なら `human-review`（人の確認。公開しない）
 - `input/visuals.json` の各画像に `onScreenText`（画面に出す文字の一覧。文字なしは []）が必須。1要素12字・1画面2要素・計20字を超えると validate が止める
 
+### 映像の強さ（visualStrength、quality-v2、2026-11-20）
+
+画面が変わる「回数」ではなく、**その映像自体を見たいと思えるか**。tank-20261119 は quality-v1 で 99・pass だったが、人の評価は「前よりかなり良い。映像が弱い。」（図・模式図中心で、同じ型の静止画だけ）。quality-v2 の参考点は 62・fail（visualStrength 24）。
+
+- 採点（0〜100、重要項目）：実写の画面時間の割合（35）・この出来事そのものの映像／公式素材（15）・動く映像（10）・冒頭の画が実物か（10）・画の種類（10）・目視の判断（20：Shorts のフィードで止まって見たくなるか・視覚的な驚き・音声なしでも何の話か分かるか）。減点：模式図・カードが安っぽい（目視）・同じデザインの図／カードが3画面以上続く・抽象画像が30%超
+- 上限：図・カード・抽象画像が画面時間の半分以上なら 55 点、実写がなければ 35 点
+- **overallQuality は 50 + visualStrength / 2 を超えない**（90点台には visualStrength 80 以上が要る）。visualVariety も、同じデザインの画面が4回以上続けば減点（回数だけで高得点にしない）
+- `input/visuals.json` の各画像に任意で `realness`（event＝この出来事そのものの映像・公式素材／real-object＝実在の物・場所・車両・製品／generic-real＝一般的な街並みなど／drawn＝図・地図・カード／abstract＝抽象・作り物）と `motion`。なければ category から決める（photo・footage は real-object）
+- 目視の判断は `--review` の `visual: { thumbStopping, visualSurprise, understandableWithoutAudio, diagramsLookCheap }`。ないと点を付けない
+- `quality-check --reference [--out=<file>]`：採点のルールを変えた後に、過去の動画を参考採点する（記録しない・試行に数えない）。content-ops の `production record-quality --reference=` に渡す
+
+**映像制作の原則**（制作依頼の `qualityRules.principles` にも入る）：テキストカードだけ・模式図だけで構成しない／可能なら実物・公式素材・場所・物・車両・製品を見せる（その出来事の素材と動く映像を最優先で探す）／図解でも画面全体を単純なカードにしない（実写に重ねる・質感のある図）／同じデザインの画面を連続させない／「次の画を見たい」と思わせる／冒頭1〜3秒には一番強い画を置く
+
 ## content-ops へ返す結果
 
 `<id>/output/production-result.json`（Git 管理外）：`productionId`・`startedAt`・`completedAt`・`scriptPath`・`audioPath`・`subtitlePath`・`videoPath`・`durationSec`（timeline.json から）・`validationStatus`・`renderStatus`。content-ops 側で `npm run co -- production record-result --campaign=<id> --key=<key> --result=<このファイル>` に渡す（content-ops のファイルを video 側から直接書かない）。
