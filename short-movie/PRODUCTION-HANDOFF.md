@@ -88,7 +88,13 @@ short-movie の今の形に、文ごとの3つを足す（template の cards.mjs
 - 上限：図・カード・抽象画像が画面時間の半分以上なら 55 点、実写がなければ 35 点
 - **overallQuality は 50 + visualStrength / 2 を超えない**（90点台には visualStrength 80 以上が要る）。visualVariety も、同じデザインの画面が4回以上続けば減点（回数だけで高得点にしない）
 - `input/visuals.json` の各画像に任意で `realness`（event＝この出来事そのものの映像・公式素材／real-object＝実在の物・場所・車両・製品／generic-real＝一般的な街並みなど／drawn＝図・地図・カード／abstract＝抽象・作り物）と `motion`。なければ category から決める（photo・footage は real-object）
-- 目視の判断は `--review` の `visual: { thumbStopping, visualSurprise, understandableWithoutAudio, diagramsLookCheap }`。ないと点を付けない
+- **自動評価（2026-11-20）：人の入力に頼らない**。通常運用は `render → encode → production.mjs frames（フレームの自動抽出）→ Claude の目視（input/visual-review.json）→ quality-check → QUALITY_GATE`
+  - `frames --project=<id>`：0・1・2・3・5・8 秒、以降 2.5 秒ごと、最後のフレームを抜き出し（`intermediate/review-frames/`・contact sheet、Git 管理外）、画像パネルを画素で測る（`scripts/lib/production/frames.mjs`）：実写らしさ（細部・色の数・平らな塗りの割合）・同じ場面の中の動き（切り替えは数えない）・似た平らな画面の連続。quality-check も毎回自動で測る。visualStrength の実写の割合・動き・冒頭の画は、宣言（visuals.json）より測定を優先する
+  - Claude は contact sheet を見て `input/visual-review.json` を書く：`mp4Sha256`（違う MP4 なら使わない）・`judgments`（thumbStopping・visualImpact・understandableWithoutAudio・looksLikeSlidesOrCheapDiagram・looksAiGeneric）・strengths・weaknesses・strongestFrame・weakestFrame・visualImpactAssessment
+  - visual-review.json がなくても、フレームの測定から目視の点の目安を出して判定が確定する（judgmentSource：claude-visual-review／frame-metrics）
+  - 根拠は試行ごとに `metrics.visualStrength.evidence`（sampledFrames・realFootageRatio・diagramRatio・cardRatio・motionEvidence・repeatedVisualPatterns・strongestFrame・weakestFrame・strengths・weaknesses・visualImpactAssessment）
+- **人の `--review` は任意**（採点には使わない）：`{ humanFeedback, visualVerdict: "strong"|"weak", visual: {...} }` を渡すと、機械の判定との一致／ズレ（`humanComparison`）を記録し、content-ops の学習データに入る
+- 参考採点（2026-11-20）：中野 20・fail（visualStrength 0）、10式戦車 63・fail（visualStrength 25）。どちらも人の評価（弱い）と一致
 - `quality-check --reference [--out=<file>]`：採点のルールを変えた後に、過去の動画を参考採点する（記録しない・試行に数えない）。content-ops の `production record-quality --reference=` に渡す
 
 **映像制作の原則**（制作依頼の `qualityRules.principles` にも入る）：テキストカードだけ・模式図だけで構成しない／可能なら実物・公式素材・場所・物・車両・製品を見せる（その出来事の素材と動く映像を最優先で探す）／図解でも画面全体を単純なカードにしない（実写に重ねる・質感のある図）／同じデザインの画面を連続させない／「次の画を見たい」と思わせる／冒頭1〜3秒には一番強い画を置く

@@ -20,7 +20,8 @@ import { buildResult, writeResult } from "./lib/production/result.mjs";
 import { buildDraftScript, precheckScript } from "./lib/production/script.mjs";
 import { runContentOpsValidation } from "./lib/production/validate.mjs";
 import { checkVisuals, draftVisuals } from "./lib/production/visuals.mjs";
-import { appendAttempt, checkOnScreenTextRules, measureAudio, scoreQuality } from "./lib/production/quality.mjs";
+import { appendAttempt, checkOnScreenTextRules, compareHumanReview, measureAudio, scoreQuality } from "./lib/production/quality.mjs";
+import { analyzeVideo } from "./lib/production/frames.mjs";
 
 /** @param {string[]} argv */
 function parse(argv) {
@@ -51,6 +52,8 @@ const files = (/** @type {string} */ id) => {
     visuals: path.join(dir, "input", "visuals.json"),
     validation: path.join(dir, "input", "production-validation.json"),
     quality: path.join(dir, "input", "quality-check.json"),
+    visualReview: path.join(dir, "input", "visual-review.json"),
+    reviewFrames: path.join(dir, "intermediate", "review-frames"),
     timeline: path.join(dir, "audio", "timeline.json"),
     mp4: path.join(dir, "output", `${id}.mp4`),
   };
@@ -158,24 +161,46 @@ const COMMANDS = {
     return ok ? 0 : 1;
   },
   /** 公開前の品質チェック（完成MP4の後・公開の前）。fail なら公開に進めない。最大3回まで自動修正、超えたら人の確認。 */
+  // 完成MP4のフレームを抜き出す（Claude の目視用の contact sheet と、映像の測定）。人の入力は要らない
+  frames(o) {
+    const id = req(o, "project");
+    const f = files(id);
+    if (!fs.existsSync(f.mp4)) throw new HandoffError(`${id}/output/${id}.mp4 がありません（encode の後）`);
+    const fr = analyzeVideo(f.mp4, readJson(f.timeline).duration, f.reviewFrames);
+    writeJson(path.join(f.reviewFrames, "frames.json"), { mp4Sha256: sha(f.mp4), ...fr });
+    console.log(`抜き出し ${fr.times.length} 枚（${fr.times.join("・")} 秒）→ ${path.relative(process.cwd(), fr.contactSheet ?? f.reviewFrames)}`);
+    console.log(`実写らしい画面 ${Math.round(fr.realFootageRatio * 100)}%・冒頭3秒の実写 ${Math.round(fr.openingPhotoLike * 100)}%・動く映像 ${fr.motionEvidence.movingFrames}/${fr.motionEvidence.measured}・似た平らな画面の連続 ${fr.repeatedVisualPatterns.length} か所`);
+    console.log(`次：Claude が contact sheet を見て ${id}/input/visual-review.json を書く（mp4Sha256: ${sha(f.mp4)}）→ quality-check`);
+    return 0;
+  },
   "quality-check"(o) {
     const id = req(o, "project");
     const f = files(id);
     for (const [p, what] of [[f.script, "input/script.json"], [f.timeline, "audio/timeline.json（ナレーションの後）"], [f.visuals, "input/visuals.json"]]) if (!fs.existsSync(p)) throw new HandoffError(`${id}/${what} がありません`);
+    // 通常運用：フレームの自動抽出・測定 → Claude の目視の判断（input/visual-review.json、同じ MP4 のときだけ）→ 採点。人の --review は任意（ズレの学習用）
+    const timeline = readJson(f.timeline);
+    const frames = fs.existsSync(f.mp4) ? analyzeVideo(f.mp4, timeline.duration, f.reviewFrames) : null;
+    let visualReview = fs.existsSync(f.visualReview) ? readJson(f.visualReview) : null;
+    if (visualReview && fs.existsSync(f.mp4) && visualReview.mp4Sha256 !== sha(f.mp4)) {
+      console.log("  ※ visual-review.json は別の MP4 を見た判断なので使いません（フレームの測定で採点します）");
+      visualReview = null;
+    }
     const review = o.review ? readJson(o.review) : null;
-    const q = scoreQuality({ script: readJson(f.script), timeline: readJson(f.timeline), visuals: readJson(f.visuals), audio: measureAudio(f.mp4), review });
+    const q = scoreQuality({ script: readJson(f.script), timeline, visuals: readJson(f.visuals), audio: measureAudio(f.mp4), visualReview, frames });
+    const humanComparison = compareHumanReview(q, review, visualReview);
     // --reference：今のルールでの参考点（記録しない・試行に数えない）。採点のルールを変えた後に、過去の動画を再評価するとき
     if (o.reference === "true") {
-      const out = { reference: true, rulesVersion: q.rulesVersion, checkedAt: new Date().toISOString(), gate: q.gate, overallQuality: q.overallQuality, weightedQuality: q.weightedQuality, overallCap: q.overallCap, scores: q.scores, blocking: q.blocking, findings: Object.fromEntries(Object.entries(q.metrics).map(([k, v]) => [k, v.findings])) };
+      const out = { reference: true, rulesVersion: q.rulesVersion, checkedAt: new Date().toISOString(), gate: q.gate, overallQuality: q.overallQuality, weightedQuality: q.weightedQuality, overallCap: q.overallCap, scores: q.scores, blocking: q.blocking, findings: Object.fromEntries(Object.entries(q.metrics).map(([k, v]) => [k, v.findings])), visualEvidence: q.metrics.visualStrength.evidence, humanComparison };
       if (o.out) writeJson(o.out, out);
       console.log(JSON.stringify(out, null, 2));
       return 0;
     }
-    const rec = appendAttempt(f.quality, { rulesVersion: q.rulesVersion, gate: q.gate, overallQuality: q.overallQuality, scores: q.scores, blocking: q.blocking, metrics: q.metrics, reviewNotes: review?.notes ?? [], reviewVisual: review?.visual ?? null, rules: q.rules, weights: q.weights });
+    const rec = appendAttempt(f.quality, { rulesVersion: q.rulesVersion, gate: q.gate, overallQuality: q.overallQuality, scores: q.scores, blocking: q.blocking, metrics: q.metrics, reviewNotes: [...(visualReview?.notes ?? []), ...(review?.notes ?? [])], visualEvidence: q.metrics.visualStrength.evidence, humanComparison, rules: q.rules, weights: q.weights });
     for (const [k, v] of Object.entries(q.metrics)) {
       console.log(`  ${String(v.score).padStart(3)} ${k}`);
       for (const x of v.findings) console.log(`        - ${x}`);
     }
+    console.log(`visualStrength の判断：${q.metrics.visualStrength.evidence?.judgmentSource}${humanComparison ? `・人の評価 ${humanComparison.humanVerdict ?? "-"} / 機械 ${humanComparison.machineVerdict}（一致 ${humanComparison.verdictAgrees}）` : ""}`);
     console.log(`overallQuality ${q.overallQuality}・QUALITY_GATE = ${q.gate}${q.blocking.length ? `（${q.blocking.join("・")}）` : ""}`);
     console.log(`試行 ${rec.latest.attempt}/${rec.maxAttempts}${rec.latest.escalation === "human-review" ? "・上限に達したので人の確認へ（公開しない）" : rec.latest.escalation === "auto-fix" ? "・修正して再レンダリング → quality-check をやり直す" : ""}`);
     return q.gate === "pass" ? 0 : 1;
