@@ -52,14 +52,26 @@ export function unknownNarration(u) {
   return `${t}。`;
 }
 
-/** 長いテロップを「、」で札に分ける。 @param {string} text */
+/** 14字を超える区切りを、真ん中に近い助詞の後ろで分ける（字幕1枚に長文を出さない）。 @param {string} p @returns {string[]} */
+function splitLong(p) {
+  if (p.length <= 14) return [p];
+  const mid = p.length / 2;
+  let best = -1;
+  for (const m of p.matchAll(/(?:で|が|を|は|に|と|へ|も|なら|て|の(?![うょ]))(?=[^、。」])|(?=「)/gu)) {
+    const at = (m.index ?? 0) + m[0].length;
+    if (at >= 4 && p.length - at >= 4 && (best < 0 || Math.abs(at - mid) < Math.abs(best - mid))) best = at;
+  }
+  return best < 0 ? [p] : [...splitLong(p.slice(0, best)), ...splitLong(p.slice(best))];
+}
+
+/** 長いテロップを「、」と助詞で札に分ける（1枚は短く）。 @param {string} text */
 export function splitCards(text) {
-  const parts = text.match(/[^、。]+[、。]?/gu) ?? [text];
+  const parts = (text.match(/[^、。]+[、。]?/gu) ?? [text]).flatMap(splitLong);
   /** @type {{ text: string }[]} */
   const cards = [];
   for (const p of parts) {
     const last = cards[cards.length - 1];
-    if (last && last.text.length + p.length <= 18 && !last.text.endsWith("。")) last.text += p;
+    if (last && last.text.length + p.length <= 12 && !last.text.endsWith("。")) last.text += p; // 字幕1枚は短く（長文を一度に出さない）
     else cards.push({ text: p });
   }
   return cards;
@@ -157,6 +169,7 @@ export function precheckScript(script, r) {
     }
     for (const x of s.attribution ?? []) if (!text.includes(x)) issues.push({ sentence: i, problem: `attribution「${x}」が本文にない` });
     if (s.kind === "fact") for (const core of unknownCores) if (text.includes(core)) issues.push({ sentence: i, problem: `分かっていないこと（${core}）を事実の文に書いている` });
+    for (const c of s.cards ?? []) if ((c.caption ?? c.text).replace(/[\s、。]/gu, "").length > 16) issues.push({ sentence: i, problem: `字幕が長い（「${c.caption ?? c.text}」。1枚16字まで・長文を一度に出さない）` });
   });
   return issues;
 }

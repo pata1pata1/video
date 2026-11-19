@@ -296,3 +296,71 @@ test("関所：制作を始めた後（content-ops が in-production に進め�
   fs.writeFileSync(f, JSON.stringify({ ...r, status: "in-production", handoff: { ...r.handoff, productionId: "someone-else" } }));
   assert.equal((await run(["gate", "--project=p-cont2"])).code, 1);
 });
+
+const quality = await import("../lib/production/quality.mjs");
+/** 字幕の並び（文ごと・画像ごと）から timeline を作る。 */
+function timelineOf(sentences) {
+  let t = 0;
+  const cards = [];
+  sentences.forEach((s, si) => s.cards.forEach((c) => {
+    const d = Math.max(1.0, c.text.length / 7.2);
+    cards.push({ sentence: si, text: c.text, image: c.image, start: t, end: t + d });
+    t += d;
+  }));
+  let img;
+  for (const c of cards) c.image = img = c.image ?? img;
+  return { duration: t, cards };
+}
+
+test("品質チェック：今回の失敗と同じ形（前置きの冒頭・長い静止画・長文カード・77秒・事務的な締め）は QUALITY_GATE = fail", { skip }, () => {
+  const s = { sentences: [
+    { kind: "hook", cards: [{ text: "東京・中野区の路上で", image: "01.png" }, { text: "女性が刃物で刺され死亡した事件で" }, { text: "警視庁は39歳の男を逮捕しました" }] },
+    { kind: "transition", cards: [{ text: "報道で分かっていることと" }, { text: "まだ分かっていないことを整理します" }] },
+    ...Array.from({ length: 10 }, (_, i) => ({ kind: "fact", factIds: [`f${i}`], cards: [{ text: "捜査関係者への取材によると、", image: i % 4 === 0 ? `0${2 + i / 4}.png` : undefined }, { text: "男は供述しているということです" }, { text: "警視庁は詳しく調べています" }] })),
+    { kind: "closing", cards: [{ text: "報道の出典は概要欄にまとめています" }] },
+  ] };
+  const visuals = { images: ["01.png", "02.png", "03.png", "04.png"].map((file) => ({ file, category: "text-card", onScreenText: ["捜査の段階", "容疑を強盗殺人に切り替え捜査書類を東京地検へ", "※11月18日の切り替えは共同通信による", "出典：NHK・共同通信"] })) };
+  const q = quality.scoreQuality({ script: s, timeline: timelineOf(s.sentences), visuals, audio: { lufs: -15.2, truePeak: -1.4, longSilences: 0 } });
+  assert.equal(q.gate, "fail");
+  assert.ok(q.scores.hookQuality < 50 && q.scores.visualPacing < 50 && q.scores.onScreenTextLoad < 30, JSON.stringify(q.scores));
+  assert.ok(q.metrics.onScreenTextLoad.findings.some((f) => f.includes("長文")), "長文カードを大きく減点");
+  assert.ok(q.metrics.retentionRisk.findings.some((f) => f.includes("事務的な締め")));
+  assert.equal(q.scores.audioQuality, 100, "音量は問題なし（それでも不合格）");
+});
+
+test("品質チェック：短い冒頭・3秒ごとの画の切り替え・短いキーワードの画面・45秒・問いで終わる動画は pass", { skip }, () => {
+  const sentences = [
+    { kind: "hook", factIds: ["arrest"], cards: [{ text: "なぜ男は刺したのか？", image: "01.jpg" }] },
+    { kind: "fact", factIds: ["incident"], cards: [{ text: "11月16日の夜", image: "02.jpg" }, { text: "中野区の路上で", image: "03.jpg" }] },
+    { kind: "fact", factIds: ["victim-age"], cards: [{ text: "24歳の女性が", image: "04.jpg" }, { text: "刺され死亡しました" }] },
+    { kind: "fact", factIds: ["arrest"], cards: [{ text: "警視庁は39歳の男を", image: "05.jpg" }, { text: "逮捕しました" }] },
+    { kind: "fact", factIds: ["charge-change"], cards: [{ text: "共同通信によると", image: "06.jpg" }, { text: "容疑を強盗殺人に" }, { text: "切り替えました", image: "07.jpg" }] },
+    { kind: "fact", factIds: ["statement"], cards: [{ text: "捜査関係者によると", image: "08.jpg" }, { text: "男は「付き合えないなら" }, { text: "殺して自分も死のう」と", image: "09.jpg" }, { text: "供述しています" }] },
+    { kind: "fact", factIds: ["police-view"], cards: [{ text: "警視庁は一方的な好意と", image: "10.jpg" }, { text: "みて調べています" }] },
+    { kind: "unknown", cards: [{ text: "動機はまだ", image: "11.jpg" }, { text: "確定していません" }] },
+    { kind: "fact", factIds: ["arrest"], cards: [{ text: "あなたはどう思いますか？", image: "12.jpg" }] },
+  ];
+  const cats = ["map-overview", "date-card", "city-street", "photo", "police-generic", "timeline-card", "icon", "diagram", "photo", "police-generic", "text-card", "photo"];
+  const visuals = { images: cats.map((category, i) => ({ file: `${String(i + 1).padStart(2, "0")}.jpg`, category, layout: i % 3 === 0 ? "full" : i % 3 === 1 ? "number" : "map", onScreenText: i % 2 ? ["39歳の男を逮捕"] : ["11月16日 夜"] })) };
+  const tl = timelineOf(sentences);
+  const q = quality.scoreQuality({ script: { sentences }, timeline: tl, visuals, audio: { lufs: -14.2, truePeak: -1.5, longSilences: 0 } });
+  assert.equal(q.gate, "pass", `${JSON.stringify(q.scores)} ${q.blocking.join(" / ")}`);
+  assert.ok(q.overallQuality >= 70);
+});
+
+test("画面の文字の決まり：onScreenText の登録が必須・長文（12字超）・要素3つ以上・計20字超は validate で止める", { skip }, () => {
+  assert.ok(quality.checkOnScreenTextRules({ images: [{ file: "a.png" }] }).some((x) => x.includes("onScreenText")));
+  assert.ok(quality.checkOnScreenTextRules({ images: [{ file: "a.png", onScreenText: ["容疑を強盗殺人に切り替え捜査書類を東京地検へ"] }] }).some((x) => x.includes("長文")));
+  assert.ok(quality.checkOnScreenTextRules({ images: [{ file: "a.png", onScreenText: ["逮捕", "警視庁", "39歳"] }] }).some((x) => x.includes("1画面1メッセージ")));
+  assert.deepEqual(quality.checkOnScreenTextRules({ images: [{ file: "a.png", onScreenText: ["39歳の男を逮捕"] }, { file: "b.png", onScreenText: [] }] }), []);
+});
+
+test("自動修正は最大3回。3回目も fail なら人の確認（human-review）", { skip }, () => {
+  const f = path.join(tmp, "quality-check.json");
+  const fail = { gate: "fail", overallQuality: 30, scores: {}, blocking: [], metrics: {}, reviewNotes: [] };
+  assert.equal(quality.appendAttempt(f, fail).latest.escalation, "auto-fix");
+  assert.equal(quality.appendAttempt(f, fail).latest.escalation, "auto-fix");
+  const third = quality.appendAttempt(f, fail);
+  assert.equal(third.latest.attempt, 3);
+  assert.equal(third.latest.escalation, "human-review");
+});

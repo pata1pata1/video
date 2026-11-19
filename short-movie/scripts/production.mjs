@@ -20,6 +20,7 @@ import { buildResult, writeResult } from "./lib/production/result.mjs";
 import { buildDraftScript, precheckScript } from "./lib/production/script.mjs";
 import { runContentOpsValidation } from "./lib/production/validate.mjs";
 import { checkVisuals, draftVisuals } from "./lib/production/visuals.mjs";
+import { appendAttempt, checkOnScreenTextRules, measureAudio, scoreQuality } from "./lib/production/quality.mjs";
 
 /** @param {string[]} argv */
 function parse(argv) {
@@ -49,6 +50,9 @@ const files = (/** @type {string} */ id) => {
     script: path.join(dir, "input", "script.json"),
     visuals: path.join(dir, "input", "visuals.json"),
     validation: path.join(dir, "input", "production-validation.json"),
+    quality: path.join(dir, "input", "quality-check.json"),
+    timeline: path.join(dir, "audio", "timeline.json"),
+    mp4: path.join(dir, "output", `${id}.mp4`),
   };
 };
 const readJson = (/** @type {string} */ f) => JSON.parse(fs.readFileSync(f, "utf8"));
@@ -126,7 +130,7 @@ const COMMANDS = {
     if (!fs.existsSync(f.script)) throw new HandoffError(`${id}/input/script.json がありません`);
     const script = readJson(f.script);
     const pre = precheckScript(script, r);
-    const vis = fs.existsSync(f.visuals) ? checkVisuals(script, readJson(f.visuals), r) : [`${id}/input/visuals.json がない（画像の種類を登録する）`];
+    const vis = fs.existsSync(f.visuals) ? [...checkVisuals(script, readJson(f.visuals), r), ...checkOnScreenTextRules(readJson(f.visuals))] : [`${id}/input/visuals.json がない（画像の種類を登録する）`];
     for (const p of pre) console.log(`  ✗ 事前確認（文 ${p.sentence}）${p.problem}`);
     for (const v of vis) console.log(`  ✗ 画像 ${v}`);
     const co = pre.length || vis.length ? null : runContentOpsValidation({ campaignId: link.campaignId, key: link.key, scriptPath: f.script });
@@ -153,11 +157,31 @@ const COMMANDS = {
     console.log(ok ? "関所：通過" : "関所：止める（VOICEVOX・字幕・レンダリングをしない）");
     return ok ? 0 : 1;
   },
+  /** 公開前の品質チェック（完成MP4の後・公開の前）。fail なら公開に進めない。最大3回まで自動修正、超えたら人の確認。 */
+  "quality-check"(o) {
+    const id = req(o, "project");
+    const f = files(id);
+    for (const [p, what] of [[f.script, "input/script.json"], [f.timeline, "audio/timeline.json（ナレーションの後）"], [f.visuals, "input/visuals.json"]]) if (!fs.existsSync(p)) throw new HandoffError(`${id}/${what} がありません`);
+    const q = scoreQuality({ script: readJson(f.script), timeline: readJson(f.timeline), visuals: readJson(f.visuals), audio: measureAudio(f.mp4) });
+    const review = o.review ? readJson(o.review) : null;
+    const rec = appendAttempt(f.quality, { gate: q.gate, overallQuality: q.overallQuality, scores: q.scores, blocking: q.blocking, metrics: q.metrics, reviewNotes: review?.notes ?? [], rules: q.rules, weights: q.weights });
+    for (const [k, v] of Object.entries(q.metrics)) {
+      console.log(`  ${String(v.score).padStart(3)} ${k}`);
+      for (const x of v.findings) console.log(`        - ${x}`);
+    }
+    console.log(`overallQuality ${q.overallQuality}・QUALITY_GATE = ${q.gate}${q.blocking.length ? `（${q.blocking.join("・")}）` : ""}`);
+    console.log(`試行 ${rec.latest.attempt}/${rec.maxAttempts}${rec.latest.escalation === "human-review" ? "・上限に達したので人の確認へ（公開しない）" : rec.latest.escalation === "auto-fix" ? "・修正して再レンダリング → quality-check をやり直す" : ""}`);
+    return q.gate === "pass" ? 0 : 1;
+  },
   result(o) {
     const id = req(o, "project");
     const { f } = linked(id);
     const v = fs.existsSync(f.validation) ? readJson(f.validation) : null;
     const r = buildResult(id, { renderStatus: req(o, "render-status"), startedAt: o["started-at"] ?? new Date().toISOString(), completedAt: o["completed-at"] ?? null, validationStatus: v?.status ?? null });
+    if (fs.existsSync(f.quality)) {
+      const q = readJson(f.quality).latest;
+      Object.assign(r, { qualityGate: q.gate, overallQuality: q.overallQuality, qualityAttempt: q.attempt, qualityEscalation: q.escalation });
+    }
     const out = writeResult(id, r);
     console.log(JSON.stringify(r, null, 2));
     console.log(`書きました：${out}（content-ops 側で npm run co -- production record-result --campaign=… --key=… --result=<このファイル>）`);

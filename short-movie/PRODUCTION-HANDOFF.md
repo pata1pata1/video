@@ -69,6 +69,17 @@ short-movie の今の形に、文ごとの3つを足す（template の cards.mjs
 - 使わない：被害者を想起させる女性の人物写真・容疑者を想起させる男性の人物写真・刃物のクローズアップ・血・刺傷の表現・遺体・犯行の再現・実際の被害者／容疑者の写真・特定できる事件現場の写真
 - 画像は news-short-top の決まり（上部の字幕帯 60〜300px を空ける）で作る
 
+## 公開前の品質チェック（QUALITY_GATE）
+
+完成MP4を作っただけでは公開に進めない。`node scripts/production.mjs quality-check --project=<id> [--review=<所見.json>]`（`scripts/lib/production/quality.mjs`）。
+
+- 採点（各100点）：hookQuality（冒頭3秒・10秒）・visualPacing（同じ画面の時間）・visualVariety（画の種類・レイアウト）・**onScreenTextLoad（画面に読ませる文字の量。長文カードは大きく減点）**・subtitleReadability・narrationPacing（尺・速さ・伝聞の言い回し）・audioQuality・informationDensity・retentionRisk → overallQuality（重み付き）
+- **fail**：overallQuality < 70、または重要4項目（hook・visualPacing・onScreenTextLoad・retentionRisk）のどれかが 50 未満、または他の項目が 40 未満
+- 機械で測れないこと（AI 生成感・素人っぽさ・声の単調さ）は `--review` の所見（notes）として記録に残す
+- 記録：`<id>/input/quality-check.json`（試行ごと）。content-ops で `production record-quality --quality=<このファイル>` に渡す。fail の間は content-ops が YouTube の upload 計画と published を止める
+- **自動修正ループ**：fail → 指摘（findings）と修正案（fixes）から台本・字幕・画面の構成を直す → validate → narration → render → encode → quality-check。**最大3回**。3回目も fail なら `human-review`（人の確認。公開しない）
+- `input/visuals.json` の各画像に `onScreenText`（画面に出す文字の一覧。文字なしは []）が必須。1要素12字・1画面2要素・計20字を超えると validate が止める
+
 ## content-ops へ返す結果
 
 `<id>/output/production-result.json`（Git 管理外）：`productionId`・`startedAt`・`completedAt`・`scriptPath`・`audioPath`・`subtitlePath`・`videoPath`・`durationSec`（timeline.json から）・`validationStatus`・`renderStatus`。content-ops 側で `npm run co -- production record-result --campaign=<id> --key=<key> --result=<このファイル>` に渡す（content-ops のファイルを video 側から直接書かない）。

@@ -43,7 +43,8 @@ export function draftVisuals(script, r) {
     for (const c of s.cards) {
       if (!c.image) continue;
       const category = s.kind === "hook" ? "abstract-news-bg" : s.kind === "unknown" ? "text-card" : s.kind === "closing" ? "chapter-title" : "text-card";
-      images.push({ file: c.image, category, description: `${sections[Math.min(si++, sections.length - 1)] ?? ""}：${SAFE_CATEGORIES[category]}`, showsIncidentLocation: false });
+      // 画面の文字は短いキーワード・数字・見出しだけ（1画面1メッセージ、12字まで）。台本の文章をそのまま出さない
+      images.push({ file: c.image, category, description: `${sections[Math.min(si++, sections.length - 1)] ?? ""}：${SAFE_CATEGORIES[category]}`, showsIncidentLocation: false, onScreenText: [] });
     }
   }
   return { policy: "news-crime-safe/1", images, rules: [...(r.creative.visualRules ?? [])], prohibited: Object.values(PROHIBITED_CATEGORIES) };

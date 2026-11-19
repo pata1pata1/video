@@ -1,0 +1,269 @@
+// @ts-check
+// 公開前の品質チェック（Pre-Publish Quality Gate）。完成MP4を作っただけでは公開に進めない。
+// 規則ベースの採点（0〜100）。基準は STYLE.md の成功サンプル（A001〜A003・N002）と、2026-11-19 の失敗例 nakano-20261119。
+//
+// 最重要方針：視聴者に文章を読ませない（動画は映像と音声で理解する媒体）。
+//   詳細はナレーションで言い、画面の文字は短いキーワード・数字・見出しだけ。1画面1メッセージ。長文カード・台本の文章をそのまま画面に出すのは禁止
+//
+// 機械で測れないもの（AI 生成感・素人っぽさ・声の単調さ）は reviewNotes に Claude／人の目視の所見として残す。
+
+import fs from "node:fs";
+import path from "node:path";
+import { spawnSync } from "node:child_process";
+
+/** 採点の基準（変えるときは STYLE.md・PRODUCTION-HANDOFF.md と合わせる）。 */
+export const QUALITY_RULES = {
+  /** ニュースショートの尺（秒）。成功サンプルは 23〜44 秒。 */
+  duration: { ideal: [30, 55], max: 65 },
+  /** 同じ画面を見せる時間（秒）。Shorts は数秒ごとに画が変わる。 */
+  visual: { avgMax: 4, staticMax: 6, imagesPerMinuteMin: 12 },
+  /** 画面の文字（画像の中の文字。字幕は別）。1画面1メッセージ・短いキーワード／数字／見出し。 */
+  onScreenText: { maxCharsPerElement: 12, maxElementsPerScreen: 2, maxCharsPerScreen: 20 },
+  /** 字幕（1枚）。最大2行・1行あたり約5〜12字。 */
+  subtitle: { maxChars: 16, minSec: 0.8, maxCharsPerSec: 9 },
+  /** ナレーションの速さ（字/秒）。 */
+  narration: { charsPerSec: [6.5, 8.5] },
+  /** 音量。 */
+  audio: { lufs: [-16, -12], truePeakMax: -1 },
+  /** 合格：overall がこれ以上、重要項目（hook・visualPacing・onScreenTextLoad・retentionRisk）がそれぞれ critical 以上、どの項目も floor 以上。 */
+  gate: { overall: 70, critical: 50, floor: 40 },
+  /** 自動修正の最大回数（超えたら人の確認）。 */
+  maxAttempts: 3,
+};
+
+export const QUALITY_WEIGHTS = {
+  hookQuality: 18,
+  visualPacing: 14,
+  visualVariety: 10,
+  onScreenTextLoad: 16,
+  subtitleReadability: 7,
+  narrationPacing: 12,
+  audioQuality: 5,
+  informationDensity: 6,
+  retentionRisk: 12,
+};
+const CRITICAL = ["hookQuality", "visualPacing", "onScreenTextLoad", "retentionRisk"];
+
+const clamp = (/** @type {number} */ n) => Math.max(0, Math.min(100, Math.round(n)));
+const META = /整理します|解説します|まとめます|見ていきます|紹介します|お伝えします|概要欄/u;
+const HEDGE = /によると|ということです|とみて|とされ|取材では/gu;
+const TEXT_ONLY = new Set(["text-card", "date-card", "timeline-card", "chapter-title"]);
+const RICH = new Set(["photo", "footage", "map-overview", "city-street", "night-city", "police-generic", "diagram", "icon"]);
+
+/** 台本・timeline・visuals から、画像の区間（同じ画面が続く時間）を出す。 @param {any} timeline */
+export function imageSegments(timeline) {
+  /** @type {{ image: string, start: number, end: number, cards: number }[]} */
+  const seg = [];
+  for (const c of timeline.cards) {
+    const last = seg[seg.length - 1];
+    if (!last || last.image !== c.image) seg.push({ image: c.image, start: c.start, end: c.end, cards: 1 });
+    else (last.end = c.end), last.cards++;
+  }
+  return seg;
+}
+
+/** MP4 の音量（ebur128）と長い無音。ffmpeg がなければ null。 @param {string} mp4 */
+export function measureAudio(mp4) {
+  if (!fs.existsSync(mp4)) return null;
+  const r = spawnSync("ffmpeg", ["-hide_banner", "-nostats", "-i", mp4, "-af", "ebur128=peak=true,silencedetect=n=-45dB:d=1.5", "-f", "null", "-"], { encoding: "utf8" });
+  const out = `${r.stderr ?? ""}`;
+  const lufs = Number(out.match(/Integrated loudness:[\s\S]*?I:\s+(-?[\d.]+) LUFS/)?.[1]);
+  const peak = Number(out.match(/True peak:[\s\S]*?Peak:\s+(-?[\d.]+) dBFS/)?.[1]);
+  const silences = (out.match(/silence_start/g) ?? []).length;
+  return { lufs: Number.isFinite(lufs) ? lufs : null, truePeak: Number.isFinite(peak) ? peak : null, longSilences: silences };
+}
+
+/**
+ * 採点。入力：script（kind・factIds つき）・timeline（audio/timeline.json）・visuals（images[].onScreenText 必須）・audio（measureAudio）。
+ * @param {{ script: any, timeline: any, visuals: any, audio: { lufs: number|null, truePeak: number|null, longSilences: number } | null }} i
+ */
+export function scoreQuality(i) {
+  const R = QUALITY_RULES;
+  const t = i.timeline;
+  const dur = t.duration;
+  const seg = imageSegments(t);
+  /** @type {Record<string, { score: number, findings: string[], fixes: string[] }>} */
+  const m = {};
+  const sentenceText = (/** @type {any} */ s) => s.cards.map((/** @type {any} */ c) => c.text).join("");
+
+  // ── hookQuality：最初の3秒・10秒 ──
+  {
+    const f = [], x = [];
+    let s = 100;
+    const first10 = t.cards.filter((/** @type {any} */ c) => c.start < 10).map((/** @type {any} */ c) => c.text).join("");
+    const firstCard = t.cards[0]?.text ?? "";
+    const firstSentenceEnd = Math.max(...t.cards.filter((/** @type {any} */ c) => c.sentence === 0).map((/** @type {any} */ c) => c.end));
+    if (META.test(first10)) (s -= 30), f.push(`最初の10秒に前置き（「${first10.match(META)?.[0]}」）がある。本題の前に離脱される`), x.push("前置き（整理します・解説します）を消し、一番の驚き・核心を最初の一言で言い切る");
+    if (/^(東京|大阪|[^、]{1,6}[都道府県市区町村]の|\d+月\d+日)/u.test(firstCard)) (s -= 15), f.push(`最初の字幕が場所・日付から始まる（「${firstCard}」）。何が起きたかが最初の1秒で分からない`), x.push("場所・日付は後回しにし、出来事の核心（誰が・何を）から入る");
+    if (firstSentenceEnd > 5) (s -= 15), f.push(`最初の1文が ${firstSentenceEnd.toFixed(1)} 秒と長い（3〜4秒で言い切る）`), x.push("最初の1文を3〜4秒（約25字以内）にする");
+    if (!seg[1] || seg[1].start > 3) (s -= 20), f.push(`最初の画面が ${(seg[1]?.start ?? dur).toFixed(1)} 秒間変わらない（3秒以内に画を変える）`), x.push("冒頭3秒の中で画面を1回以上変える（数字・キーワードのカット）");
+    if (!/[？?]|なぜ|実は|まさか|なんと/u.test(first10)) (s -= 10), f.push("冒頭に続きを見たくなる仕掛け（問い・意外性）がない"), x.push("冒頭に問いか意外な一点を入れる（報道にある事実の範囲で）");
+    m.hookQuality = { score: clamp(s), findings: f, fixes: x };
+  }
+
+  // ── visualPacing：同じ画面が続く時間 ──
+  {
+    const f = [], x = [];
+    const avg = dur / Math.max(1, seg.length);
+    const max = Math.max(...seg.map((g) => g.end - g.start));
+    const longest = seg.find((g) => g.end - g.start === max);
+    let s = 100 - Math.max(0, avg - R.visual.avgMax) * 8 - Math.max(0, max - R.visual.staticMax) * 3;
+    if (avg > R.visual.avgMax) f.push(`画面の切り替えが平均 ${avg.toFixed(1)} 秒に1回（目安 ${R.visual.avgMax} 秒以内）`);
+    if (max > R.visual.staticMax) f.push(`同じ画面が最長 ${max.toFixed(1)} 秒続く（${longest?.image}。目安 ${R.visual.staticMax} 秒以内）`);
+    if (f.length) x.push("1文ごと（2〜4秒）に画を変える。同じ画像を続けるならズーム先・切り抜きを変えて別カットにする");
+    m.visualPacing = { score: clamp(s), findings: f, fixes: x };
+  }
+
+  // ── visualVariety：画の種類 ──
+  {
+    const f = [], x = [];
+    const imgs = i.visuals?.images ?? [];
+    const perMin = (seg.length / dur) * 60;
+    const textOnly = imgs.filter((/** @type {any} */ v) => TEXT_ONLY.has(v.category)).length;
+    const rich = imgs.filter((/** @type {any} */ v) => RICH.has(v.category)).length;
+    const layouts = new Set(imgs.map((/** @type {any} */ v) => v.layout ?? "panel-text")).size;
+    let s = 100 - Math.max(0, R.visual.imagesPerMinuteMin - perMin) * 5;
+    if (perMin < R.visual.imagesPerMinuteMin) f.push(`画の数が1分あたり ${perMin.toFixed(1)} 枚（目安 ${R.visual.imagesPerMinuteMin} 枚以上）`);
+    if (imgs.length && textOnly / imgs.length > 0.4) (s -= 25), f.push(`文字だけの画面が ${textOnly}/${imgs.length} 枚`);
+    if (!imgs.some((/** @type {any} */ v) => ["photo", "footage", "map-overview", "diagram", "icon"].includes(v.category))) (s -= 20), f.push("写真・映像・地図・図・アイコンがない（文字と抽象背景だけ）");
+    if (layouts <= 1 && imgs.length > 3) (s -= 10), f.push("全画面が同じレイアウト（同じ枠・同じ配色）");
+    if (rich < imgs.length / 2) x.push("写真・映像・地図・図・アイコン・大きな数字で伝える。テキストカードは見出しだけに使う");
+    if (layouts <= 1) x.push("レイアウトを章ごとに変える（全面の画・数字の大写し・地図・比較）");
+    m.visualVariety = { score: clamp(s), findings: f, fixes: x };
+  }
+
+  // ── onScreenTextLoad：画面に読ませる文字の量（最重要方針） ──
+  {
+    const f = [], x = [];
+    const L = R.onScreenText;
+    let s = 100;
+    const narration = i.script.sentences.map(sentenceText).join("");
+    for (const v of i.visuals?.images ?? []) {
+      const els = Array.isArray(v.onScreenText) ? v.onScreenText : null;
+      if (!els) {
+        (s -= 25), f.push(`${v.file}：画面の文字（onScreenText）が登録されていない（文字量を確かめられない）`);
+        continue;
+      }
+      const total = els.reduce((/** @type {number} */ a, /** @type {string} */ e) => a + e.replace(/\s/g, "").length, 0);
+      const long = els.filter((/** @type {string} */ e) => e.replace(/\s/g, "").length > L.maxCharsPerElement);
+      const shown = seg.filter((g) => g.image === v.file).reduce((a, g) => a + g.end - g.start, 0);
+      if (total > L.maxCharsPerScreen) (s -= Math.min(30, (total - L.maxCharsPerScreen) * 1.5)), f.push(`${v.file}：画面の文字が ${total} 字（目安 ${L.maxCharsPerScreen} 字以内）`);
+      if (els.length > L.maxElementsPerScreen) (s -= 8), f.push(`${v.file}：文字の要素が ${els.length} 個（1画面1メッセージ。目安 ${L.maxElementsPerScreen} 個まで）`);
+      for (const e of long) (s -= 10), f.push(`${v.file}：長文の文字「${e}」（${e.length} 字。目安 ${L.maxCharsPerElement} 字以内）`);
+      for (const e of els) if (e.length >= 8 && narration.includes(e.replace(/[\s（）()]/g, ""))) (s -= 5), f.push(`${v.file}：ナレーションの文をそのまま画面に出している（「${e}」）`);
+      if (total > 0 && shown > 0 && total / 8 > shown) f.push(`${v.file}：文字を読むのに約 ${(total / 8).toFixed(1)} 秒かかるのに ${shown.toFixed(1)} 秒しか出ていない`);
+    }
+    if (f.length) x.push("画面は短いキーワード・数字・見出しだけ（例：ナレーション「警視庁は39歳の男を逮捕しました」→ 画面「39歳の男を逮捕」）。説明・出典・注記はナレーションか概要欄へ");
+    m.onScreenTextLoad = { score: clamp(s), findings: f, fixes: x };
+  }
+
+  // ── subtitleReadability：字幕 ──
+  {
+    const f = [], x = [];
+    let s = 100;
+    const S = R.subtitle;
+    const long = t.cards.filter((/** @type {any} */ c) => c.text.length > S.maxChars);
+    const fast = t.cards.filter((/** @type {any} */ c) => c.end - c.start < S.minSec || c.text.length / Math.max(0.1, c.end - c.start) > S.maxCharsPerSec);
+    if (long.length) (s -= long.length * 6), f.push(`${long.length} 枚の字幕が ${S.maxChars} 字を超える（最長 ${Math.max(...long.map((/** @type {any} */ c) => c.text.length))} 字。文字が小さくなる）`);
+    if (fast.length) (s -= fast.length * 3), f.push(`${fast.length} 枚の字幕が短時間で切り替わる・速すぎる`);
+    if (long.length) x.push(`字幕1枚は ${S.maxChars} 字以内（1行5〜12字×最大2行）。長文を一度に出さない`);
+    m.subtitleReadability = { score: clamp(s), findings: f, fixes: x };
+  }
+
+  // ── narrationPacing：尺・速さ・言い回し ──
+  {
+    const f = [], x = [];
+    let s = 100;
+    const chars = t.cards.reduce((/** @type {number} */ a, /** @type {any} */ c) => a + c.text.length, 0);
+    const cps = chars / dur;
+    const hedges = (i.script.sentences.map(sentenceText).join("").match(HEDGE) ?? []).length;
+    if (dur > R.duration.max) (s -= Math.min(40, (dur - R.duration.max) * 2.5)), f.push(`尺 ${dur.toFixed(1)} 秒（ニュースショートの目安 ${R.duration.ideal[0]}〜${R.duration.ideal[1]} 秒、上限 ${R.duration.max} 秒）`);
+    if (cps < R.narration.charsPerSec[0]) (s -= (R.narration.charsPerSec[0] - cps) * 15), f.push(`ナレーションが遅い（${cps.toFixed(1)} 字/秒。目安 ${R.narration.charsPerSec.join("〜")}）`);
+    if (hedges / (dur / 60) > 5) (s -= 10), f.push(`伝聞・出典の言い回しが1分に ${(hedges / (dur / 60)).toFixed(1)} 回（「〜によると」「〜ということです」）。テンポが落ちる`);
+    if (f.length) x.push("尺を40〜55秒に絞る（事実を厳選）。出典の明示は必要な文だけにまとめ、言い回しを短くする（例：「捜査関係者によると」）。声の速さは 1.2〜1.3 を試す");
+    m.narrationPacing = { score: clamp(s), findings: f, fixes: x };
+  }
+
+  // ── audioQuality ──
+  {
+    const f = [], x = [];
+    let s = 100;
+    const a = i.audio;
+    if (!a) (s = 60), f.push("音声を測れない（MP4 がない）");
+    else {
+      if (a.lufs !== null && (a.lufs < R.audio.lufs[0] || a.lufs > R.audio.lufs[1])) (s -= 15), f.push(`音量 ${a.lufs} LUFS（目安 ${R.audio.lufs.join("〜")}）`);
+      if (a.truePeak !== null && a.truePeak > R.audio.truePeakMax) (s -= 15), f.push(`ピーク ${a.truePeak} dBFS`);
+      if (a.longSilences) (s -= 10 * a.longSilences), f.push(`1.5秒以上の無音が ${a.longSilences} か所`);
+    }
+    if (f.length) x.push("音量・無音を直す");
+    m.audioQuality = { score: clamp(s), findings: f, fixes: x };
+  }
+
+  // ── informationDensity：中身の文の割合 ──
+  {
+    const f = [], x = [];
+    const ss = i.script.sentences;
+    const framing = ss.filter((/** @type {any} */ s) => ["transition", "closing"].includes(s.kind) || META.test(sentenceText(s))).length;
+    const facts = new Set(ss.flatMap((/** @type {any} */ s) => s.factIds ?? [])).size;
+    const perMin = facts / (dur / 60);
+    let s = 100 - Math.max(0, framing / ss.length - 0.15) * 200 - Math.max(0, 6 - perMin) * 6;
+    if (framing / ss.length > 0.15) f.push(`前置き・つなぎ・締めの文が ${framing}/${ss.length} 文`);
+    if (perMin < 6) f.push(`事実が1分あたり ${perMin.toFixed(1)} 個`);
+    if (f.length) x.push("つなぎ・前置きの文を減らし、1文1事実で進める");
+    m.informationDensity = { score: clamp(s), findings: f, fixes: x };
+  }
+
+  // ── retentionRisk（高いほど離脱しにくい） ──
+  {
+    const f = [], x = [];
+    let s = 100;
+    if (dur > R.duration.max) (s -= 20), f.push("尺が長い");
+    if (m.hookQuality.score < 60) (s -= 25), f.push("冒頭で引き込めない");
+    if (m.visualPacing.score < 50) (s -= 25), f.push("画面がほとんど変わらない");
+    if (m.onScreenTextLoad.score < 50) (s -= 15), f.push("画面の文字を読ませている");
+    const last = i.script.sentences[i.script.sentences.length - 1];
+    if (last && (last.kind === "closing" || META.test(sentenceText(last)))) (s -= 10), f.push(`最後が事務的な締め（「${sentenceText(last)}」）。最後まで見る理由・コメントする理由がない`);
+    if (f.length) x.push("最後は本題の一番強い一言か、視聴者への問いで終える（出典は概要欄にだけ書く）");
+    m.retentionRisk = { score: clamp(s), findings: f, fixes: x };
+  }
+
+  const w = /** @type {Record<string, number>} */ (QUALITY_WEIGHTS);
+  const overall = clamp(Object.keys(w).reduce((a, k) => a + w[k] * m[k].score, 0) / Object.values(w).reduce((a, b) => a + b, 0));
+  const G = R.gate;
+  /** @type {string[]} */
+  const blocking = [];
+  if (overall < G.overall) blocking.push(`overallQuality ${overall} < ${G.overall}`);
+  for (const k of CRITICAL) if (m[k].score < G.critical) blocking.push(`${k} ${m[k].score} < ${G.critical}（重要項目）`);
+  for (const [k, v] of Object.entries(m)) if (v.score < G.floor && !CRITICAL.includes(k)) blocking.push(`${k} ${v.score} < ${G.floor}`);
+  return { scores: Object.fromEntries(Object.entries(m).map(([k, v]) => [k, v.score])), overallQuality: overall, gate: blocking.length ? "fail" : "pass", blocking, metrics: m, rules: R, weights: QUALITY_WEIGHTS };
+}
+
+/** 画面の文字の決まり（画像を作る前・検証で使う）。 @param {any} visuals */
+export function checkOnScreenTextRules(visuals) {
+  const L = QUALITY_RULES.onScreenText;
+  /** @type {string[]} */
+  const issues = [];
+  for (const v of visuals?.images ?? []) {
+    if (!Array.isArray(v.onScreenText)) {
+      issues.push(`${v.file}：onScreenText（画面に出す文字の一覧。文字なしは []）がない`);
+      continue;
+    }
+    const total = v.onScreenText.reduce((/** @type {number} */ a, /** @type {string} */ e) => a + e.replace(/\s/g, "").length, 0);
+    if (v.onScreenText.length > L.maxElementsPerScreen) issues.push(`${v.file}：文字の要素 ${v.onScreenText.length} 個（1画面1メッセージ、${L.maxElementsPerScreen} 個まで）`);
+    if (total > L.maxCharsPerScreen) issues.push(`${v.file}：画面の文字 ${total} 字（${L.maxCharsPerScreen} 字まで）`);
+    for (const e of v.onScreenText) if (e.replace(/\s/g, "").length > L.maxCharsPerElement) issues.push(`${v.file}：長文「${e}」（${L.maxCharsPerElement} 字まで。説明はナレーションで）`);
+  }
+  return issues;
+}
+
+/** quality-check の記録（<id>/input/quality-check.json）を読む・足す。最大回数を超えたら人の確認へ。 @param {string} file */
+export function appendAttempt(file, result) {
+  const prev = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, "utf8")) : { attempts: [] };
+  const attempts = [...prev.attempts, { attempt: prev.attempts.length + 1, checkedAt: new Date().toISOString(), ...result }];
+  const last = attempts[attempts.length - 1];
+  const escalation = last.gate === "pass" ? null : attempts.length >= QUALITY_RULES.maxAttempts ? "human-review" : "auto-fix";
+  const rec = { maxAttempts: QUALITY_RULES.maxAttempts, attempts, latest: { attempt: last.attempt, gate: last.gate, overallQuality: last.overallQuality, scores: last.scores, escalation } };
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, `${JSON.stringify(rec, null, 2)}\n`);
+  return rec;
+}

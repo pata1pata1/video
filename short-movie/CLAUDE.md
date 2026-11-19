@@ -40,6 +40,8 @@
 - 依頼の status が ready で readyExpiresAt 内のときだけ本制作に進む。台本は allowedFacts だけから作り、文ごとに `kind`・`factIds`・`attribution` を付け、`production.mjs validate`（content-ops の validate-script を含む）を通す。fail ならナレーション・字幕・レンダリングをしない（依頼に紐付いた動画は sm.mjs の narration・render・encode の前に gate が自動で止める）
 - 事件ニュースの画像は `input/visuals.json` に種類つきで登録し、安全な種類だけを使う（人物写真・刃物・血・現場の特定をしない）
 - 結果は `<id>/output/production-result.json` を作り、content-ops 側で `production record-result` に渡す
+- **最重要：視聴者に文章を読ませない**（2026-11-19、ユーザー指定）。詳細はナレーション、画面は短いキーワード・数字・見出しだけ（1画面1メッセージ・長文カード禁止）。`STYLE.md` の同名の章と失敗例 N003（nakano-20261119）
+- 完成MP4の後、公開前に `production.mjs quality-check`（QUALITY_GATE）。fail は公開しない。自動修正は最大3回、超えたら人の確認
 
 ## 共通remotionとの関係（2026-10-30決定、恒久方針）
 - `../../remotion` を共通の動画制作エンジンとして使う（`../../remotion/docs/video-platform-architecture.md` の13章）。VOICEVOX・WAV・FFmpeg/ffprobe・音量・字幕・project管理・cleanup・書き出し基盤は remotion の core を使い、このフォルダで新しく独自実装しない。移行計画は `../../remotion/docs/video-migration-plan.md` の **Phase 3**
