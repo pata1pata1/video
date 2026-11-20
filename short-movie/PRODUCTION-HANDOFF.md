@@ -106,3 +106,11 @@ short-movie の今の形に、文ごとの3つを足す（template の cards.mjs
 ## テスト
 
 `node --test short-movie/scripts/test/production.test.mjs`（video で実行。依頼は一時ディレクトリの mock、検証は本物の content-ops CLI を読み取りだけで使う）。型チェック：`node ../../remotion/node_modules/typescript/bin/tsc -p scripts/tsconfig.json`（short-movie で実行）。
+
+## x-clip（X 動画＋ナレーション、2026-11-20）
+
+content-ops の依頼 `productionType: "x-clip"`（`targetTemplate: "x-clip-narration"`）も同じ consumer で読む。news-short との違い：
+- 題材の事実確認（allowedFacts・制作直前の再確認）はない。代わりに content-ops の `workflow.requiredInputs` の **source-video・source-rights（素材の利用確認）が provided** のときだけ ready（期限なし）。denied の依頼は blocked
+- `prepare-script` は使わない（台本は `templates/x-clip-narration/README.md` の型で書く）。`validate` は台本の形（clip・source.url・credit・文の at）を確かめ、content-ops で禁止表現・人名を調べる（画像の登録 visuals.json はない）
+- `quality-check` は clip-v1（`scripts/lib/production/clipQuality.mjs`）：素材の利用確認と出典は満点必須・冒頭1秒以内のタイトル・ナレーションは全体の6割まで（元の音を残す）・字幕16字・尺15〜60秒・音量 -16〜-12 LUFS
+- テスト：`node --test scripts/test/xclip.test.mjs`

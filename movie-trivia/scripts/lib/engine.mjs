@@ -27,3 +27,7 @@ const load = (rel) => import(pathToFileURL(path.join(REMOTION_ROOT, rel)).href);
 
 /** runMovieTriviaCli(argv) and loadVideo(files) of the movie-trivia video type. */
 export const movieTrivia = await load("src/video-types/movie-trivia/cli.mjs");
+/** content-ops の制作依頼を読む共通部品（依頼の読み取り・本制作に進めるか・content-ops の台本の検証）。2026-11-20 */
+export const productionRequest = await load("src/core/production-request/index.mjs");
+/** ffprobe・音量の測定（品質ゲートで使う）。 */
+export const media = await load("src/core/media/index.ts");

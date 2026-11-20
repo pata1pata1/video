@@ -30,6 +30,10 @@ YouTube向け解説・雑学動画（横1920×1080・30fps、VOICEVOXナレー�
 - 確認用の動画 `p01-preview`（2026-11-06、公開しない）：新 pattern-01 の見た目の確認用。2026-11-07 に削除した（ユーザー承認）。ライカの台本とベース動画（`image/` の提供素材）も同じ日に削除した
 - `bgm/パステルハウス.mp3` は残している（台本の`bgm`で指定すれば使える。クレジット「パステルハウス written by かずち」）
 
+## content-ops の制作依頼（news-long、2026-11-20）
+- content-ops の依頼（`productionType: news-long`・`targetTemplate: pattern-0N`）で作る動画は `scripts/production.mjs`（show・import・validate・gate・quality-check・result）。手順は `PRODUCTION-HANDOFF.md`。紐付いた動画は `mt.mjs` の narration・render・encode の前に関所（gate）を通る。品質ゲートは long-v1（`scripts/lib/production/quality.mjs`）
+- pattern-01 はユーザーの台本・ベース動画、pattern-02 は人物の実名・写真の承認が content-ops に記録されるまで依頼が awaiting-input（制作しない）
+
 ## 新しい動画の作り方（「pattern-0Nを使用。テーマは〇〇。動画IDは〇〇。」と言われたら。パターンの指定がないニュース・事件のテーマは pattern-03。「旺旺の動画と同じ感じで」・台本とベース動画をもらう動画は pattern-01で、手順は `patterns/pattern-01/README.md`：台本の文は変えず、2〜3は台本から事実を確かめる・画像を探す、に読み替える）
 1. `node scripts/mt.mjs new --project=<id> --pattern=pattern-0N`（動画フォルダ `<id>/`〈project.json・input/・audio/・assets/・intermediate/・output/〉と台本の雛形・図解ファイル・投稿メモを作り、`src/` をその動画に切り替える）
 2. テーマを一次情報で調べる（`common/production-rules.md`）。pattern-02 は人物の写真・名前の扱い（ユーザーに確認）と処分の有無、pattern-03 は確定判決の有無と実名・写真を使うか（ユーザーに確認）を最初に確かめる

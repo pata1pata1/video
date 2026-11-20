@@ -11,8 +11,21 @@ import path from "node:path";
 import { SHORT_MOVIE_ROOT } from "./paths.mjs";
 
 export const SUPPORTED_CONTRACT = "content-ops.production-request/1";
-/** この short-movie が受けられる制作の種類とテンプレート。 */
-export const SUPPORTED = { "news-short": { targetProject: "short-movie", targetTemplate: "news-short-top" } };
+/** この short-movie が受けられる制作の種類とテンプレート（x-clip は 2026-11-20 から）。 */
+export const SUPPORTED = {
+  "news-short": { targetProject: "short-movie", targetTemplate: "news-short-top" },
+  "x-clip": { targetProject: "short-movie", targetTemplate: "x-clip-narration" },
+};
+
+/** 依頼が題材の事実確認のある種類か（workflow がない古い依頼は news-short＝あり）。 @param {any} r */
+export const isFactual = (r) => r?.workflow?.factual !== false;
+
+/** 素材・確認・承認（content-ops の workflow）のうち、制作の前にそろっていないもの。 @param {any} r */
+export function pendingInputs(r) {
+  const w = r?.workflow;
+  if (!w) return [];
+  return [...(w.requiredInputs ?? []).filter((/** @type {any} */ i) => i.status !== "provided"), ...(w.approvals ?? []).filter((/** @type {any} */ a) => a.stage === "before-production" && a.status !== "approved")];
+}
 const KEBAB = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 export class HandoffError extends Error {}
@@ -70,10 +83,10 @@ export function contractIssues(r, campaignId, key) {
   if (v.voice?.engine !== "voicevox" || typeof v.voice?.speaker !== "number") issues.push("video.voice（voicevox・speaker）がない");
   const s = r.scriptRules ?? {};
   for (const k of ["allowedFacts", "prohibitedClaims", "attributionRequired", "unknownFacts", "safetyRules", "allowedNumbers"]) if (!Array.isArray(s[k])) issues.push(`scriptRules.${k} がない`);
-  if (Array.isArray(s.allowedFacts) && !s.allowedFacts.length) issues.push("scriptRules.allowedFacts が空");
+  if (isFactual(r) && Array.isArray(s.allowedFacts) && !s.allowedFacts.length) issues.push("scriptRules.allowedFacts が空");
   for (const f of s.allowedFacts ?? []) if (!f.id || !f.statement || !Array.isArray(f.sources)) issues.push(`allowedFacts の形が違う（${JSON.stringify(f).slice(0, 80)}）`);
   const c = r.creative ?? {};
-  if (typeof c.hook !== "string" || !Array.isArray(c.structure) || !c.structure.length) issues.push("creative（hook・structure）がない");
+  if (typeof c.hook !== "string" || !Array.isArray(c.structure) || (isFactual(r) && !c.structure.length)) issues.push("creative（hook・structure）がない");
   if (r.handoff?.readOnlySource !== true) issues.push("handoff.readOnlySource が true ではない");
   if (!r.factCheck || typeof r.factCheck.requiresRefreshBeforeProduction !== "boolean") issues.push("factCheck がない");
   return issues;
@@ -87,11 +100,18 @@ export function checkReadiness(r, now = new Date()) {
   /** @type {{ name: string, passed: boolean, reason: string }[]} */
   const checks = [];
   checks.push({ name: "status", passed: r.status === "ready", reason: `status ${r.status}（ready のときだけ制作を始める。prepared は content-ops の production check --refresh が先）` });
-  const exp = r.factCheck?.readyExpiresAt;
-  const expOk = typeof exp === "string" && now.getTime() <= Date.parse(exp);
-  checks.push({ name: "readyExpiresAt", passed: r.status === "ready" ? expOk : false, reason: exp ? `ready の期限 ${exp}${expOk ? "（有効）" : "（期限切れ。content-ops で production check をやり直す）"}` : "期限がない（制作直前の事実確認がまだ）" });
+  // 題材の事実確認がない種類（x-clip）は期限なし（素材の利用確認は inputs）
+  if (r.factCheck?.requiresRefreshBeforeProduction !== false) {
+    const exp = r.factCheck?.readyExpiresAt;
+    const expOk = typeof exp === "string" && now.getTime() <= Date.parse(exp);
+    checks.push({ name: "readyExpiresAt", passed: r.status === "ready" ? expOk : false, reason: exp ? `ready の期限 ${exp}${expOk ? "（有効）" : "（期限切れ。content-ops で production check をやり直す）"}` : "期限がない（制作直前の事実確認がまだ）" });
+  }
   if (r.factCheck?.requiresRefreshBeforeProduction) {
     checks.push({ name: "refresh", passed: !!r.factCheck.lastRefresh, reason: r.factCheck.lastRefresh ? `制作直前の事実確認 ${r.factCheck.lastRefresh.checkedAt}` : "制作直前の事実確認がまだ" });
+  }
+  if (r.workflow) {
+    const p = pendingInputs(r);
+    checks.push({ name: "inputs", passed: p.length === 0, reason: p.length ? `素材・確認・承認を待っている：${p.map((/** @type {any} */ x) => x.id).join("・")}` : "素材・確認・承認はそろっている" });
   }
   return { ready: checks.every((c) => c.passed), checks };
 }
@@ -107,9 +127,15 @@ export function checkContinuation(r, projectId, now = new Date()) {
   const checks = [];
   const mine = r.status === "in-production" && r.handoff?.productionId === projectId;
   checks.push({ name: "status", passed: r.status === "ready" || mine, reason: r.status === "in-production" ? `status in-production（制作 ${r.handoff?.productionId ?? "?"}${mine ? "＝この動画" : "。この動画ではない"}）` : `status ${r.status}（ready、またはこの動画の in-production のときだけ続ける）` });
-  const exp = r.factCheck?.readyExpiresAt;
-  const expOk = typeof exp === "string" && now.getTime() <= Date.parse(exp);
-  checks.push({ name: "readyExpiresAt", passed: expOk, reason: exp ? `ready の期限 ${exp}${expOk ? "（有効）" : "（期限切れ。content-ops で production check をやり直す）"}` : "期限がない（制作直前の事実確認がまだ）" });
+  if (r.factCheck?.requiresRefreshBeforeProduction !== false) {
+    const exp = r.factCheck?.readyExpiresAt;
+    const expOk = typeof exp === "string" && now.getTime() <= Date.parse(exp);
+    checks.push({ name: "readyExpiresAt", passed: expOk, reason: exp ? `ready の期限 ${exp}${expOk ? "（有効）" : "（期限切れ。content-ops で production check をやり直す）"}` : "期限がない（制作直前の事実確認がまだ）" });
+  }
   if (r.factCheck?.requiresRefreshBeforeProduction) checks.push({ name: "refresh", passed: !!r.factCheck.lastRefresh, reason: r.factCheck.lastRefresh ? `制作直前の事実確認 ${r.factCheck.lastRefresh.checkedAt}` : "制作直前の事実確認がまだ" });
+  if (r.workflow) {
+    const p = pendingInputs(r);
+    checks.push({ name: "inputs", passed: p.length === 0, reason: p.length ? `素材・確認・承認を待っている：${p.map((/** @type {any} */ x) => x.id).join("・")}` : "素材・確認・承認はそろっている" });
+  }
   return { ready: checks.every((c) => c.passed), checks };
 }

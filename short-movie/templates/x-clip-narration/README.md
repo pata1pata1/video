@@ -3,7 +3,7 @@
 Xに投稿された動画1本を主役の映像にして、元の音を残したまま要所だけ VOICEVOX のナレーションと字幕を入れる縦型ショート（2026-11-20 作成）。ユーザーのチャンネル @news_mt の過去のショート3本から学んだ型で、型は `../../STYLE.md` の「X動画＋ナレーション（@news_mt型）」。最初の検証サンプルは rappa-20261120（2026-11-20 公開・cleanup 済み。台本は Git の履歴、記録は content-ops の campaign `xclip-rappa-20261120`）。
 
 - `news-short-top`（画像＋ナレーション＋上部字幕）とは**別の制作パターン**。決まりを混ぜない
-- content-ops の自動運用（Topic Discovery・制作依頼）にはつないでいない。人が素材を選び、手で作る
+- content-ops の制作依頼 `x-clip`（2026-11-20）。素材の X 動画（source-video）と利用確認（source-rights）が content-ops に記録されて ready になった依頼だけ作る（`node scripts/production.mjs import`）。確認できない素材は blocked で、制作・公開しない。品質ゲートは `production.mjs quality-check`（clip-v1）。Topic Discovery の自動採用からは選ばない（素材の利用確認に人が要るため）
 
 ## 素材の利用確認（制作の前に必ず）
 他人のX動画を「Xに公開されているから自由に転載できる」とは扱わない。1本ごとに人が次を確かめてから制作・公開する（確かめる仕組みはまだない）

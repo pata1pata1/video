@@ -22,6 +22,32 @@ import { runContentOpsValidation } from "./lib/production/validate.mjs";
 import { checkVisuals, draftVisuals } from "./lib/production/visuals.mjs";
 import { appendAttempt, checkOnScreenTextRules, compareHumanReview, measureAudio, scoreQuality } from "./lib/production/quality.mjs";
 import { analyzeVideo } from "./lib/production/frames.mjs";
+import { CLIP_QUALITY_RULES, scoreClipQuality } from "./lib/production/clipQuality.mjs";
+
+/** x-clip-narration の台本の事前確認：テンプレート・素材の範囲（clip）・出典・文の開始秒（at）・字幕。 @param {any} script */
+export function precheckClipScript(script) {
+  /** @type {{ sentence: number, problem: string }[]} */
+  const issues = [];
+  if (script?.template !== "x-clip-narration") issues.push({ sentence: -1, problem: `template が ${script?.template}（x-clip-narration のはず）` });
+  const c = script?.clip ?? {};
+  if (!c.file || !(Number(c.end) > Number(c.start ?? 0))) issues.push({ sentence: -1, problem: "clip（file・start・end）がない" });
+  if (!/^https?:\/\//.test(String(script?.source?.url ?? ""))) issues.push({ sentence: -1, problem: "source.url（素材の投稿 URL）がない" });
+  if (!String(script?.credit ?? "").trim()) issues.push({ sentence: -1, problem: "credit（画面の出典表記）がない" });
+  let prev = -1;
+  (script?.sentences ?? []).forEach((/** @type {any} */ s, /** @type {number} */ i) => {
+    if (typeof s.at !== "number" || s.at < prev) issues.push({ sentence: i, problem: "at（文を始める秒）がない・順番になっていない" });
+    prev = typeof s.at === "number" ? s.at : prev;
+    if (!Array.isArray(s.cards) || !s.cards.length) issues.push({ sentence: i, problem: "cards がない" });
+  });
+  if (!(script?.sentences ?? []).length) issues.push({ sentence: -1, problem: "sentences がない" });
+  return issues;
+}
+
+/** 依頼の素材の利用確認（content-ops の workflow の source-rights）。 @param {any} r */
+const rightsOf = (r) => {
+  const i = (r.workflow?.requiredInputs ?? []).find((/** @type {any} */ x) => x.id === "source-rights");
+  return { confirmed: i?.status === "provided", note: i ? `${i.status}${i.by ? `・${i.by}` : ""}${i.note ? `・${i.note}` : ""}` : "依頼に利用確認の項目がない" };
+};
 
 /** @param {string[]} argv */
 function parse(argv) {
@@ -116,6 +142,7 @@ const COMMANDS = {
   "prepare-script"(o) {
     const id = req(o, "project");
     const { f, request: r } = linked(id);
+    if (r.productionType !== "news-short") throw new HandoffError(`prepare-script は news-short（news-short-top）だけです。${r.productionType} の台本は templates/${r.targetTemplate}/README.md の型で書く`);
     const rd = checkReadiness(r);
     printChecks(rd.checks);
     if (!rd.ready) throw new HandoffError("本制作に進めないので台本を作りません");
@@ -132,8 +159,10 @@ const COMMANDS = {
     const { f, link, request: r } = linked(id);
     if (!fs.existsSync(f.script)) throw new HandoffError(`${id}/input/script.json がありません`);
     const script = readJson(f.script);
-    const pre = precheckScript(script, r);
-    const vis = fs.existsSync(f.visuals) ? [...checkVisuals(script, readJson(f.visuals), r), ...checkOnScreenTextRules(readJson(f.visuals))] : [`${id}/input/visuals.json がない（画像の種類を登録する）`];
+    const clip = r.productionType === "x-clip";
+    // x-clip：素材の X 動画が主役なので、画像の登録（visuals.json）はない。台本の形・出典を確かめ、content-ops で禁止表現・人名を調べる
+    const pre = clip ? precheckClipScript(script) : precheckScript(script, r);
+    const vis = clip ? [] : fs.existsSync(f.visuals) ? [...checkVisuals(script, readJson(f.visuals), r), ...checkOnScreenTextRules(readJson(f.visuals))] : [`${id}/input/visuals.json がない（画像の種類を登録する）`];
     for (const p of pre) console.log(`  ✗ 事前確認（文 ${p.sentence}）${p.problem}`);
     for (const v of vis) console.log(`  ✗ 画像 ${v}`);
     const co = pre.length || vis.length ? null : runContentOpsValidation({ campaignId: link.campaignId, key: link.key, scriptPath: f.script });
@@ -176,6 +205,24 @@ const COMMANDS = {
   "quality-check"(o) {
     const id = req(o, "project");
     const f = files(id);
+    // x-clip-narration：clip-v1（素材の利用確認・出典・タイトル・元の音・字幕・尺・音量）
+    if (fs.existsSync(f.script) && readJson(f.script).template === "x-clip-narration") {
+      if (!fs.existsSync(f.timeline)) throw new HandoffError(`${id}/audio/timeline.json がありません（narration の後）`);
+      if (!fs.existsSync(f.mp4)) throw new HandoffError(`${id}/output/${id}.mp4 がありません（encode の後）`);
+      const { request: r } = linked(id);
+      const rights = rightsOf(r);
+      const audio = measureAudio(f.mp4);
+      const q = scoreClipQuality({ script: readJson(f.script), timeline: readJson(f.timeline), audio, mp4Duration: null, rightsConfirmed: rights.confirmed, rightsNote: rights.note });
+      for (const [k, v] of Object.entries(q.metrics)) {
+        console.log(`  ${String(v.score).padStart(3)} ${k}`);
+        for (const x of v.findings) console.log(`        - ${x}`);
+      }
+      console.log(`overallQuality ${q.overallQuality}・QUALITY_GATE = ${q.gate}${q.blocking.length ? `（${q.blocking.join("・")}）` : ""}`);
+      const visualReview = fs.existsSync(f.visualReview) ? readJson(f.visualReview) : null;
+      const rec = appendAttempt(o.out ?? f.quality, { rulesVersion: q.rulesVersion, gate: q.gate, overallQuality: q.overallQuality, scores: q.scores, blocking: q.blocking, metrics: q.metrics, reviewNotes: visualReview?.notes ?? [], visualEvidence: null, humanComparison: null, rules: CLIP_QUALITY_RULES });
+      console.log(`試行 ${rec.latest.attempt}/${rec.maxAttempts}${rec.latest.escalation === "human-review" ? "・上限に達したので人の確認へ（公開しない）" : rec.latest.escalation === "auto-fix" ? "・修正して再レンダリング → quality-check をやり直す" : ""}`);
+      return q.gate === "pass" ? 0 : 1;
+    }
     for (const [p, what] of [[f.script, "input/script.json"], [f.timeline, "audio/timeline.json（ナレーションの後）"], [f.visuals, "input/visuals.json"]]) if (!fs.existsSync(p)) throw new HandoffError(`${id}/${what} がありません`);
     // 通常運用：フレームの自動抽出・測定 → Claude の目視の判断（input/visual-review.json、同じ MP4 のときだけ）→ 採点。人の --review は任意（ズレの学習用）
     const timeline = readJson(f.timeline);
