@@ -1,7 +1,7 @@
 {
   "id": "__ID__",
   "pattern": "pattern-02",
-  "title": "（YouTubeタイトル・エンディングにも表示）",
+  "title": "（YouTubeタイトル。32字以内・結論か一番の驚きを先に。【】・誇張なし）",
   "titleTop": "（サムネイル・説明用の小見出し）",
   "titleMain": "（番組名に使う短いタイトル）",
   "titleSub": "（補足の一言）",
@@ -9,7 +9,7 @@
   "asOf": "（ヘッダー右。例：2026年11月16日時点）",
   "pronunciation": {},
   "media": {
-    "hook1": { "query": "（冒頭の映像の検索語・英語）" },
+    "hook1": { "query": "（冒頭の画：本人・現場・報道の写真や映像のキー。イメージ映像〈Pexels〉で始めない）" },
     "c1": { "query": "（第1章の映像）" }
   },
   "roster": [
@@ -20,9 +20,9 @@
       "id": "opening",
       "kind": "opening",
       "lines": [
-        { "id": "o1", "visual": { "footage": "hook1", "headline": { "title": "（見出し）", "sub": "（補足）" }, "ticker": "（速報テロップ）" }, "text": "（最新のできごと）" },
-        { "id": "o2", "visual": { "clear": true }, "text": "（何をまとめるか）" },
-        { "id": "o3", "visual": { "points": { "title": "この動画の注意", "items": ["逮捕は有罪の確定ではありません", "（中心人物）本人に容疑はありません"] } }, "text": "（注意書き）" }
+        { "id": "o1", "visual": { "footage": "hook1", "headline": { "title": "（見出し：最新のできごと）", "sub": "（補足）" } }, "text": "（フック：最新のできごとを1文で。最初の3秒）" },
+        { "id": "o2", "visual": { "clear": true }, "text": "（何をまとめるか、1文で）" },
+        { "id": "o3", "notice": true, "visual": { "points": { "title": "この動画の注意", "items": ["逮捕は有罪の確定ではありません", "（中心人物）本人に容疑はありません"] } }, "text": "（注意書き。30秒以内）" }
       ]
     },
     {

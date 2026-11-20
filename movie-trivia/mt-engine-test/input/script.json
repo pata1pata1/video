@@ -1,6 +1,9 @@
 {
   "id": "mt-engine-test",
   "pattern": "pattern-03",
+  "voice": { "speaker": 13, "speakerName": "青山龍星", "speedScale": 0.95 },
+  "timing": { "leadIn": 0.8, "linePause": 0.45, "scenePause": 1.2, "tailOut": 2.5 },
+  "fixtureNote": "回帰fixture：共通エンジンの比較用に、2026-11-20 の pattern-03 の改定（速さ 1.15・間の短縮）より前の声と間を固定する",
   "title": "共通エンジン移行テスト",
   "titleTop": "移行テスト",
   "titleMain": "エンジン移行テスト",

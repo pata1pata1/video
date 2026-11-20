@@ -4,12 +4,8 @@
   "speaker": 13,
   "speakerName": "青山龍星",
   "style": "ノーマル",
-  "speedScale": 1.05,
-  "timing": {
-    "leadIn": 0.6,
-    "linePause": 0.35,
-    "scenePause": 0.9,
-    "tailOut": 2
-  },
-  "credit": "VOICEVOX:青山龍星（エンディング画面と説明文に入れる）"
+  "speedScale": 1.15,
+  "timing": { "leadIn": 0.3, "linePause": 0.3, "scenePause": 0.8, "tailOut": 2 },
+  "credit": "VOICEVOX:青山龍星（エンディング画面と説明文に入れる）",
+  "tempoNote": "2026-11-20 改善 D：VOICEVOX で同じ文を合成して確認（青山龍星 1.15＝約5.8字/秒、四国めたん 1.20＝約6.1字/秒。品質ゲートの 5.5〜9.0 字/秒の中）。冒頭の無音 leadIn は 0.3 秒"
 }

@@ -1,12 +1,23 @@
 // @ts-check
-// 通常動画（movie-trivia の pattern）の公開前の品質ゲート（QUALITY_GATE、long-v1。2026-11-20）。
-// 縦型ショート（short-movie の quality-v2）とは別の基準：尺は pattern の目安、画を変える間隔は長め、章の構成・サムネイルを見る。
-// 「視聴者に文章を読ませない」「実写・この出来事の素材を優先」「冒頭で何の話かを示す」は共通の考え方。基準を下げて通さない。
+// 通常動画（movie-trivia の pattern）の公開前の品質ゲート（QUALITY_GATE）。
+// long-v1（2026-11-20）→ long-v2（2026-11-20、視聴維持率の分析に基づく改善 A〜F。content-ops proposals/news-mt-20261120-movie-trivia-retention.md）：
+//   過去の movie-trivia は 5〜15 秒で視聴者の多くが離れていた。冒頭 3 秒に一番強い題材そのものの画（イメージ映像・タイトル画面・前置きで始めない）、
+//   注意書きは省略せず早い位置（notice の文、既定 30 秒以内）、尺は pattern で固定せず制作依頼の目標（content-ops の production decide-format）で見る、
+//   タイトルは短く具体的に。
+// 縦型ショート（short-movie の quality-v2）とは別の基準：画を変える間隔は長め、章の構成・サムネイルを見る。基準を下げて通さない。
 // 入力：input/script.json・audio/narration.json・assets/asset-sources.json・output/<id>.mp4（音量）・output/thumbnail-*.png・patterns/<p>/config.json
-//       input/visual-review.json（任意：Claude が代表コマを見た判断。同じ MP4 のときだけ使う）
+//       制作依頼（任意：video.durationTargetSec・事件かどうか）・input/visual-review.json（任意：Claude が代表コマを見た判断。同じ MP4 のときだけ使う）
 
 export const LONG_QUALITY_RULES = {
-  version: "long-v1",
+  version: "long-v2",
+  /** 尺：制作依頼の目標（秒）からの許容。目標がないときは pattern の durationRangeSeconds（形として成り立つ範囲）だけを見る。 */
+  duration: { minRatio: 0.7, maxRatio: 1.4 },
+  /** 冒頭：最初の画とフック（秒）。 */
+  hook: { firstVisualWithinSec: 3, noStockFirstShot: true, noTitleScreenFirst: true },
+  /** 注意書き（line の notice: true）：この秒までに1回は言う。事件の動画で注意書きがないときも指摘する。 */
+  notice: { withinSec: 30 },
+  /** タイトル（script.title）の長さ（字）。 */
+  title: { maxChars: 32 },
   /** 画を変える間隔（秒）。横長の通常動画はショートより長くてよいが、同じ画を長く見せない。 */
   visual: { avgMax: 10, staticMax: 20 },
   /** 画面の文字（字幕は別）。キーワード・見出しだけ。 */
@@ -53,8 +64,22 @@ export function lineVisuals(script) {
   return out;
 }
 
+/** 尺の目安（秒）：制作依頼の目標 → pattern の durationRangeSeconds → 古い pattern の targetMinutes。 */
+export function durationBounds(/** @type {any} */ pattern, /** @type {any} */ target) {
+  const R = LONG_QUALITY_RULES.duration;
+  if (target && typeof target.target === "number" && target.target > 0) {
+    const lo = Math.round(target.target * R.minRatio);
+    const hi = Math.round(target.target * R.maxRatio);
+    return { lo, hi, label: `制作依頼の目標 ${target.target} 秒（${lo}〜${hi} 秒）` };
+  }
+  const st = pattern?.structure ?? {};
+  if (Array.isArray(st.durationRangeSeconds)) return { lo: st.durationRangeSeconds[0], hi: st.durationRangeSeconds[1], label: `pattern の範囲 ${st.durationRangeSeconds[0]}〜${st.durationRangeSeconds[1]} 秒（目標は制作依頼で決める）` };
+  const tm = st.targetMinutes ?? [5, 10];
+  return { lo: tm[0] * 60, hi: tm[1] * 60, label: `pattern の目安 ${tm[0]}〜${tm[1]} 分` };
+}
+
 /**
- * @param {{ script: any, narration: any, ledger: Record<string, any>, pattern: any, audio: { integratedLufs: number, truePeakDb: number } | null, mp4Duration: number | null, thumbnails: string[], visualReview: any }} i
+ * @param {{ script: any, narration: any, ledger: Record<string, any>, pattern: any, audio: { integratedLufs: number, truePeakDb: number } | null, mp4Duration: number | null, thumbnails: string[], visualReview: any, durationTarget?: { min: number, max: number, target: number } | null, crime?: boolean }} i
  */
 export function scoreLongQuality(i) {
   const R = LONG_QUALITY_RULES;
@@ -66,28 +91,33 @@ export function scoreLongQuality(i) {
   const visOf = new Map(vis.map((v) => [v.lineId, v]));
   const scriptLines = new Map((i.script.scenes ?? []).flatMap((/** @type {any} */ sc) => (sc.lines ?? []).map((/** @type {any} */ l) => [l.id, l])));
 
-  // 尺：pattern の目安
+  // 尺：制作依頼の目標（題材ごとに Claude が決めた長さ）。目標がなければ pattern の範囲
   {
-    const tm = i.pattern?.structure?.targetMinutes ?? [5, 10];
-    const [lo, hi] = [tm[0] * 60, tm[1] * 60];
+    const b = durationBounds(i.pattern, i.durationTarget);
     const f = [];
     let s = 100;
-    if (dur < lo) (s = 100 - ((lo - dur) / lo) * 150), f.push(`${Math.round(dur)}秒で pattern の目安（${tm[0]}〜${tm[1]}分）より短い`);
-    else if (dur > hi) (s = 100 - ((dur - hi) / hi) * 200), f.push(`${Math.round(dur)}秒で pattern の目安（${tm[0]}〜${tm[1]}分）より長い`);
-    m.duration = { score: clamp(s), findings: f, fixes: f.length ? [dur < lo ? "確認済みの事実を文として足す（推測で埋めない）" : "重複・前置きを削る"] : [] };
+    if (dur < b.lo) (s = 100 - ((b.lo - dur) / b.lo) * 150), f.push(`${Math.round(dur)}秒で ${b.label} より短い`);
+    else if (dur > b.hi) (s = 100 - ((dur - b.hi) / b.hi) * 200), f.push(`${Math.round(dur)}秒で ${b.label} より長い`);
+    m.duration = { score: clamp(s), findings: f, fixes: f.length ? [dur < b.lo ? "長さの判断を見直す（content-ops の production decide-format）。事実を水増しして伸ばさない" : "重複・前置きを削る"] : [] };
   }
-  // 冒頭
+  // 冒頭（A・E：最初の 3 秒に題材そのものの一番強い画。タイトル画面・イメージ映像・前置きで始めない）
   {
     const f = [];
     let s = 100;
     const opening = (i.narration?.scenes ?? []).find((/** @type {any} */ x) => x.id === "opening") ?? i.narration?.scenes?.[0];
     const first = vis[0];
     if (!first || (first.kind !== "footage" && first.kind !== "photo")) (s -= 40), f.push("最初の画が実際の映像・写真ではない（文字・図で始まる）");
+    const firstSrc = first?.key ? i.ledger?.[first.key] : null;
+    if (R.hook.noStockFirstShot && firstSrc && firstSrc.provider === "pexels") (s -= 30), f.push(`最初の画がイメージ映像（${first?.key}・Pexels）。題材そのものの映像・写真で始める`);
+    const firstLine = scriptLines.get(first?.lineId);
+    if (R.hook.noTitleScreenFirst && firstLine?.visual?.title) (s -= 20), f.push("タイトル画面から始まる（タイトルはフックの後か画面の帯で）");
+    const firstStart = lines[0]?.start;
+    if (typeof firstStart === "number" && firstStart > R.hook.firstVisualWithinSec) (s -= 15), f.push(`最初の言葉まで ${firstStart.toFixed(1)} 秒（${R.hook.firstVisualWithinSec} 秒以内）`);
     const os = i.pattern?.structure?.openingSeconds;
     if (opening && typeof os === "number" && opening.end - opening.start > os * R.opening.maxRatio) (s -= 25), f.push(`冒頭が ${Math.round(opening.end - opening.start)} 秒（pattern の目安 ${os} 秒の ${R.opening.maxRatio} 倍まで）`);
-    const firstText = scriptLines.get(vis[0]?.lineId)?.text ?? "";
+    const firstText = firstLine?.text ?? "";
     if (META.test(firstText)) (s -= 25), f.push(`1文目が前置き（「${firstText.slice(0, 20)}…」）`);
-    m.hookQuality = { score: clamp(s), findings: f, fixes: f.length ? ["冒頭はこの出来事の一番強い映像・写真で、何の話かを言い切る"] : [] };
+    m.hookQuality = { score: clamp(s), findings: f, fixes: f.length ? ["冒頭 3 秒はこの出来事の一番強い映像・写真と結論の1文。タイトル画面・イメージ映像・「今回は〜」で始めない"] : [] };
   }
   // 画を変える間隔（同じ画を続ける文はまとめる）
   {
@@ -181,7 +211,15 @@ export function scoreLongQuality(i) {
     if (chapters < 2) (s -= 30), f.push(`章が ${chapters} つ（通常動画は2つ以上）`);
     if (!(i.script.scenes ?? []).some((/** @type {any} */ x) => x.kind === "ending")) (s -= 20), f.push("締め（ending）がない");
     if (!i.thumbnails.length) (s -= 30), f.push("サムネイルがない（mt.mjs thumbnails）");
-    m.structure = { score: clamp(s), findings: f, fixes: f.length ? ["pattern の構成（opening・chapter × N・ending）とサムネイルをそろえる"] : [] };
+    // B：注意書き（逮捕は有罪ではない・容疑段階など）は省略せず、誤解されない早い位置で（line の notice: true）
+    const noticeIds = (i.script.scenes ?? []).flatMap((/** @type {any} */ sc) => (sc.lines ?? []).filter((/** @type {any} */ l) => l.notice).map((/** @type {any} */ l) => l.id));
+    const noticeStart = lines.find((/** @type {any} */ l) => noticeIds.includes(l.id))?.start;
+    if (noticeIds.length && typeof noticeStart === "number" && noticeStart > R.notice.withinSec) (s -= 20), f.push(`注意書きの最初が ${Math.round(noticeStart)} 秒（${R.notice.withinSec} 秒以内に1回は言う）`);
+    if (i.crime && !noticeIds.length) (s -= 20), f.push("事件の動画に注意書きの文（notice: true）がない（容疑段階・判決の確定の有無などを言う）");
+    // F：タイトルは短く具体的に
+    const title = String(i.script.title ?? "");
+    if (len(title) > R.title.maxChars) (s -= 10), f.push(`タイトルが ${len(title)} 字（${R.title.maxChars} 字まで。結論か一番の驚きを先に）`);
+    m.structure = { score: clamp(s), findings: f, fixes: f.length ? ["pattern の構成（opening・chapter × N・ending）・注意書きの位置・タイトルの長さ・サムネイルをそろえる"] : [] };
   }
 
   const W = LONG_QUALITY_WEIGHTS;

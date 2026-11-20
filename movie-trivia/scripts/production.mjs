@@ -1,14 +1,14 @@
 // @ts-check
 // content-ops の制作依頼（production request、news-long）を読んで、movie-trivia の既存の制作コマンド（scripts/mt.mjs）で通常動画を作るための consumer（2026-11-20）。
 // 依頼は content-ops の campaign にあり、ここでは読むだけ（コピー・書き換えをしない）。共通部分（依頼の読み取り・本制作に進めるか・content-ops の台本の検証・
-// 品質の記録の形）は共通remotionの src/core/production-request（scripts/lib/engine.mjs 経由）。movie-trivia 固有は台本の形と品質ゲート（long-v1）。
+// 品質の記録の形）は共通remotionの src/core/production-request（scripts/lib/engine.mjs 経由）。movie-trivia 固有は台本の形と品質ゲート（long-v2）。
 // 説明：PRODUCTION-HANDOFF.md（契約は ../../content-ops/docs/production-handoff.md）
 //
 //   node scripts/production.mjs show --campaign=<id> [--key=main] [--json]          依頼の中身と、本制作に進めるか
 //   node scripts/production.mjs import --campaign=<id> [--key=main] --project=<id>    ready なら動画フォルダに紐付け（<id>/input/production.json。依頼のコピーは作らない）
 //   node scripts/production.mjs validate --project=<id>                             台本の事前確認（文ごとの kind・factIds・pattern）→ content-ops の production validate-script
 //   node scripts/production.mjs gate --project=<id>                                 ナレーション・書き出しの前の関所（mt.mjs が自動で呼ぶ）
-//   node scripts/production.mjs quality-check --project=<id> [--out=<file>]         公開前の品質ゲート（long-v1）。input/quality-check.json に試行を足す
+//   node scripts/production.mjs quality-check --project=<id> [--out=<file>]         公開前の品質ゲート（long-v2）。input/quality-check.json に試行を足す
 //   node scripts/production.mjs result --project=<id> --render-status=started|rendered|failed|published [--started-at=] [--completed-at=]
 //                                                                                    content-ops へ返す結果（output/production-result.json）
 
@@ -102,8 +102,9 @@ const COMMANDS = {
     }
     const rd = pr.checkReadiness(r);
     console.log(`${path.relative(pr.contentOpsRoot(), file)}（${r.contractVersion}・読み取り専用）`);
-    console.log(`制作      : ${r.productionType} → movie-trivia/patterns/${r.targetTemplate}・${r.video.width}×${r.video.height}・${r.video.fps}fps・${Math.round(r.video.durationTargetSec.min / 60)}〜${Math.round(r.video.durationTargetSec.max / 60)}分`);
+    console.log(`制作      : ${r.productionType} → movie-trivia/patterns/${r.targetTemplate}・${r.video.width}×${r.video.height}・${r.video.fps}fps・尺の目標 ${r.video.durationTargetSec.target} 秒（${r.video.durationTargetSec.min}〜${r.video.durationTargetSec.max} 秒。題材ごとの判断）`);
     console.log(`声        : ${r.video.voice.name}（speaker ${r.video.voice.speaker}・speedScale ${r.video.voice.speedScale}）`);
+    if (r.scriptRules.noticeRequired) console.log("注意書き  : 必要（事件。容疑段階・判決の確定の有無などを、冒頭のフックの直後〈30 秒以内〉に notice: true の文で言う）");
     console.log(`事実      : allowedFacts ${r.scriptRules.allowedFacts.length}・出典の明示が要る ${r.scriptRules.attributionRequired.length}・禁止表現 ${r.scriptRules.prohibitedClaims.length}・分かっていない ${r.scriptRules.unknownFacts.length}・人名 ${r.scriptRules.noPersonNames ? "出さない" : "承認済み"}`);
     for (const f of r.scriptRules.allowedFacts) console.log(`  [${f.id}] ${f.statement}${f.attribution ? `  ※「${f.attribution.phrases.join("」か「")}」` : ""}`);
     for (const i of r.workflow?.requiredInputs ?? []) console.log(`素材      : ${i.status === "provided" ? "✓" : "…"} ${i.id}（${i.label}）`);
@@ -170,7 +171,15 @@ const COMMANDS = {
     }
     const loud = await media.measureLoudness(f.mp4);
     const thumbnails = fs.existsSync(f.output) ? fs.readdirSync(f.output).filter((x) => /^thumbnail-.+\.png$/.test(x)) : [];
-    const q = scoreLongQuality({ script, narration: readJson(f.narration), ledger: fs.existsSync(f.ledger) ? readJson(f.ledger) : {}, pattern: readJson(patternFile), audio: { integratedLufs: loud.integratedLufs, truePeakDb: loud.truePeakDb }, mp4Duration: await media.getDuration(f.mp4), thumbnails, visualReview });
+    // 制作依頼（content-ops）があれば、題材ごとに決めた尺の目標と注意書きの要否を使う（long-v2）。依頼のない動画は pattern の範囲だけ
+    /** @type {any} */
+    let request = null;
+    try {
+      request = linked(id).request;
+    } catch {
+      request = null;
+    }
+    const q = scoreLongQuality({ script, narration: readJson(f.narration), ledger: fs.existsSync(f.ledger) ? readJson(f.ledger) : {}, pattern: readJson(patternFile), audio: { integratedLufs: loud.integratedLufs, truePeakDb: loud.truePeakDb }, mp4Duration: await media.getDuration(f.mp4), thumbnails, visualReview, durationTarget: request?.video?.durationTargetSec ?? null, crime: request?.scriptRules?.noticeRequired === true });
     for (const [k, v] of Object.entries(q.metrics)) {
       console.log(`  ${String(v.score).padStart(3)} ${k}`);
       for (const x of v.findings) console.log(`        - ${x}`);

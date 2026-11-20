@@ -130,3 +130,55 @@ test("台本の事前確認：pattern が依頼どおり・文ごとに kind と
   assert.ok(bad.some((p) => p.includes("factIds がない")));
   assert.ok(bad.some((p) => p.includes("zz")));
 });
+
+test("品質ゲート long-v2（2026-11-20、改善 A〜F）：冒頭 3 秒・イメージ映像・タイトル画面・注意書きの位置・タイトルの長さ・依頼の尺の目標", async () => {
+  const { scoreLongQuality, durationBounds, LONG_QUALITY_RULES } = await import("../lib/production/quality.mjs");
+  assert.equal(LONG_QUALITY_RULES.version, "long-v2");
+  const narr = (/** @type {number} */ first, /** @type {string[]} */ ids, /** @type {number} */ step) => ({ durationSeconds: first + ids.length * step, scenes: [{ id: "opening", start: first, end: first + 2 * step }], lines: ids.map((id, n) => ({ id, start: first + n * step, end: first + (n + 1) * step })) });
+  const ids = ["o1", "o2", "o3", "c1a", "c1b", "c2a", "c2b", "e1"];
+  const base = (/** @type {any} */ over = {}) => ({
+    id: "x", pattern: "pattern-03", title: over.title ?? "逮捕の男、15年逃げた理由",
+    scenes: [
+      { id: "opening", kind: "opening", lines: [{ id: "o1", visual: over.firstVisual ?? { footage: "real" }, text: "15年、見つからなかった男が逮捕されました。" }, { id: "o2", notice: over.noticeAt === "o2" || undefined, text: "逮捕は、有罪の確定ではありません。" }] },
+      { id: "c1", kind: "chapter", lines: [{ id: "o3", text: "始まりは一本の電話でした。" }, { id: "c1a", visual: { photo: "doc" }, text: "資料には。" }, { id: "c1b", text: "こうありました。" }] },
+      { id: "c2", kind: "chapter", lines: [{ id: "c2a", visual: { footage: "real" }, notice: over.noticeAt === "c2a" || undefined, text: "容疑を否認しています。" }, { id: "c2b", text: "捜査は続いています。" }] },
+      { id: "e", kind: "ending", lines: [{ id: "e1", text: "どう考えますか。" }] },
+    ],
+  });
+  const ledger = { real: { provider: "commons", mediaType: "video" }, stock: { provider: "pexels", mediaType: "video" }, doc: { provider: "official", mediaType: "photo" } };
+  const pattern = JSON.parse(fs.readFileSync(path.join(MT, "patterns", "pattern-03", "config.json"), "utf8"));
+  const run = (/** @type {any} */ script, /** @type {any} */ o = {}) => scoreLongQuality({ script, narration: narr(o.first ?? 0.3, ids, o.step ?? 8), ledger, pattern, audio: { integratedLufs: -16, truePeakDb: -1.7 }, mp4Duration: o.dur ?? 70, thumbnails: ["thumbnail-A.png"], visualReview: null, durationTarget: o.target === undefined ? { min: 49, max: 98, target: 70 } : o.target, crime: o.crime ?? false });
+  const good = run(base({ noticeAt: "o2" }), { crime: true });
+  assert.deepEqual(good.metrics.hookQuality.findings, []);
+  assert.deepEqual(good.metrics.structure.findings, []);
+  assert.deepEqual(good.metrics.duration.findings, []);
+  // A・E：イメージ映像・タイトル画面・遅い最初の言葉
+  assert.match(run(base({ firstVisual: { footage: "stock" } })).metrics.hookQuality.findings.join(), /イメージ映像/);
+  assert.match(run(base({ firstVisual: { title: true, footage: "real" } })).metrics.hookQuality.findings.join(), /タイトル画面/);
+  assert.match(run(base(), { first: 4 }).metrics.hookQuality.findings.join(), /最初の言葉まで 4\.0 秒/);
+  // B：注意書きは 30 秒以内。事件で注意書きがなければ指摘
+  assert.match(run(base({ noticeAt: "c2a" }), { step: 8 }).metrics.structure.findings.join(), /注意書きの最初が 40 秒/);
+  assert.match(run(base(), { crime: true }).metrics.structure.findings.join(), /notice: true/);
+  assert.deepEqual(run(base(), { crime: false }).metrics.structure.findings, [], "事件でない題材には注意書きを求めない");
+  // F：タイトルの長さ
+  assert.match(run(base({ noticeAt: "o2", title: "【衝撃】あの事件の真相がついに明らかに！？15年間逃げ続けた男の正体とは一体何者だったのか" })).metrics.structure.findings.join(), /タイトルが/);
+  // C：尺は依頼の目標（題材ごと）。2〜4分は上限ではない
+  assert.match(run(base({ noticeAt: "o2" }), { dur: 300, target: { min: 126, max: 252, target: 180 } }).metrics.duration.findings.join(), /制作依頼の目標 180 秒/);
+  assert.deepEqual(run(base({ noticeAt: "o2" }), { dur: 900, target: { min: 630, max: 1260, target: 900 } }).metrics.duration.findings, []);
+  assert.deepEqual(durationBounds(pattern, null), { lo: 60, hi: 1500, label: "pattern の範囲 60〜1500 秒（目標は制作依頼で決める）" });
+  assert.deepEqual(durationBounds({ structure: { targetMinutes: [8, 12] } }, null).lo, 480, "古い pattern（targetMinutes）も読める");
+});
+
+test("3つの pattern の設定（2026-11-20、改善 A〜F）：尺は固定しない・冒頭は 15 秒まで・注意書き・タイトルの規則・読み上げの速さ", () => {
+  for (const p of ["pattern-01", "pattern-02", "pattern-03"]) {
+    const c = JSON.parse(fs.readFileSync(path.join(MT, "patterns", p, "config.json"), "utf8"));
+    const v = JSON.parse(fs.readFileSync(path.join(MT, "patterns", p, "voice.json"), "utf8"));
+    assert.equal(c.structure.targetMinutes, undefined, `${p}：固定の尺を持たない`);
+    assert.deepEqual(c.structure.durationRangeSeconds, [60, 1500]);
+    assert.ok(c.structure.openingSeconds <= 15, `${p}：冒頭 ${c.structure.openingSeconds} 秒`);
+    for (const k of ["durationRule", "hookRule", "noticeRule", "titleRule", "openingRule"]) assert.ok(typeof c.structure[k] === "string" && c.structure[k].length > 10, `${p}.${k}`);
+    assert.match(c.structure.openingRule, /3 秒/);
+    assert.ok(v.speedScale >= 1.1 && v.speedScale <= 1.25, `${p}：speedScale ${v.speedScale}`);
+    assert.ok(v.timing.leadIn <= 0.3, `${p}：leadIn ${v.timing.leadIn}`);
+  }
+});
