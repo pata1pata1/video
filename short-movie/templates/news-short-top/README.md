@@ -31,6 +31,19 @@
   - `zoom` を書かなければ 1.00〜1.04倍のゆっくりズーム
 - 素材より台本が長いときは、スロー（0.4倍くらいまで）と同じ区間の使い回しで合わせる。ピンぼけ・カメラ移動中の区間は避ける
 
+## フリー映像の札（Pexels、2026-11-22〜）
+画像の札の間に、Pexels の縦型のフリー映像（・写真）を挟める。字幕帯・パネルの位置は映像パネル型と同じで、帯と枠はテンプレートが描き、映像はパネルいっぱいに流れる（ゆっくりズーム）。検索・取得・出典の記録は共通remotionの `core/assets/stockMedia.mjs`（movie-trivia の `pexels` と同じ部品）。
+1. `<id>/input/script.json` に探すものを書く：`"footage": { "night-city": { "query": "tokyo night street" } }`（キーは英小文字・数字・ハイフン。検索語は英語が当たりやすい）。`"start": 2.5` で映像の頭を飛ばせる
+2. 取得：
+   - 自動：`node scripts/sm.mjs footage auto --project=<id>`（まだ映像のないキーごとに縦型・1080px以上・6秒以上の最上位の結果を取得。`--key=`・`--query=`・`--min-duration=`・`--force`）
+   - 選ぶ：`footage candidates --project=<id> [--key=] [--kind=video|photo]` で候補の一覧（`<id>/intermediate/candidates/<key>-<kind>.png`）→ `footage pick --project=<id> --key=<key> --video=<id>|--photo=<id> [--force]`
+   - 映像は `<id>/assets/video/<key>.mp4`、写真は `<id>/assets/images/<key>.jpg`、出典は `<id>/assets/asset-sources.json`（`rightsStatus: "unknown"`。人が Pexels のページで確かめる）
+3. **auto の後は必ず候補の一覧（contact sheet）を見る**。Pexels は関係の薄い語でも何かを返すので、自動の選択は中身を保証しない。違えば `pick --force` で替える
+4. 札の `"image"` に `"<key>.mp4"`（写真は `"<key>.jpg"`）を書く。場面より映像が短いときは自動でスロー（0.5倍まで）。それより長い場面は映像を替えるか場面を分ける
+5. content-ops の依頼の動画は `input/visuals.json` にも登録する（事件以外は `category: "footage"`、事件は安全な種類〈`city-street`・`night-city`・`police-generic`〉に `motion: true`）。人物の顔が分かる映像・刃物・事件現場と特定できる映像は使わない
+- APIキーは環境変数 `PEXELS_API_KEY` か `short-movie/.env`（Git 管理外）。movie-trivia の `.env` は読まない（アプリは独立）
+- 取得した映像・写真・出典はその動画専用（`usageScope: "video"`）。公開後の `video:cleanup` で動画フォルダごと消える
+
 ## 新しい動画の作り方（共通remotion、2026-11-03〜。コマンドはすべて short-movie で実行）
 このフォルダ（アプリ）はコピーしない。動画ごとのフォルダ `short-movie/<id>/` にはデータだけを置く。Remotion・VOICEVOX・ffmpeg の処理は共通remotion（`../../../remotion`）を `scripts/sm.mjs` → `scripts/lib/engine.mjs` から使う。`node_modules` は作らない
 1. 作成：`node scripts/sm.mjs new --project=<id>` → `<id>/project.json`・`<id>/input/script.json`（`script.example.json` から）・`<id>/assets/images/`

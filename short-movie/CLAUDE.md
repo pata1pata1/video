@@ -16,7 +16,7 @@
 - `templates/news-short-top/` … ニュースショート動画（上部字幕固定型）の**アプリ**（縦型レイアウト・テロップ・`cards.mjs`〈モーラ長からのテロップ時刻〉・`template.json`〈連番・書き出し・-14 LUFS・声のみ〉）。**動画ごとにコピーしない**
 - `templates/movie-trailer/` … 映画予告編（縦型・アクション／壮大）の**アプリ**（2026-11-03）。画像＋VOICEVOXナレーション＋明朝の字幕＋最後に無音のタイトルカード。字幕の時刻は news-short-top の `cards.mjs` をそのまま使う。`sm.mjs new --template=movie-trailer` で使う。作り方はテンプレートの README
 - `templates/x-clip-narration/` … X動画＋ナレーション（ユーザーのチャンネル @news_mt の過去のショート3本から学んだ型、2026-11-20）の**アプリ**。Xの動画1本を主役にし、元の音を残して要所だけナレーション・字幕を入れる。共通remotionの `"audio": "voice-over-clip"` と文ごとの `at`（秒）を使う。作り方はテンプレートの README、型は `STYLE.md` の同名の章。**news-short-top とは別の制作パターン（混ぜない）**。**素材の利用確認が必要**（他人のX動画を自由に転載できるとは扱わない）。content-ops の制作依頼 `x-clip`（2026-11-20 接続。素材の利用確認〈source-rights〉がそろうまで制作しない・確認できなければ blocked）。最初の検証サンプルは `rappa-20261120`（2026-11-20 公開 https://youtu.be/LYXq4vefwuQ・cleanup 済み。記録は content-ops の campaign `xclip-rappa-20261120`、台本は Git の履歴）
-- `scripts/sm.mjs` … 制作コマンド（new・narration・render・encode）。`scripts/lib/engine.mjs` を通して共通remotionを使う
+- `scripts/sm.mjs` … 制作コマンド（new・narration・render・encode・footage）。`footage` は Pexels の縦型のフリー映像・写真の検索・自動取得・選択（共通remotionの `core/assets/stockMedia.mjs`。movie-trivia の `pexels` と同じ部品で、アプリは別。2026-11-22）。APIキーは `short-movie/.env`（Git 管理外）。使い方は `templates/news-short-top/README.md` の「フリー映像の札」。`scripts/lib/engine.mjs` を通して共通remotionを使う
 - `<id>/` … こちらで制作する動画1本ごとのフォルダ（2026-11-03〜、データだけ）：`project.json`・`input/script.json`（Git 管理）、`assets/images/`・`assets/video/`・`audio/`・`intermediate/`・`output/<id>.mp4`（Git 管理外）
 - `productions/<id>/` … 旧方式（テンプレートをコピーして作った動画）。今は制作中の `robot-ai-20261030` だけ（旧方式の `sm-engine-test` は2026-11-03に削除）。新しい動画では使わない
   - ※最初の1本 `gmo-20261028`（N001）は short-movie の直下に作っていた（アップロード後に削除済み）
