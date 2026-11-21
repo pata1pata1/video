@@ -15,6 +15,8 @@ export const SUPPORTED_CONTRACT = "content-ops.production-request/1";
 export const SUPPORTED = {
   "news-short": { targetProject: "short-movie", targetTemplate: "news-short-top" },
   "x-clip": { targetProject: "short-movie", targetTemplate: "x-clip-narration" },
+  // 語りのショート（2026-11-22、セット02 つぐみの開運チャンネル）：news-short-top を落ち着いた声・藤色・BGM で（STYLE.md「語りのショート」）
+  "story-short": { targetProject: "short-movie", targetTemplate: "news-short-top" },
 };
 
 /** 依頼が題材の事実確認のある種類か（workflow がない古い依頼は news-short＝あり）。 @param {any} r */

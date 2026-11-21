@@ -1,0 +1,9 @@
+{
+  "contractVersion": "content-ops.production-request/1",
+  "campaignId": "tsugumi-tenshabi-20261216",
+  "key": "main",
+  "requestId": "pr-tsugumi-tenshabi-20261216-main-202611211628",
+  "requestPath": "campaigns/tsugumi-tenshabi-20261216/production/video-main.json",
+  "productionId": "tsugumi-tenshabi-20261216",
+  "importedAt": "2026-11-21T16:28:43.170Z"
+}

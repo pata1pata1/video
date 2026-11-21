@@ -142,7 +142,7 @@ const COMMANDS = {
   "prepare-script"(o) {
     const id = req(o, "project");
     const { f, request: r } = linked(id);
-    if (r.productionType !== "news-short") throw new HandoffError(`prepare-script は news-short（news-short-top）だけです。${r.productionType} の台本は templates/${r.targetTemplate}/README.md の型で書く`);
+    if (r.productionType !== "news-short" && r.productionType !== "story-short") throw new HandoffError(`prepare-script は news-short・story-short（news-short-top）だけです。${r.productionType} の台本は templates/${r.targetTemplate}/README.md の型で書く`);
     const rd = checkReadiness(r);
     printChecks(rd.checks);
     if (!rd.ready) throw new HandoffError("本制作に進めないので台本を作りません");
