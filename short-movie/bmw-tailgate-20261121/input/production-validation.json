@@ -1,0 +1,15 @@
+{
+  "validatedAt": "2026-11-21T12:03:35.946Z",
+  "requestId": "pr-xclip-bmw-tailgate-20261121-main-202611211159",
+  "scriptSha256": "e09b48070f7ed4fda52a922ecd9f998916db2d07fac394d4fb96cae2ee3f7b86",
+  "status": "pass",
+  "proceed": true,
+  "precheck": [],
+  "visuals": [],
+  "contentOps": {
+    "status": "pass",
+    "problems": [],
+    "safeWarnings": [],
+    "blockingWarnings": []
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "contractVersion": "content-ops.production-request/1",
+  "campaignId": "xclip-bmw-tailgate-20261121",
+  "key": "main",
+  "requestId": "pr-xclip-bmw-tailgate-20261121-main-202611211159",
+  "requestPath": "campaigns/xclip-bmw-tailgate-20261121/production/video-main.json",
+  "productionId": "bmw-tailgate-20261121",
+  "importedAt": "2026-11-21T12:03:07.517Z"
+}
