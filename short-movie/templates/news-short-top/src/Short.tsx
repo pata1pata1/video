@@ -11,7 +11,9 @@ const FADE = 10; // crossfade between images, frames
 
 type Card = { text: string; image: string; start: number; end: number };
 /** The video (input/script.json) and its card timeline (audio/timeline.json), passed as props per render. */
-export type ShortProps = { script: Record<string, unknown>; timeline: { duration: number; cards: Card[] } };
+export type ShortProps = { script: Record<string, unknown>; timeline: { duration: number; cards: Card[] }; footage?: Record<string, Footage> };
+/** Free stock media fetched with `sm.mjs footage` (render props, from assets/asset-sources.json): a card's "image" names one. */
+type Footage = { src: string; kind: "video" | "photo"; durationSeconds?: number };
 export const totalFramesOf = (timeline: ShortProps["timeline"]) => Math.ceil((timeline.duration + TAIL) * FPS);
 
 type Motion = { zoom: [number, number]; panX: [number, number] };
@@ -28,6 +30,12 @@ type Options = {
   footer?: string;
 };
 const f = (s: number) => Math.round(s * FPS);
+
+/** script.json footage.<key>.start for the card image "<key>.mp4" (0 when not set). */
+const footageStart = (script: Record<string, unknown>, image: string) => {
+  const entry = (script.footage as Record<string, { start?: number }> | undefined)?.[image.replace(/\.(mp4|jpg)$/, "")];
+  return Math.max(0, Number(entry?.start ?? 0));
+};
 
 // consecutive cards on the same image form one shot
 type Shot = { image: string; from: number; to: number };
@@ -123,6 +131,34 @@ const ClipView: React.FC<{ shot: Shot; index: number; options: Options }> = ({ s
   );
 };
 
+// Stock footage / photo card (`sm.mjs footage`): the caption band and the panel border are drawn here (as in video
+// panel mode) and the footage covers the panel, moving with a slow zoom. A clip shorter than the shot is slowed down
+// (to 0.5x at most); script.json footage.<key>.start (s) skips the clip's start.
+const FootageView: React.FC<{ shot: Shot; index: number; footage: Footage; start: number }> = ({ shot, index, footage, start }) => {
+  const frame = useCurrentFrame();
+  const p = VIDEO_PANEL;
+  const len = shot.to - shot.from + FADE;
+  const zoom = index % 2 ? [MAX_ZOOM, 1.0] : [1.0, MAX_ZOOM];
+  const scale = interpolate(frame, [0, len], zoom, { extrapolateRight: "clamp", easing: Easing.inOut(Easing.cubic) });
+  const opacity = index === 0 ? 1 : interpolate(frame, [0, FADE], [0, 1], { extrapolateRight: "clamp" });
+  const available = (footage.durationSeconds ?? Infinity) - start;
+  const playbackRate = Math.max(0.5, Math.min(1, available / (len / FPS)));
+  const style = { position: "absolute" as const, width: p.width, height: p.height, objectFit: "cover" as const, transform: `scale(${scale})` };
+  return (
+    <AbsoluteFill style={{ opacity, backgroundColor: "#050a18" }}>
+      <div style={{ position: "absolute", ...VIDEO_BAND_BOX, borderRadius: 18, border: "2px solid rgba(90,150,255,0.45)", background: "linear-gradient(180deg,#0b1630,#081022)" }} />
+      <div style={{ position: "absolute", ...p, overflow: "hidden", backgroundColor: "#000" }}>
+        {footage.kind === "video" ? (
+          <OffthreadVideo src={staticFile(footage.src)} muted trimBefore={f(start)} playbackRate={playbackRate} style={style} />
+        ) : (
+          <Img src={staticFile(footage.src)} style={style} />
+        )}
+      </div>
+      <div style={{ position: "absolute", left: p.left - 3, top: p.top - 3, width: p.width, height: p.height, border: "3px solid rgba(90,150,255,0.55)", borderRadius: 6 }} />
+    </AbsoluteFill>
+  );
+};
+
 const VideoFrame: React.FC<{ options: Options }> = ({ options }) => {
   const p = VIDEO_PANEL;
   return (
@@ -178,7 +214,7 @@ const Telop: React.FC<{ text: string; color: string }> = ({ text, color }) => {
   );
 };
 
-export const Short: React.FC<ShortProps> = ({ script, timeline }) => {
+export const Short: React.FC<ShortProps> = ({ script, timeline, footage }) => {
   const options = script as unknown as Options;
   const cards = timeline.cards;
   const totalFrames = totalFramesOf(timeline);
@@ -188,7 +224,13 @@ export const Short: React.FC<ShortProps> = ({ script, timeline }) => {
     <AbsoluteFill style={{ backgroundColor: "#050a18" }}>
       {shots.map((s, i) => (
         <Sequence key={`${s.image}-${i}`} from={s.from} durationInFrames={s.to - s.from + (i < shots.length - 1 ? FADE : 0)}>
-          {options.clips ? <ClipView shot={s} index={i} options={options} /> : <ShotView shot={s} index={i} options={options} />}
+          {footage?.[s.image] ? (
+            <FootageView shot={s} index={i} footage={footage[s.image]} start={footageStart(script, s.image)} />
+          ) : options.clips ? (
+            <ClipView shot={s} index={i} options={options} />
+          ) : (
+            <ShotView shot={s} index={i} options={options} />
+          )}
         </Sequence>
       ))}
       {options.clips ? <VideoFrame options={options} /> : null}
