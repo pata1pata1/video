@@ -3,7 +3,11 @@
   "type": "short-movie",
   "name": "tsugumi-sanpai-check-20261122",
   "created": "2026-11-21T17:10:55.740Z",
-  "status": "active",
-  "locked": false,
-  "published": false
+  "status": "completed",
+  "locked": true,
+  "published": true,
+  "publishedAt": "2026-11-21T18:22:10Z",
+  "publishedUrls": [
+    "https://youtu.be/NJeQACojwfQ"
+  ]
 }

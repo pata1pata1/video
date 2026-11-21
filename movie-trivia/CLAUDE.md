@@ -92,7 +92,7 @@ bgm/                        パターンが使う共通BGM（Git管理外）
 - パターンには動画固有のもの（テーマ・台本・素材・図解・タイトル・サムネイルの文言・読み替え表・出典）を入れない
 
 ## YouTube投稿後の後片付け
-- **全動画プロジェクト共通の方針（2026-10-30）**：video配下を完成動画の保存庫にしない。アップロードと再生確認が終わったら、その動画固有の制作物を毎回すべて削除する。手順は 2026-11-20 から「公開と再生の確認 → `video:cleanup --dry-run`（①削除対象の一覧・②残るもの・`DELETABLE: YES`）→ 人の追加指示を待たずに fingerprint 付きで削除 → 結果を報告」（条件の詳細は `../CLAUDE.md` の cleanup。1つでも満たさなければ消さずに報告）。共通の対象一覧は `../../remotion/docs/video-migration-plan.md` の「cleanupの対象」
+- **全動画プロジェクト共通の方針（2026-10-30）**：video配下を完成動画の保存庫にしない。アップロードと再生確認が終わったら、その動画固有の制作物を毎回すべて削除する。手順は 2026-11-20 から「公開と再生の確認 → `video:cleanup --dry-run`（①削除対象の一覧・②残るもの・`DELETABLE: YES`）→ 人の追加指示を待たずに fingerprint 付きで削除 → 結果を報告」（条件の詳細は `../CLAUDE.md` の cleanup。1つでも満たさなければ消さずに報告）。共通の対象一覧は `../../remotion/docs/video-migration-plan.md` の「cleanupの対象」 **【2026-11-22 改定（ユーザー指示）】完成MP4は当面保持する。自動で行うのは content-ops の `production post-publish`（ops/run-cycle.sh）からの remotion `video:prune`（中間ファイルだけ。`workspaces/<ws>/cleanup-policy.json` が有効な workspace だけ）。完成MP4ごと消す `video:cleanup` は自動では使わず、ユーザーの指示があるときだけ（この行の「人の追加指示を待たずに video:cleanup で自動削除」は停止）**
 - 条件：動画が完成してYouTubeへのアップロードと再生確認が終わったこと
 - 手順（共通remotionで実行）：`npm run video:mark-completed -- --type=movie-trivia --project=<id>` → `npm run video:mark-published -- --type=movie-trivia --project=<id> --url=<YouTubeのURL>` → `npm run video:cleanup -- --type=movie-trivia --project=<id>`（dry-run：①削除対象の一覧〈SIZE〉と②残るもの〈REMAINS〉と FINGERPRINT を表示）→ ③ユーザーに見せて確認 → ④承認後に `--confirm-delete=<id> --expect-fingerprint=<表示された値>`
 - 削除されるもの：動画フォルダ `<id>/` 全体（台本・図解・投稿メモ・ナレーション・素材・出典台帳・連番・キャッシュ・完成MP4・サムネイル）

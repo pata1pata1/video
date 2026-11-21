@@ -3,7 +3,11 @@
   "type": "short-movie",
   "name": "tsugumi-amano-iwato-20261122",
   "created": "2026-11-21T16:02:45.047Z",
-  "status": "active",
-  "locked": false,
-  "published": false
+  "status": "completed",
+  "locked": true,
+  "published": true,
+  "publishedAt": "2026-11-21T21:22:25Z",
+  "publishedUrls": [
+    "https://youtu.be/-dyqWplktKQ"
+  ]
 }
