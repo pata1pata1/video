@@ -1,0 +1,52 @@
+{
+  "id": "bicycle-pass-20261121",
+  "template": "x-clip-narration",
+  "source": {
+    "url": "https://x.com/santa02254649/status/2123343147254395125",
+    "account": "@santa02254649",
+    "postedAt": "2026-11-19"
+  },
+  "clip": {
+    "file": "source.mp4",
+    "start": 0,
+    "end": 10.9,
+    "width": 540,
+    "height": 960
+  },
+  "layout": {
+    "fit": "cover",
+    "videoCenterY": 960,
+    "titleY": 330,
+    "captionY": 640
+  },
+  "voice": {
+    "speaker": 10,
+    "name": "雨晴はう（ノーマル）",
+    "speedScale": 1.15
+  },
+  "pronunciation": {},
+  "sentences": [
+    {
+      "at": 0.2,
+      "style": "title",
+      "kind": "hook",
+      "cards": [
+        {
+          "text": "背後から迫る自転車、おばあちゃんが振り向いてかわす",
+          "caption": "背後から迫る自転車\nおばあちゃんが振り向いてかわす"
+        }
+      ]
+    },
+    {
+      "at": 4.4,
+      "kind": "transition",
+      "cards": [
+        {
+          "text": "もう一度、スローで"
+        }
+      ]
+    }
+  ],
+  "lines": [],
+  "credit": "出典：X @santa02254649"
+}

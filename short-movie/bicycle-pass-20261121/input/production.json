@@ -1,0 +1,9 @@
+{
+  "contractVersion": "content-ops.production-request/1",
+  "campaignId": "xpost-bicycle-pass-20261121",
+  "key": "main",
+  "requestId": "pr-xpost-bicycle-pass-20261121-main-202611210904",
+  "requestPath": "campaigns/xpost-bicycle-pass-20261121/production/video-main.json",
+  "productionId": "bicycle-pass-20261121",
+  "importedAt": "2026-11-21T09:05:58.810Z"
+}
