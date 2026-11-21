@@ -1,0 +1,25 @@
+{
+  "id": "<案件ID>",
+  "template": "tool-demo-short",
+  "title": "無料のAIで|仕事を早く終わらせる",
+  "voice": { "speaker": 11, "name": "玄野武宏（ノーマル）", "speedScale": 1.3 },
+  "sentenceGap": 0.25,
+  "captionColor": "#22d3ee",
+  "credit": "VOICEVOX:玄野武宏",
+  "pronunciation": { "AI": "エーアイ" },
+  "sentences": [
+    { "kind": "hook", "factIds": [], "cards": [
+      { "text": "AIに聞いたら、10秒で今日の段取りが出ました。", "shot": { "capture": "chat", "steps": ["answer"] } }
+    ]},
+    { "kind": "demo", "captureSteps": [{ "capture": "chat", "step": "ask" }], "cards": [
+      { "text": "まず、やりたいことをそのまま入力します。", "shot": { "capture": "chat", "steps": ["ask"] }, "badge": "STEP 1" }
+    ]},
+    { "kind": "demo", "captureSteps": [{ "capture": "chat", "step": "send" }, { "capture": "chat", "step": "answer" }], "cards": [
+      { "text": "送信すると、", "shot": { "capture": "chat", "steps": ["send"] }, "badge": "STEP 2" },
+      { "text": "3つのコツが返ってきました。", "shot": { "capture": "chat", "steps": ["answer"] } }
+    ]},
+    { "kind": "closing", "factIds": [], "cards": [
+      { "text": "保存して、明日の朝に試してみてください。", "caption": "保存して|明日の朝に試そう", "textCard": { "rows": ["保存して", "明日の朝に試そう"] } }
+    ]}
+  ]
+}

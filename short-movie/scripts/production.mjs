@@ -23,6 +23,7 @@ import { checkVisuals, draftVisuals } from "./lib/production/visuals.mjs";
 import { appendAttempt, checkOnScreenTextRules, compareHumanReview, measureAudio, qualityProfileOf, scoreQuality } from "./lib/production/quality.mjs";
 import { analyzeVideo } from "./lib/production/frames.mjs";
 import { CLIP_QUALITY_RULES, scoreClipQuality } from "./lib/production/clipQuality.mjs";
+import { DEMO_SHORT_RULES, captureSummaries, loadCaptures, precheckDemoScript, scoreDemoShort } from "./lib/production/demo.mjs";
 
 /** x-clip-narration の台本の事前確認：テンプレート・素材の範囲（clip）・出典・文の開始秒（at）・字幕。 @param {any} script */
 export function precheckClipScript(script) {
@@ -106,7 +107,7 @@ const printChecks = (checks) => {
   for (const c of checks) console.log(`  ${c.passed ? "✓" : "✗"} ${c.name.padEnd(15)} ${c.reason}`);
 };
 
-/** @type {Record<string, (o: Record<string, string>) => number>} */
+/** @type {Record<string, (o: Record<string, string>) => number | Promise<number>>} */
 const COMMANDS = {
   show(o) {
     const { file, request: r } = readRequest(req(o, "campaign"), o.key ?? "main");
@@ -160,9 +161,11 @@ const COMMANDS = {
     if (!fs.existsSync(f.script)) throw new HandoffError(`${id}/input/script.json がありません`);
     const script = readJson(f.script);
     const clip = r.productionType === "x-clip";
+    // tool-demo-short：実際に操作した画面の録画が主役（画像の登録はない）。録画の記録にある成功した操作だけを使っているかを確かめる
+    const demo = r.productionType === "tool-demo-short";
     // x-clip：素材の X 動画が主役なので、画像の登録（visuals.json）はない。台本の形・出典を確かめ、content-ops で禁止表現・人名を調べる
-    const pre = clip ? precheckClipScript(script) : precheckScript(script, r);
-    const vis = clip ? [] : fs.existsSync(f.visuals) ? [...checkVisuals(script, readJson(f.visuals), r), ...checkOnScreenTextRules(readJson(f.visuals))] : [`${id}/input/visuals.json がない（画像の種類を登録する）`];
+    const pre = clip ? precheckClipScript(script) : demo ? precheckDemoScript(script, r, loadCaptures(f.dir)) : precheckScript(script, r);
+    const vis = clip || demo ? [] : fs.existsSync(f.visuals) ? [...checkVisuals(script, readJson(f.visuals), r), ...checkOnScreenTextRules(readJson(f.visuals))] : [`${id}/input/visuals.json がない（画像の種類を登録する）`];
     for (const p of pre) console.log(`  ✗ 事前確認（文 ${p.sentence}）${p.problem}`);
     for (const v of vis) console.log(`  ✗ 画像 ${v}`);
     const co = pre.length || vis.length ? null : runContentOpsValidation({ campaignId: link.campaignId, key: link.key, scriptPath: f.script });
@@ -202,9 +205,24 @@ const COMMANDS = {
     console.log(`次：Claude が contact sheet を見て ${id}/input/visual-review.json を書く（mp4Sha256: ${sha(f.mp4)}）→ quality-check`);
     return 0;
   },
-  "quality-check"(o) {
+  async "quality-check"(o) {
     const id = req(o, "project");
     const f = files(id);
+    // tool-demo-short：demo-short-v1（共通remotionの core/capture/demoQuality.mjs。録画の根拠・正直さ・個人情報・冒頭・速さ・画面の変化・字幕・尺・音量）
+    if (fs.existsSync(f.script) && readJson(f.script).template === "tool-demo-short") {
+      if (!fs.existsSync(f.timeline)) throw new HandoffError(`${id}/audio/timeline.json がありません（narration の後）`);
+      if (!fs.existsSync(f.mp4)) throw new HandoffError(`${id}/output/${id}.mp4 がありません（encode の後）`);
+      const q = await scoreDemoShort({ script: readJson(f.script), timeline: readJson(f.timeline), captures: loadCaptures(f.dir), audio: measureAudio(f.mp4) });
+      for (const [k, v] of Object.entries(q.metrics)) {
+        console.log(`  ${String(v.score).padStart(3)} ${k}`);
+        for (const x of v.findings) console.log(`        - ${x}`);
+      }
+      console.log(`overallQuality ${q.overallQuality}・QUALITY_GATE = ${q.gate}${q.blocking.length ? `（${q.blocking.join("・")}）` : ""}`);
+      const visualReview = fs.existsSync(f.visualReview) ? readJson(f.visualReview) : null;
+      const rec = appendAttempt(o.out ?? f.quality, { rulesVersion: q.rulesVersion, gate: q.gate, overallQuality: q.overallQuality, scores: q.scores, blocking: q.blocking, metrics: q.metrics, reviewNotes: visualReview?.notes ?? [], visualEvidence: null, humanComparison: null, rules: DEMO_SHORT_RULES, weights: q.weights });
+      console.log(`試行 ${rec.latest.attempt}/${rec.maxAttempts}${rec.latest.escalation === "human-review" ? "・上限に達したので人の確認へ（公開しない）" : rec.latest.escalation === "auto-fix" ? "・修正して再レンダリング → quality-check をやり直す" : ""}`);
+      return q.gate === "pass" ? 0 : 1;
+    }
     // x-clip-narration：clip-v1（素材の利用確認・出典・タイトル・元の音・字幕・尺・音量）
     if (fs.existsSync(f.script) && readJson(f.script).template === "x-clip-narration") {
       if (!fs.existsSync(f.timeline)) throw new HandoffError(`${id}/audio/timeline.json がありません（narration の後）`);
@@ -262,7 +280,7 @@ const COMMANDS = {
     console.log(`試行 ${rec.latest.attempt}/${rec.maxAttempts}${rec.latest.escalation === "human-review" ? "・上限に達したので人の確認へ（公開しない）" : rec.latest.escalation === "auto-fix" ? "・修正して再レンダリング → quality-check をやり直す" : ""}`);
     return q.gate === "pass" ? 0 : 1;
   },
-  result(o) {
+  async result(o) {
     const id = req(o, "project");
     const { f } = linked(id);
     const v = fs.existsSync(f.validation) ? readJson(f.validation) : null;
@@ -271,6 +289,8 @@ const COMMANDS = {
       const q = readJson(f.quality).latest;
       Object.assign(r, { qualityGate: q.gate, overallQuality: q.overallQuality, qualityAttempt: q.attempt, qualityEscalation: q.escalation });
     }
+    // 実演ショート：実際に操作した記録（ツール・規約の確認日・操作・収録日時）を content-ops の campaign に残す（動画を消した後も残る）
+    if (fs.existsSync(f.script) && readJson(f.script).template === "tool-demo-short") Object.assign(r, { captures: await captureSummaries(loadCaptures(f.dir)) });
     const out = writeResult(id, r);
     console.log(JSON.stringify(r, null, 2));
     console.log(`書きました：${out}（content-ops 側で npm run co -- production record-result --campaign=… --key=… --result=<このファイル>）`);
@@ -286,7 +306,7 @@ export async function main(/** @type {string[]} */ argv) {
     return cmd ? 1 : 0;
   }
   try {
-    return fn(o);
+    return await fn(o);
   } catch (err) {
     console.error(err instanceof HandoffError ? `止めました：${err.message}` : err instanceof Error ? (err.stack ?? err.message) : String(err));
     return 1;

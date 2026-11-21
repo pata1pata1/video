@@ -87,6 +87,9 @@ export function loadLesson(file, lessonNo, dictionary) {
   if (lesson.schemaVersion !== 1) errors.push(`schemaVersion must be 1 (got ${lesson.schemaVersion})`);
   if (lesson.lesson !== lessonNo) errors.push(`"lesson" is "${lesson.lesson}", expected "${lessonNo}"`);
   if (!Number.isInteger(lesson.voice?.speaker)) errors.push("voice.speaker must be an integer style ID");
+  if (lesson.voice?.speedScale !== undefined && !(typeof lesson.voice.speedScale === "number" && lesson.voice.speedScale >= 0.5 && lesson.voice.speedScale <= 2)) {
+    errors.push("voice.speedScale must be a number 0.5-2 (optional; course.json's speed otherwise)");
+  }
   for (const key of ["leadInSeconds", "linePauseSeconds", "scenePauseSeconds", "tailOutSeconds"]) {
     const v = lesson.timing?.[key];
     if (typeof v !== "number" || v < 0 || v > 10) errors.push(`timing.${key} must be a number 0-10`);
