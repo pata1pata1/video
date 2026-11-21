@@ -28,7 +28,7 @@
     {
       "file": "03.jpg",
       "category": "historical-print",
-      "realness": "real-object",
+      "realness": "subject",
       "layout": "panel-text",
       "description": "東遊亭國秀「大小暦 羽子板と凧」（国立国会図書館、パブリックドメイン）",
       "showsIncidentLocation": false,
@@ -109,7 +109,7 @@
     {
       "file": "10.jpg",
       "category": "historical-print",
-      "realness": "real-object",
+      "realness": "subject",
       "layout": "full-bleed",
       "description": "「大小暦」（色を抑えた）",
       "showsIncidentLocation": false,

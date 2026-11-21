@@ -40,6 +40,28 @@ export const QUALITY_RULES = {
   maxAttempts: 3,
 };
 
+/**
+ * 語りのショート（story-short、セット02 つぐみの開運チャンネル）の評価設定（2026-11-22、proposals/tsugumi-kaiun-20261122-story-short-quality.md の A）。
+ * 合格点（gate）・重み・画面の文字の基準・安全の確認は変えない。変えるのは次だけ：
+ *   - 語りの速さの目安 5.0〜7.5 字/秒（落ち着いた女性の語り）・尺の目安 35〜60 秒
+ *   - 伝聞の言い回しに「〜とされる」を数えない（占い・開運・神話の安全のための慎重な表現。「によると」などは数える）
+ *   - 冒頭の引きに、問いの形でない意外性（「太陽が消えました」「年に数回しかない」など）や Claude の目視（visual-review の judgments.strongHook）も数える
+ *   - 主題の実物（visuals.json の realness "subject"：神話の古典の絵・史料・暦の資料・神社など）を「この題材そのものの素材」として数える
+ */
+export const STORY_SHORT_RULES = {
+  ...QUALITY_RULES,
+  version: "quality-v2-story",
+  duration: { ideal: [35, 60], max: 65 },
+  narration: { charsPerSec: [5.0, 7.5] },
+};
+/** 評価設定の名前 → 基準。制作の種類（content-ops の productionType）か、台本の qualityProfile で選ぶ。 */
+export const QUALITY_PROFILES = { "news-short": QUALITY_RULES, "story-short": STORY_SHORT_RULES };
+/** 台本・制作依頼から評価設定を選ぶ（依頼の productionType が優先。依頼のない動画は script.json の qualityProfile）。 @param {any} script @param {any} [request] */
+export function qualityProfileOf(script, request) {
+  const t = request?.productionType ?? script?.qualityProfile ?? "news-short";
+  return t === "story-short" ? "story-short" : "news-short";
+}
+
 export const QUALITY_WEIGHTS = {
   visualStrength: 20,
   hookQuality: 18,
@@ -57,6 +79,10 @@ const CRITICAL = ["hookQuality", "visualPacing", "onScreenTextLoad", "retentionR
 const clamp = (/** @type {number} */ n) => Math.max(0, Math.min(100, Math.round(n)));
 const META = /整理します|解説します|まとめます|見ていきます|紹介します|お伝えします|概要欄/u;
 const HEDGE = /によると|ということです|とみて|とされ|取材では/gu;
+/** story-short：「〜とされる」は占い・開運・神話の安全のための慎重な表現なので数えない（出典の言い回しは数える）。 */
+const HEDGE_STORY = /によると|ということです|とみて|取材では/gu;
+/** story-short の冒頭の引き：問いの形でない意外性・神秘・希少性の言い切り。 */
+const STORY_HOOK = /消え|しかない|年に数回|重な|最上|初めて|たった|秘密|知られざ|伝説|不思議|ふしぎ|意外|隠れ|禁じ/u;
 const TEXT_ONLY = new Set(["text-card", "date-card", "timeline-card", "chapter-title"]);
 const RICH = new Set(["photo", "footage", "map-overview", "city-street", "night-city", "police-generic", "diagram", "icon"]);
 
@@ -67,8 +93,10 @@ const RICH = new Set(["photo", "footage", "map-overview", "city-street", "night-
  *   generic-real：一般的な街並み・警察署などのイメージ写真（話の中心ではない）
  *   drawn       ：図・模式図・地図・アイコン・数字・テキストカード
  *   abstract    ：抽象的な背景・作り物のイメージ（AI 生成を含む）
+ *   subject     ：題材の主役の実物（神話を描いた古典の絵・史料・暦の資料・その神社など。2026-11-22、story-short）。
+ *                 実物として数え、story-short では「この題材そのものの素材」（event と同じ扱い）にもする
  */
-export const REALNESS = ["event", "real-object", "generic-real", "drawn", "abstract"];
+export const REALNESS = ["event", "subject", "real-object", "generic-real", "drawn", "abstract"];
 /** @param {any} v */
 export function realnessOf(v) {
   if (v && REALNESS.includes(v.realness)) return v.realness;
@@ -105,10 +133,12 @@ export function measureAudio(mp4) {
 /**
  * 採点。入力：script（kind・factIds つき）・timeline（audio/timeline.json）・visuals（images[].onScreenText 必須）・audio（measureAudio）。
  * review（任意）：目視の判断 { visual: { thumbStopping, visualSurprise, understandableWithoutAudio, diagramsLookCheap } }。
- * @param {{ script: any, timeline: any, visuals: any, audio: { lufs: number|null, truePeak: number|null, longSilences: number } | null, review?: any, visualReview?: any, frames?: any }} i
+ * profile（任意）：評価設定（news-short＝既定・story-short）。qualityProfileOf で選ぶ。
+ * @param {{ script: any, timeline: any, visuals: any, audio: { lufs: number|null, truePeak: number|null, longSilences: number } | null, review?: any, visualReview?: any, frames?: any, profile?: "news-short" | "story-short" }} i
  */
 export function scoreQuality(i) {
-  const R = QUALITY_RULES;
+  const story = i.profile === "story-short";
+  const R = story ? STORY_SHORT_RULES : QUALITY_RULES;
   const t = i.timeline;
   const dur = t.duration;
   const seg = imageSegments(t);
@@ -127,7 +157,8 @@ export function scoreQuality(i) {
     if (/^(東京|大阪|[^、]{1,6}[都道府県市区町村]の|\d+月\d+日)/u.test(firstCard)) (s -= 15), f.push(`最初の字幕が場所・日付から始まる（「${firstCard}」）。何が起きたかが最初の1秒で分からない`), x.push("場所・日付は後回しにし、出来事の核心（誰が・何を）から入る");
     if (firstSentenceEnd > 5) (s -= 15), f.push(`最初の1文が ${firstSentenceEnd.toFixed(1)} 秒と長い（3〜4秒で言い切る）`), x.push("最初の1文を3〜4秒（約25字以内）にする");
     if (!seg[1] || seg[1].start > 3) (s -= 20), f.push(`最初の画面が ${(seg[1]?.start ?? dur).toFixed(1)} 秒間変わらない（3秒以内に画を変える）`), x.push("冒頭3秒の中で画面を1回以上変える（数字・キーワードのカット）");
-    if (!/[？?]|なぜ|実は|まさか|なんと/u.test(first10)) (s -= 10), f.push("冒頭に続きを見たくなる仕掛け（問い・意外性）がない"), x.push("冒頭に問いか意外な一点を入れる（報道にある事実の範囲で）");
+    const intrigue = /[？?]|なぜ|実は|まさか|なんと/u.test(first10) || (story && (STORY_HOOK.test(first10) || i.visualReview?.judgments?.strongHook === true));
+    if (!intrigue) (s -= 10), f.push("冒頭に続きを見たくなる仕掛け（問い・意外性）がない"), x.push("冒頭に問いか意外な一点を入れる（報道にある事実の範囲で）");
     m.hookQuality = { score: clamp(s), findings: f, fixes: x };
   }
 
@@ -212,8 +243,8 @@ export function scoreQuality(i) {
     let s = 100;
     const chars = t.cards.reduce((/** @type {number} */ a, /** @type {any} */ c) => a + c.text.length, 0);
     const cps = chars / dur;
-    const hedges = (i.script.sentences.map(sentenceText).join("").match(HEDGE) ?? []).length;
-    if (dur > R.duration.max) (s -= Math.min(40, (dur - R.duration.max) * 2.5)), f.push(`尺 ${dur.toFixed(1)} 秒（ニュースショートの目安 ${R.duration.ideal[0]}〜${R.duration.ideal[1]} 秒、上限 ${R.duration.max} 秒）`);
+    const hedges = (i.script.sentences.map(sentenceText).join("").match(story ? HEDGE_STORY : HEDGE) ?? []).length;
+    if (dur > R.duration.max) (s -= Math.min(40, (dur - R.duration.max) * 2.5)), f.push(`尺 ${dur.toFixed(1)} 秒（${story ? "語りのショート" : "ニュースショート"}の目安 ${R.duration.ideal[0]}〜${R.duration.ideal[1]} 秒、上限 ${R.duration.max} 秒）`);
     if (cps < R.narration.charsPerSec[0]) (s -= (R.narration.charsPerSec[0] - cps) * 15), f.push(`ナレーションが遅い（${cps.toFixed(1)} 字/秒。目安 ${R.narration.charsPerSec.join("〜")}）`);
     if (hedges / (dur / 60) > 5) (s -= 10), f.push(`伝聞・出典の言い回しが1分に ${(hedges / (dur / 60)).toFixed(1)} 回（「〜によると」「〜ということです」）。テンポが落ちる`);
     if (f.length) x.push("尺を40〜55秒に絞る（事実を厳選）。出典の明示は必要な文だけにまとめ、言い回しを短くする（例：「捜査関係者によると」）。声の速さは 1.2〜1.3 を試す");
@@ -255,8 +286,9 @@ export function scoreQuality(i) {
     const V = R.visualStrength;
     const byFile = new Map((i.visuals?.images ?? []).map((/** @type {any} */ v) => [v.file, v]));
     const share = (/** @type {(v: any) => boolean} */ pred) => seg.filter((g) => pred(byFile.get(g.image))).reduce((a, g) => a + g.end - g.start, 0) / Math.max(0.1, dur);
-    const real = share((v) => ["event", "real-object"].includes(realnessOf(v))) + share((v) => realnessOf(v) === "generic-real") * 0.5;
-    const event = share((v) => realnessOf(v) === "event");
+    const real = share((v) => ["event", "subject", "real-object"].includes(realnessOf(v))) + share((v) => realnessOf(v) === "generic-real") * 0.5;
+    // 題材そのものの素材：ニュースは出来事の映像・公式素材（event）。story-short は題材の主役の実物（subject）も
+    const event = share((v) => realnessOf(v) === "event" || (story && realnessOf(v) === "subject"));
     const footage = share((v) => v?.category === "footage" || v?.motion === true);
     const drawnOrAbstract = share((v) => ["drawn", "abstract"].includes(realnessOf(v)));
     const abstract = share((v) => realnessOf(v) === "abstract");
@@ -268,9 +300,10 @@ export function scoreQuality(i) {
     s += 35 * Math.min(1, realM / V.realShareFull);
     s += 15 * Math.min(1, event / V.eventShareFull);
     s += 10 * Math.min(1, footageM / V.footageShareFull);
-    const opening = realnessOf(byFile.get(seg[0]?.image));
+    const opening0 = realnessOf(byFile.get(seg[0]?.image));
+    const opening = story && opening0 === "subject" ? "event" : opening0 === "subject" ? "real-object" : opening0;
     s += fr ? (fr.openingPhotoLike >= 0.67 ? (opening === "event" ? 10 : 7) : fr.openingPhotoLike > 0 ? 3 : 0) : opening === "event" ? 10 : opening === "real-object" ? 7 : opening === "generic-real" ? 3 : 0;
-    const kind = (/** @type {any} */ v) => (["event", "real-object", "generic-real"].includes(realnessOf(v)) ? "real" : v?.category === "map-overview" ? "map" : v?.category === "diagram" ? "diagram" : v?.layout === "big-number" || v?.category === "icon" ? "number" : realnessOf(v) === "abstract" ? "abstract" : "card");
+    const kind = (/** @type {any} */ v) => (["event", "subject", "real-object", "generic-real"].includes(realnessOf(v)) ? "real" : v?.category === "map-overview" ? "map" : v?.category === "diagram" ? "diagram" : v?.layout === "big-number" || v?.category === "icon" ? "number" : realnessOf(v) === "abstract" ? "abstract" : "card");
     const kinds = new Set(seg.map((g) => kind(byFile.get(g.image)))).size;
     s += Math.min(10, (kinds - 1) * 2.5);
     // 目視の判断：通常運用は Claude が抜き出したフレームを見て書く visualReview（input/visual-review.json）。
@@ -315,8 +348,11 @@ export function scoreQuality(i) {
     if (m.visualPacing.score < 50) (s -= 25), f.push("画面がほとんど変わらない");
     if (m.onScreenTextLoad.score < 50) (s -= 15), f.push("画面の文字を読ませている");
     const last = i.script.sentences[i.script.sentences.length - 1];
-    if (last && (last.kind === "closing" || META.test(sentenceText(last)))) (s -= 10), f.push(`最後が事務的な締め（「${sentenceText(last)}」）。最後まで見る理由・コメントする理由がない`);
-    if (f.length) x.push("最後は本題の一番強い一言か、視聴者への問いで終える（出典は概要欄にだけ書く）");
+    // 締め（2026-11-22、proposals の B）：視聴者への問いかけで終わる締めは減点しない（前置き・出典の案内などの事務的な締めだけ減点）
+    const lastText = last ? sentenceText(last) : "";
+    const asks = /[？?]\s*$/u.test(lastText.trim());
+    if (last && (META.test(lastText) || (last.kind === "closing" && !asks))) (s -= 10), f.push(`最後が事務的な締め（「${lastText}」）。最後まで見る理由・コメントする理由がない`);
+    if (f.length) x.push("最後は本題の一番強い一言か、内容に合う問いかけで終える（無理に問いの形にしない。出典は概要欄にだけ書く）");
     m.retentionRisk = { score: clamp(s), findings: f, fixes: x };
   }
 

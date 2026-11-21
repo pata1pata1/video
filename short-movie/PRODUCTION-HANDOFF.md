@@ -78,6 +78,7 @@ short-movie の今の形に、文ごとの3つを足す（template の cards.mjs
 - 機械で測れないこと（AI 生成感・素人っぽさ・声の単調さ）は `--review` の所見（notes）として記録に残す
 - 記録：`<id>/input/quality-check.json`（試行ごと）。content-ops で `production record-quality --quality=<このファイル>` に渡す。fail の間は content-ops が YouTube の upload 計画と published を止める
 - **自動修正ループ**：fail → 指摘（findings）と修正案（fixes）から台本・字幕・画面の構成を直す → validate → narration → render → encode → quality-check。**最大3回**。3回目も fail なら `human-review`（人の確認。公開しない）
+- 評価設定（2026-11-22）：制作依頼の種類が story-short なら語りのショートの基準（quality-v2-story：語りの速さ 5.0〜7.5 字/秒・「〜とされる」を伝聞に数えない・問いでない冒頭の意外性・realness "subject"）。それ以外は news-short の基準（quality-v2）。合格点は共通。どちらも、視聴者への問いかけで終わる締めは「事務的な締め」として減点しない
 - `input/visuals.json` の各画像に `onScreenText`（画面に出す文字の一覧。文字なしは []）が必須。1要素12字・1画面2要素・計20字を超えると validate が止める
 
 ### 映像の強さ（visualStrength、quality-v2、2026-11-20）

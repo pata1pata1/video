@@ -20,7 +20,7 @@ import { buildResult, writeResult } from "./lib/production/result.mjs";
 import { buildDraftScript, precheckScript } from "./lib/production/script.mjs";
 import { runContentOpsValidation } from "./lib/production/validate.mjs";
 import { checkVisuals, draftVisuals } from "./lib/production/visuals.mjs";
-import { appendAttempt, checkOnScreenTextRules, compareHumanReview, measureAudio, scoreQuality } from "./lib/production/quality.mjs";
+import { appendAttempt, checkOnScreenTextRules, compareHumanReview, measureAudio, qualityProfileOf, scoreQuality } from "./lib/production/quality.mjs";
 import { analyzeVideo } from "./lib/production/frames.mjs";
 import { CLIP_QUALITY_RULES, scoreClipQuality } from "./lib/production/clipQuality.mjs";
 
@@ -233,7 +233,17 @@ const COMMANDS = {
       visualReview = null;
     }
     const review = o.review ? readJson(o.review) : null;
-    const q = scoreQuality({ script: readJson(f.script), timeline, visuals: readJson(f.visuals), audio: measureAudio(f.mp4), visualReview, frames });
+    // 評価設定：制作依頼の種類（story-short は語りのショートの基準）。依頼のない動画は script.json の qualityProfile
+    const script = readJson(f.script);
+    let request = null;
+    try {
+      request = fs.existsSync(path.join(path.dirname(f.script), "production.json")) ? linked(id).request : null;
+    } catch {
+      request = null;
+    }
+    const profile = qualityProfileOf(script, request);
+    const q = scoreQuality({ script, timeline, visuals: readJson(f.visuals), audio: measureAudio(f.mp4), visualReview, frames, profile });
+    console.log(`評価設定：${profile}（${q.rulesVersion}）`);
     const humanComparison = compareHumanReview(q, review, visualReview);
     // --reference：今のルールでの参考点（記録しない・試行に数えない）。採点のルールを変えた後に、過去の動画を再評価するとき
     if (o.reference === "true") {

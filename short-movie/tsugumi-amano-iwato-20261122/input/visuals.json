@@ -4,7 +4,7 @@
     {
       "file": "01.jpg",
       "category": "ukiyo-e",
-      "realness": "event",
+      "realness": "subject",
       "description": "歌川国貞（三代豊国）「岩戸神楽之起顕」1856 の天照大御神（暗く加工）",
       "showsIncidentLocation": false,
       "onScreenText": [
@@ -15,7 +15,7 @@
     {
       "file": "01b.jpg",
       "category": "ukiyo-e",
-      "realness": "event",
+      "realness": "subject",
       "description": "春斎年昌「岩戸神楽之起顕」1889（暗く加工）",
       "showsIncidentLocation": false,
       "onScreenText": [
@@ -26,7 +26,7 @@
     {
       "file": "02.jpg",
       "category": "ukiyo-e",
-      "realness": "event",
+      "realness": "subject",
       "description": "歌川国貞「岩戸神楽之起顕」1856",
       "showsIncidentLocation": false,
       "onScreenText": [
@@ -38,7 +38,7 @@
     {
       "file": "03.jpg",
       "category": "ukiyo-e",
-      "realness": "event",
+      "realness": "subject",
       "description": "歌川国貞「岩戸神楽之起顕」1856（右の図・落ち着いた色に加工）",
       "showsIncidentLocation": false,
       "onScreenText": [
@@ -50,7 +50,7 @@
     {
       "file": "04.jpg",
       "category": "ukiyo-e",
-      "realness": "event",
+      "realness": "subject",
       "description": "歌川国貞「岩戸神楽之起顕」c1844（暗く加工）",
       "showsIncidentLocation": false,
       "onScreenText": [
@@ -61,7 +61,7 @@
     {
       "file": "05.jpg",
       "category": "ukiyo-e",
-      "realness": "event",
+      "realness": "subject",
       "description": "歌川国貞「岩戸神楽之起顕」c1844",
       "showsIncidentLocation": false,
       "onScreenText": [
@@ -73,7 +73,7 @@
     {
       "file": "06.jpg",
       "category": "ukiyo-e",
-      "realness": "event",
+      "realness": "subject",
       "description": "作者不詳「鶏と鏡を持つウズメ」（パブリックドメイン）",
       "showsIncidentLocation": false,
       "onScreenText": [
@@ -84,7 +84,7 @@
     {
       "file": "07.jpg",
       "category": "ukiyo-e",
-      "realness": "event",
+      "realness": "subject",
       "description": "魚屋北渓「春の岩戸」のアメノウズメ",
       "showsIncidentLocation": false,
       "onScreenText": [
@@ -96,7 +96,7 @@
     {
       "file": "08.jpg",
       "category": "ukiyo-e",
-      "realness": "event",
+      "realness": "subject",
       "description": "春斎年昌「岩戸神楽之起顕」1889（右の神々）",
       "showsIncidentLocation": false,
       "onScreenText": [
@@ -107,7 +107,7 @@
     {
       "file": "09.jpg",
       "category": "ukiyo-e",
-      "realness": "event",
+      "realness": "subject",
       "description": "歌川国貞「岩戸神楽之起顕」1856 の天照大御神",
       "showsIncidentLocation": false,
       "onScreenText": [
@@ -118,7 +118,7 @@
     {
       "file": "10.jpg",
       "category": "ukiyo-e",
-      "realness": "event",
+      "realness": "subject",
       "description": "春斎年昌「岩戸神楽之起顕」1889",
       "showsIncidentLocation": false,
       "onScreenText": [
@@ -141,7 +141,7 @@
     {
       "file": "12.jpg",
       "category": "ukiyo-e",
-      "realness": "event",
+      "realness": "subject",
       "description": "春斎年昌「岩戸神楽之起顕」1889 の天照大御神",
       "showsIncidentLocation": false,
       "onScreenText": [
