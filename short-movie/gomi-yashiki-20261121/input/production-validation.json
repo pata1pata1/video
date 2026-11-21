@@ -1,0 +1,15 @@
+{
+  "validatedAt": "2026-11-21T12:54:30.410Z",
+  "requestId": "pr-xclip-gomi-yashiki-20261121-main-202611211252",
+  "scriptSha256": "18d36e9cc24cbeb0d181041c1a1992733cf54d5eef4b7e4b5165b5a70455b17b",
+  "status": "pass",
+  "proceed": true,
+  "precheck": [],
+  "visuals": [],
+  "contentOps": {
+    "status": "pass",
+    "problems": [],
+    "safeWarnings": [],
+    "blockingWarnings": []
+  }
+}

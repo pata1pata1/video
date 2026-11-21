@@ -1,0 +1,9 @@
+{
+  "contractVersion": "content-ops.production-request/1",
+  "campaignId": "xclip-gomi-yashiki-20261121",
+  "key": "main",
+  "requestId": "pr-xclip-gomi-yashiki-20261121-main-202611211252",
+  "requestPath": "campaigns/xclip-gomi-yashiki-20261121/production/video-main.json",
+  "productionId": "gomi-yashiki-20261121",
+  "importedAt": "2026-11-21T12:52:25.066Z"
+}

@@ -1,0 +1,72 @@
+{
+  "id": "gomi-yashiki-20261121",
+  "template": "x-clip-narration",
+  "source": {
+    "url": "https://x.com/oreha_ahero/status/2124049036550586458",
+    "account": "@oreha_ahero",
+    "postedAt": "2026-11-21"
+  },
+  "clip": {
+    "file": "source.mp4",
+    "start": 0,
+    "end": 25.9,
+    "width": 1080,
+    "height": 1920
+  },
+  "layout": {
+    "fit": "cover",
+    "videoCenterY": 960,
+    "titleY": 330,
+    "captionY": 640
+  },
+  "voice": {
+    "speaker": 10,
+    "name": "雨晴はう（ノーマル）",
+    "speedScale": 1.15
+  },
+  "pronunciation": {},
+  "sentences": [
+    {
+      "at": 0.2,
+      "style": "title",
+      "kind": "hook",
+      "cards": [
+        { "text": "港区のゴミ屋敷が凄すぎる", "caption": "港区のゴミ屋敷が\n凄すぎる" }
+      ]
+    },
+    {
+      "at": 4.6,
+      "kind": "transition",
+      "cards": [
+        { "text": "投稿によると、" },
+        { "text": "港区の住宅街" }
+      ]
+    },
+    {
+      "at": 10.0,
+      "kind": "transition",
+      "cards": [
+        { "text": "入口は、" },
+        { "text": "ゴミの山でふさがれています" }
+      ]
+    },
+    {
+      "at": 16.6,
+      "kind": "transition",
+      "cards": [
+        { "text": "住人はいったい、" },
+        { "text": "どうやって出入りしているのか" }
+      ]
+    },
+    {
+      "at": 22.4,
+      "kind": "closing",
+      "cards": [
+        { "text": "このゴミ屋敷、", "caption": "このゴミ屋敷" },
+        { "text": "あなたはどう思う？" }
+      ]
+    }
+  ],
+  "lines": [],
+  "credit": "出典：X @oreha_ahero"
+}
