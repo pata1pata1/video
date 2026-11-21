@@ -180,17 +180,203 @@
         },
         "maxAttempts": 3
       }
+    },
+    {
+      "attempt": 3,
+      "checkedAt": "2026-11-21T22:38:54.044Z",
+      "rulesVersion": "clip-v1",
+      "gate": "fail",
+      "overallQuality": 88,
+      "scores": {
+        "rights": 100,
+        "credit": 100,
+        "titleHook": 100,
+        "narrationShare": 20,
+        "subtitleReadability": 100,
+        "duration": 100,
+        "audioQuality": 100
+      },
+      "blocking": [
+        "narrationShare 20 < 50"
+      ],
+      "metrics": {
+        "rights": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "credit": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "titleHook": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "narrationShare": {
+          "score": 20,
+          "findings": [
+            "ナレーションが全体の 92%（60% まで。元の音を残す）"
+          ],
+          "fixes": [
+            "ナレーションは要所だけにし、映像の見どころでは元の音を聞かせる"
+          ]
+        },
+        "subtitleReadability": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "duration": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "audioQuality": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        }
+      },
+      "reviewNotes": [],
+      "visualEvidence": null,
+      "humanComparison": null,
+      "rules": {
+        "version": "clip-v1",
+        "duration": {
+          "ideal": [
+            15,
+            60
+          ],
+          "max": 90
+        },
+        "titleAtMax": 1,
+        "narrationShare": {
+          "min": 0.1,
+          "max": 0.6
+        },
+        "subtitle": {
+          "maxChars": 16
+        },
+        "audio": {
+          "lufs": [
+            -16,
+            -12
+          ],
+          "truePeakMax": -1
+        },
+        "gate": {
+          "overall": 70,
+          "critical": 50,
+          "floor": 40
+        },
+        "maxAttempts": 3
+      }
+    },
+    {
+      "attempt": 4,
+      "checkedAt": "2026-11-21T22:41:15.221Z",
+      "rulesVersion": "clip-v1",
+      "gate": "pass",
+      "overallQuality": 97,
+      "scores": {
+        "rights": 100,
+        "credit": 100,
+        "titleHook": 100,
+        "narrationShare": 77,
+        "subtitleReadability": 100,
+        "duration": 100,
+        "audioQuality": 100
+      },
+      "blocking": [],
+      "metrics": {
+        "rights": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "credit": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "titleHook": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "narrationShare": {
+          "score": 77,
+          "findings": [
+            "ナレーションが全体の 69%（60% まで。元の音を残す）"
+          ],
+          "fixes": [
+            "ナレーションは要所だけにし、映像の見どころでは元の音を聞かせる"
+          ]
+        },
+        "subtitleReadability": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "duration": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "audioQuality": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        }
+      },
+      "reviewNotes": [],
+      "visualEvidence": null,
+      "humanComparison": null,
+      "rules": {
+        "version": "clip-v1",
+        "duration": {
+          "ideal": [
+            15,
+            60
+          ],
+          "max": 90
+        },
+        "titleAtMax": 1,
+        "narrationShare": {
+          "min": 0.1,
+          "max": 0.6
+        },
+        "subtitle": {
+          "maxChars": 16
+        },
+        "audio": {
+          "lufs": [
+            -16,
+            -12
+          ],
+          "truePeakMax": -1
+        },
+        "gate": {
+          "overall": 70,
+          "critical": 50,
+          "floor": 40
+        },
+        "maxAttempts": 3
+      }
     }
   ],
   "latest": {
-    "attempt": 2,
+    "attempt": 4,
     "gate": "pass",
-    "overallQuality": 100,
+    "overallQuality": 97,
     "scores": {
       "rights": 100,
       "credit": 100,
       "titleHook": 100,
-      "narrationShare": 100,
+      "narrationShare": 77,
       "subtitleReadability": 100,
       "duration": 100,
       "audioQuality": 100
