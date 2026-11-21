@@ -1,0 +1,729 @@
+{
+  "maxAttempts": 3,
+  "attempts": [
+    {
+      "attempt": 1,
+      "checkedAt": "2026-11-21T17:14:49.359Z",
+      "rulesVersion": "quality-v2-story",
+      "gate": "pass",
+      "overallQuality": 93,
+      "scores": {
+        "hookQuality": 100,
+        "visualPacing": 96,
+        "visualVariety": 100,
+        "onScreenTextLoad": 100,
+        "subtitleReadability": 100,
+        "narrationPacing": 100,
+        "audioQuality": 100,
+        "informationDensity": 90,
+        "visualStrength": 85,
+        "retentionRisk": 90
+      },
+      "blocking": [],
+      "metrics": {
+        "hookQuality": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "visualPacing": {
+          "score": 96,
+          "findings": [
+            "同じ画面が最長 7.3 秒続く（11.jpg。目安 6 秒以内）"
+          ],
+          "fixes": [
+            "1文ごと（2〜4秒）に画を変える。同じ画像を続けるならズーム先・切り抜きを変えて別カットにする"
+          ]
+        },
+        "visualVariety": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "onScreenTextLoad": {
+          "score": 100,
+          "findings": [
+            "01.jpg：文字を読むのに約 2.1 秒かかるのに 1.4 秒しか出ていない"
+          ],
+          "fixes": [
+            "画面は短いキーワード・数字・見出しだけ（例：ナレーション「警視庁は39歳の男を逮捕しました」→ 画面「39歳の男を逮捕」）。説明・出典・注記はナレーションか概要欄へ"
+          ]
+        },
+        "subtitleReadability": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "narrationPacing": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "audioQuality": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "informationDensity": {
+          "score": 90,
+          "findings": [
+            "前置き・つなぎ・締めの文が 2/10 文"
+          ],
+          "fixes": [
+            "つなぎ・前置きの文を減らし、1文1事実で進める"
+          ]
+        },
+        "visualStrength": {
+          "score": 85,
+          "findings": [
+            "動く映像がない（静止画とズームだけ）",
+            "映像の強さで overallQuality を 93 点までに抑えた（重み付きの平均 96）"
+          ],
+          "fixes": [],
+          "evidence": {
+            "judgmentSource": "claude-visual-review",
+            "realFootageRatio": 0.64,
+            "diagramRatio": 0.3,
+            "cardRatio": 0,
+            "motionEvidence": {
+              "movingFrames": 0,
+              "measured": 24,
+              "maxDiff": 0.024
+            },
+            "repeatedVisualPatterns": [
+              {
+                "from": 5,
+                "to": 8,
+                "frames": 2
+              },
+              {
+                "from": 23,
+                "to": 25.5,
+                "frames": 2
+              },
+              {
+                "from": 28,
+                "to": 30.5,
+                "frames": 2
+              },
+              {
+                "from": 35.5,
+                "to": 38,
+                "frames": 2
+              }
+            ],
+            "sampledFrames": [
+              {
+                "t": 0,
+                "edge": 0.259,
+                "colors": 253,
+                "flat": 0.5,
+                "contrast": 0.356,
+                "photoLike": true,
+                "motion": 0.024
+              },
+              {
+                "t": 1,
+                "edge": 0.254,
+                "colors": 251,
+                "flat": 0.505,
+                "contrast": 0.363,
+                "photoLike": true,
+                "motion": 0.024
+              },
+              {
+                "t": 2,
+                "edge": 0.311,
+                "colors": 231,
+                "flat": 0.273,
+                "contrast": 0.357,
+                "photoLike": true,
+                "motion": 0.011
+              },
+              {
+                "t": 3,
+                "edge": 0.312,
+                "colors": 236,
+                "flat": 0.268,
+                "contrast": 0.356,
+                "photoLike": true,
+                "motion": 0.011
+              },
+              {
+                "t": 5,
+                "edge": 0.256,
+                "colors": 235,
+                "flat": 0.616,
+                "contrast": 0.636,
+                "photoLike": false,
+                "motion": 0.009
+              },
+              {
+                "t": 8,
+                "edge": 0.252,
+                "colors": 220,
+                "flat": 0.605,
+                "contrast": 0.642,
+                "photoLike": false,
+                "motion": 0.009
+              },
+              {
+                "t": 10.5,
+                "edge": 0.156,
+                "colors": 207,
+                "flat": 0.658,
+                "contrast": 0.417,
+                "photoLike": false,
+                "motion": 0.008
+              },
+              {
+                "t": 13,
+                "edge": 0.298,
+                "colors": 258,
+                "flat": 0.358,
+                "contrast": 0.364,
+                "photoLike": true,
+                "motion": 0.009
+              },
+              {
+                "t": 15.5,
+                "edge": 0.288,
+                "colors": 259,
+                "flat": 0.358,
+                "contrast": 0.366,
+                "photoLike": true,
+                "motion": 0.009
+              },
+              {
+                "t": 18,
+                "edge": 0.224,
+                "colors": 246,
+                "flat": 0.494,
+                "contrast": 0.399,
+                "photoLike": true,
+                "motion": 0.008
+              },
+              {
+                "t": 20.5,
+                "edge": 0.306,
+                "colors": 250,
+                "flat": 0.256,
+                "contrast": 0.395,
+                "photoLike": true,
+                "motion": 0.011
+              },
+              {
+                "t": 23,
+                "edge": 0.2,
+                "colors": 204,
+                "flat": 0.641,
+                "contrast": 0.738,
+                "photoLike": false,
+                "motion": 0.011
+              },
+              {
+                "t": 25.5,
+                "edge": 0.209,
+                "colors": 209,
+                "flat": 0.622,
+                "contrast": 0.728,
+                "photoLike": false,
+                "motion": 0.011
+              },
+              {
+                "t": 28,
+                "edge": 0.246,
+                "colors": 242,
+                "flat": 0.62,
+                "contrast": 0.431,
+                "photoLike": false,
+                "motion": 0.007
+              },
+              {
+                "t": 30.5,
+                "edge": 0.243,
+                "colors": 224,
+                "flat": 0.625,
+                "contrast": 0.436,
+                "photoLike": false,
+                "motion": 0.007
+              },
+              {
+                "t": 33,
+                "edge": 0.411,
+                "colors": 236,
+                "flat": 0.307,
+                "contrast": 0.352,
+                "photoLike": true,
+                "motion": 0
+              },
+              {
+                "t": 35.5,
+                "edge": 0.243,
+                "colors": 197,
+                "flat": 0.695,
+                "contrast": 0.814,
+                "photoLike": false,
+                "motion": 0.007
+              },
+              {
+                "t": 38,
+                "edge": 0.241,
+                "colors": 186,
+                "flat": 0.683,
+                "contrast": 0.819,
+                "photoLike": false,
+                "motion": 0.007
+              },
+              {
+                "t": 40.5,
+                "edge": 0.268,
+                "colors": 197,
+                "flat": 0.386,
+                "contrast": 0.593,
+                "photoLike": true,
+                "motion": 0
+              },
+              {
+                "t": 43,
+                "edge": 0.242,
+                "colors": 278,
+                "flat": 0.536,
+                "contrast": 0.528,
+                "photoLike": true,
+                "motion": 0.006
+              },
+              {
+                "t": 45.5,
+                "edge": 0.232,
+                "colors": 282,
+                "flat": 0.536,
+                "contrast": 0.526,
+                "photoLike": true,
+                "motion": 0.006
+              },
+              {
+                "t": 48,
+                "edge": 0.228,
+                "colors": 180,
+                "flat": 0.434,
+                "contrast": 0.513,
+                "photoLike": true,
+                "motion": 0.008
+              },
+              {
+                "t": 50.5,
+                "edge": 0.249,
+                "colors": 242,
+                "flat": 0.547,
+                "contrast": 0.34,
+                "photoLike": true,
+                "motion": 0.005
+              },
+              {
+                "t": 53,
+                "edge": 0.255,
+                "colors": 254,
+                "flat": 0.541,
+                "contrast": 0.339,
+                "photoLike": true,
+                "motion": 0.005
+              },
+              {
+                "t": 54.49,
+                "edge": 0.25,
+                "colors": 256,
+                "flat": 0.546,
+                "contrast": 0.337,
+                "photoLike": true,
+                "motion": null
+              }
+            ],
+            "strongestFrame": "f00（「その参拝 合ってる？ 作法チェック3つ」の大きな題名）",
+            "weakestFrame": "f26〜f28（締めの画面が長い）",
+            "strengths": [
+              "冒頭0秒から題名の大きな文字と問い（自分ごと）",
+              "番号①②③のカードと実物の写真を交互、手順の図で一目で分かる",
+              "視聴者がチェックする参加型の構成と保存の締め"
+            ],
+            "weaknesses": [
+              "動く映像がない",
+              "締めの画面が7秒続く",
+              "カード系の画面が続く区間がある"
+            ],
+            "visualImpactAssessment": "参考チャンネルの上位（番号つきチェック・大きな題名）に近い。写真は手水舎・伊勢神宮の実物"
+          }
+        },
+        "retentionRisk": {
+          "score": 90,
+          "findings": [
+            "最後が事務的な締め（「あなたは、いくつできていましたか？次の参拝のために、保存しておいてくださいね。」）。最後まで見る理由・コメントする理由がない"
+          ],
+          "fixes": [
+            "最後は本題の一番強い一言か、内容に合う問いかけで終える（無理に問いの形にしない。出典は概要欄にだけ書く）"
+          ]
+        }
+      },
+      "reviewNotes": [],
+      "visualEvidence": {
+        "judgmentSource": "claude-visual-review",
+        "realFootageRatio": 0.64,
+        "diagramRatio": 0.3,
+        "cardRatio": 0,
+        "motionEvidence": {
+          "movingFrames": 0,
+          "measured": 24,
+          "maxDiff": 0.024
+        },
+        "repeatedVisualPatterns": [
+          {
+            "from": 5,
+            "to": 8,
+            "frames": 2
+          },
+          {
+            "from": 23,
+            "to": 25.5,
+            "frames": 2
+          },
+          {
+            "from": 28,
+            "to": 30.5,
+            "frames": 2
+          },
+          {
+            "from": 35.5,
+            "to": 38,
+            "frames": 2
+          }
+        ],
+        "sampledFrames": [
+          {
+            "t": 0,
+            "edge": 0.259,
+            "colors": 253,
+            "flat": 0.5,
+            "contrast": 0.356,
+            "photoLike": true,
+            "motion": 0.024
+          },
+          {
+            "t": 1,
+            "edge": 0.254,
+            "colors": 251,
+            "flat": 0.505,
+            "contrast": 0.363,
+            "photoLike": true,
+            "motion": 0.024
+          },
+          {
+            "t": 2,
+            "edge": 0.311,
+            "colors": 231,
+            "flat": 0.273,
+            "contrast": 0.357,
+            "photoLike": true,
+            "motion": 0.011
+          },
+          {
+            "t": 3,
+            "edge": 0.312,
+            "colors": 236,
+            "flat": 0.268,
+            "contrast": 0.356,
+            "photoLike": true,
+            "motion": 0.011
+          },
+          {
+            "t": 5,
+            "edge": 0.256,
+            "colors": 235,
+            "flat": 0.616,
+            "contrast": 0.636,
+            "photoLike": false,
+            "motion": 0.009
+          },
+          {
+            "t": 8,
+            "edge": 0.252,
+            "colors": 220,
+            "flat": 0.605,
+            "contrast": 0.642,
+            "photoLike": false,
+            "motion": 0.009
+          },
+          {
+            "t": 10.5,
+            "edge": 0.156,
+            "colors": 207,
+            "flat": 0.658,
+            "contrast": 0.417,
+            "photoLike": false,
+            "motion": 0.008
+          },
+          {
+            "t": 13,
+            "edge": 0.298,
+            "colors": 258,
+            "flat": 0.358,
+            "contrast": 0.364,
+            "photoLike": true,
+            "motion": 0.009
+          },
+          {
+            "t": 15.5,
+            "edge": 0.288,
+            "colors": 259,
+            "flat": 0.358,
+            "contrast": 0.366,
+            "photoLike": true,
+            "motion": 0.009
+          },
+          {
+            "t": 18,
+            "edge": 0.224,
+            "colors": 246,
+            "flat": 0.494,
+            "contrast": 0.399,
+            "photoLike": true,
+            "motion": 0.008
+          },
+          {
+            "t": 20.5,
+            "edge": 0.306,
+            "colors": 250,
+            "flat": 0.256,
+            "contrast": 0.395,
+            "photoLike": true,
+            "motion": 0.011
+          },
+          {
+            "t": 23,
+            "edge": 0.2,
+            "colors": 204,
+            "flat": 0.641,
+            "contrast": 0.738,
+            "photoLike": false,
+            "motion": 0.011
+          },
+          {
+            "t": 25.5,
+            "edge": 0.209,
+            "colors": 209,
+            "flat": 0.622,
+            "contrast": 0.728,
+            "photoLike": false,
+            "motion": 0.011
+          },
+          {
+            "t": 28,
+            "edge": 0.246,
+            "colors": 242,
+            "flat": 0.62,
+            "contrast": 0.431,
+            "photoLike": false,
+            "motion": 0.007
+          },
+          {
+            "t": 30.5,
+            "edge": 0.243,
+            "colors": 224,
+            "flat": 0.625,
+            "contrast": 0.436,
+            "photoLike": false,
+            "motion": 0.007
+          },
+          {
+            "t": 33,
+            "edge": 0.411,
+            "colors": 236,
+            "flat": 0.307,
+            "contrast": 0.352,
+            "photoLike": true,
+            "motion": 0
+          },
+          {
+            "t": 35.5,
+            "edge": 0.243,
+            "colors": 197,
+            "flat": 0.695,
+            "contrast": 0.814,
+            "photoLike": false,
+            "motion": 0.007
+          },
+          {
+            "t": 38,
+            "edge": 0.241,
+            "colors": 186,
+            "flat": 0.683,
+            "contrast": 0.819,
+            "photoLike": false,
+            "motion": 0.007
+          },
+          {
+            "t": 40.5,
+            "edge": 0.268,
+            "colors": 197,
+            "flat": 0.386,
+            "contrast": 0.593,
+            "photoLike": true,
+            "motion": 0
+          },
+          {
+            "t": 43,
+            "edge": 0.242,
+            "colors": 278,
+            "flat": 0.536,
+            "contrast": 0.528,
+            "photoLike": true,
+            "motion": 0.006
+          },
+          {
+            "t": 45.5,
+            "edge": 0.232,
+            "colors": 282,
+            "flat": 0.536,
+            "contrast": 0.526,
+            "photoLike": true,
+            "motion": 0.006
+          },
+          {
+            "t": 48,
+            "edge": 0.228,
+            "colors": 180,
+            "flat": 0.434,
+            "contrast": 0.513,
+            "photoLike": true,
+            "motion": 0.008
+          },
+          {
+            "t": 50.5,
+            "edge": 0.249,
+            "colors": 242,
+            "flat": 0.547,
+            "contrast": 0.34,
+            "photoLike": true,
+            "motion": 0.005
+          },
+          {
+            "t": 53,
+            "edge": 0.255,
+            "colors": 254,
+            "flat": 0.541,
+            "contrast": 0.339,
+            "photoLike": true,
+            "motion": 0.005
+          },
+          {
+            "t": 54.49,
+            "edge": 0.25,
+            "colors": 256,
+            "flat": 0.546,
+            "contrast": 0.337,
+            "photoLike": true,
+            "motion": null
+          }
+        ],
+        "strongestFrame": "f00（「その参拝 合ってる？ 作法チェック3つ」の大きな題名）",
+        "weakestFrame": "f26〜f28（締めの画面が長い）",
+        "strengths": [
+          "冒頭0秒から題名の大きな文字と問い（自分ごと）",
+          "番号①②③のカードと実物の写真を交互、手順の図で一目で分かる",
+          "視聴者がチェックする参加型の構成と保存の締め"
+        ],
+        "weaknesses": [
+          "動く映像がない",
+          "締めの画面が7秒続く",
+          "カード系の画面が続く区間がある"
+        ],
+        "visualImpactAssessment": "参考チャンネルの上位（番号つきチェック・大きな題名）に近い。写真は手水舎・伊勢神宮の実物"
+      },
+      "humanComparison": null,
+      "rules": {
+        "version": "quality-v2-story",
+        "duration": {
+          "ideal": [
+            35,
+            60
+          ],
+          "max": 65
+        },
+        "visual": {
+          "avgMax": 4,
+          "staticMax": 6,
+          "imagesPerMinuteMin": 12
+        },
+        "onScreenText": {
+          "maxCharsPerElement": 12,
+          "maxElementsPerScreen": 2,
+          "maxCharsPerScreen": 20
+        },
+        "subtitle": {
+          "maxChars": 16,
+          "minSec": 0.8,
+          "maxCharsPerSec": 9
+        },
+        "narration": {
+          "charsPerSec": [
+            5,
+            7.5
+          ]
+        },
+        "audio": {
+          "lufs": [
+            -16,
+            -12
+          ],
+          "truePeakMax": -1
+        },
+        "visualStrength": {
+          "realShareFull": 0.6,
+          "eventShareFull": 0.25,
+          "footageShareFull": 0.3,
+          "drawnCapShare": 0.5,
+          "drawnCap": 55,
+          "noRealCap": 35,
+          "sameDesignRunMax": 2,
+          "overallCapBase": 50,
+          "overallCapSlope": 0.5
+        },
+        "gate": {
+          "overall": 70,
+          "critical": 50,
+          "floor": 40
+        },
+        "maxAttempts": 3
+      },
+      "weights": {
+        "visualStrength": 20,
+        "hookQuality": 18,
+        "visualPacing": 14,
+        "visualVariety": 10,
+        "onScreenTextLoad": 16,
+        "subtitleReadability": 7,
+        "narrationPacing": 12,
+        "audioQuality": 5,
+        "informationDensity": 6,
+        "retentionRisk": 12
+      }
+    }
+  ],
+  "latest": {
+    "attempt": 1,
+    "gate": "pass",
+    "overallQuality": 93,
+    "scores": {
+      "hookQuality": 100,
+      "visualPacing": 96,
+      "visualVariety": 100,
+      "onScreenTextLoad": 100,
+      "subtitleReadability": 100,
+      "narrationPacing": 100,
+      "audioQuality": 100,
+      "informationDensity": 90,
+      "visualStrength": 85,
+      "retentionRisk": 90
+    },
+    "escalation": null
+  }
+}

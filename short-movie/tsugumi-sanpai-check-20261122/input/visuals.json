@@ -1,0 +1,169 @@
+{
+  "policy": "story-short/1",
+  "images": [
+    {
+      "file": "01.jpg",
+      "category": "photo",
+      "realness": "subject",
+      "layout": "title-card",
+      "description": "手水舎（Immanuelle, CC BY-SA 4.0）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "その参拝 合ってる？",
+        "作法チェック 3つ"
+      ]
+    },
+    {
+      "file": "02.jpg",
+      "category": "photo",
+      "realness": "subject",
+      "layout": "full-bleed",
+      "description": "明治神宮の手水（scott1346, CC BY 2.0）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "いきなり口から？"
+      ]
+    },
+    {
+      "file": "03.jpg",
+      "category": "diagram",
+      "realness": "drawn",
+      "layout": "checklist",
+      "description": "自作の図・カード（背景はぼかした写真）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "いくつできてる？",
+        "手水・柄杓・指先"
+      ]
+    },
+    {
+      "file": "04.jpg",
+      "category": "icon",
+      "realness": "drawn",
+      "layout": "big-number",
+      "description": "自作の図・カード（背景はぼかした写真）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "1",
+        "手水は左手から"
+      ]
+    },
+    {
+      "file": "05.jpg",
+      "category": "photo",
+      "realness": "subject",
+      "layout": "full-bleed",
+      "description": "手水舎",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "左手 → 右手"
+      ]
+    },
+    {
+      "file": "06.jpg",
+      "category": "icon",
+      "realness": "drawn",
+      "layout": "big-number",
+      "description": "自作の図・カード（背景はぼかした写真）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "2",
+        "柄杓に口をつけない"
+      ]
+    },
+    {
+      "file": "07.jpg",
+      "category": "photo",
+      "realness": "subject",
+      "layout": "full-bleed",
+      "description": "明治神宮の手水",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "左手に受けて口へ"
+      ]
+    },
+    {
+      "file": "08.jpg",
+      "category": "diagram",
+      "realness": "drawn",
+      "layout": "steps",
+      "description": "自作の図・カード（背景はぼかした写真）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "左手→右手→口",
+        "→左手→柄"
+      ]
+    },
+    {
+      "file": "09.jpg",
+      "category": "icon",
+      "realness": "drawn",
+      "layout": "big-number",
+      "description": "自作の図・カード（背景はぼかした写真）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "3",
+        "右手の指先を少し下へ"
+      ]
+    },
+    {
+      "file": "10.jpg",
+      "category": "photo",
+      "realness": "subject",
+      "layout": "full-bleed",
+      "description": "伊勢神宮 外宮（Sakaori, CC BY 3.0）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "二拝二拍手一拝"
+      ]
+    },
+    {
+      "file": "11.jpg",
+      "category": "diagram",
+      "realness": "drawn",
+      "layout": "steps",
+      "description": "自作の図・カード（背景はぼかした写真）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "お辞儀2回→拍手2回",
+        "→お辞儀1回"
+      ]
+    },
+    {
+      "file": "12.jpg",
+      "category": "photo",
+      "realness": "subject",
+      "layout": "full-bleed",
+      "description": "伊勢神宮 宇治橋（Zairon, CC BY 4.0）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "外宮は左・内宮は右"
+      ]
+    },
+    {
+      "file": "13.jpg",
+      "category": "photo",
+      "realness": "real-object",
+      "layout": "full-bleed",
+      "description": "五十鈴川（Zairon, CC BY 4.0）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "神社で違うことも"
+      ]
+    },
+    {
+      "file": "14.jpg",
+      "category": "photo",
+      "realness": "subject",
+      "layout": "title-card",
+      "description": "宇治橋",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "いくつできてた？",
+        "保存して次の参拝で"
+      ]
+    }
+  ],
+  "rules": [],
+  "prohibited": []
+}

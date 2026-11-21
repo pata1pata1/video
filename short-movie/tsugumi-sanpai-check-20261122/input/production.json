@@ -1,0 +1,9 @@
+{
+  "contractVersion": "content-ops.production-request/1",
+  "campaignId": "tsugumi-sanpai-check-20261122",
+  "key": "main",
+  "requestId": "pr-tsugumi-sanpai-check-20261122-main-202611211710",
+  "requestPath": "campaigns/tsugumi-sanpai-check-20261122/production/video-main.json",
+  "productionId": "tsugumi-sanpai-check-20261122",
+  "importedAt": "2026-11-21T17:10:55.787Z"
+}
