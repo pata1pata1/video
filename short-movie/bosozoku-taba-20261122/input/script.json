@@ -1,0 +1,86 @@
+{
+  "id": "bosozoku-taba-20261122",
+  "template": "x-clip-narration",
+  "source": {
+    "url": "https://x.com/narutorutona/status/2124103426594546098",
+    "account": "@narutorutona",
+    "postedAt": "2026-11-21"
+  },
+  "clip": {
+    "file": "source.mp4",
+    "start": 0,
+    "end": 24.8,
+    "width": 720,
+    "height": 1280
+  },
+  "layout": {
+    "fit": "cover",
+    "videoCenterY": 960,
+    "titleY": 330,
+    "captionY": 640
+  },
+  "voice": {
+    "speaker": 10,
+    "name": "雨晴はう（ノーマル）",
+    "speedScale": 1.15
+  },
+  "pronunciation": {},
+  "sentences": [
+    {
+      "at": 0.2,
+      "style": "title",
+      "kind": "hook",
+      "cards": [
+        {
+          "text": "交差点を埋め尽くす、暴走族風の集団",
+          "caption": "交差点を埋め尽くす\n暴走族風の集団"
+        }
+      ]
+    },
+    {
+      "at": 8.0,
+      "kind": "transition",
+      "cards": [
+        {
+          "text": "投稿者いわく、",
+          "caption": "投稿者いわく"
+        },
+        {
+          "text": "AIじゃない、",
+          "caption": "AIじゃない"
+        },
+        {
+          "text": "マジの束"
+        }
+      ]
+    },
+    {
+      "at": 17.6,
+      "kind": "transition",
+      "cards": [
+        {
+          "text": "この爆音の集団、",
+          "caption": "この爆音の集団"
+        },
+        {
+          "text": "近くにいたら",
+          "caption": "近くにいたら"
+        },
+        {
+          "text": "怖いですよね"
+        }
+      ]
+    },
+    {
+      "at": 22.4,
+      "kind": "closing",
+      "cards": [
+        {
+          "text": "あなたはどう思う？"
+        }
+      ]
+    }
+  ],
+  "lines": [],
+  "credit": "出典：X @narutorutona"
+}

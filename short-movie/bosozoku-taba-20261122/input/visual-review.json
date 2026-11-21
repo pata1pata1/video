@@ -1,0 +1,25 @@
+{
+  "mp4Sha256": "bd15817cd26875c570b815f66afa63e5975bc41508db881c9733007f392b4f8c",
+  "reviewedAt": "2026-11-22T07:45:00+09:00",
+  "reviewedBy": "claude",
+  "judgments": {
+    "thumbStopping": true,
+    "visualImpact": true,
+    "understandableWithoutAudio": true,
+    "looksLikeSlidesOrCheapDiagram": false,
+    "looksAiGeneric": false
+  },
+  "strongestFrame": "f03・f07（ガソリンスタンド前の交差点が端までバイクで埋まる）",
+  "weakestFrame": "f00（タイトル表示前の0秒。0.2秒から出る）",
+  "strengths": [
+    "冒頭から実写で、旗・族車の集団が画面いっぱい",
+    "撮影者が集団の中から撮っていて、左右に振るたびに台数の多さが分かる",
+    "全編で排気音が鳴り、投稿の『爆音』が音で伝わる",
+    "カード・図解なし。元の映像が主役"
+  ],
+  "weaknesses": [
+    "決定的な瞬間（事故・トラブル）はなく、集団の大きさを見せる型",
+    "停車・徐行の場面で、走行中の迫力は少ない"
+  ],
+  "visualImpactAssessment": "快晴の交差点を埋め尽くす族車の集団という一目で分かる強い実写。止める力は高い"
+}

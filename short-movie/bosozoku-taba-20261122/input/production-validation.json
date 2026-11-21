@@ -1,0 +1,15 @@
+{
+  "validatedAt": "2026-11-21T22:24:19.668Z",
+  "requestId": "pr-xclip-bosozoku-taba-20261122-main-202611212220",
+  "scriptSha256": "336e48055331d7fcdd0491bd8625351fc6668e4d25abffd5681039f4125ed414",
+  "status": "pass",
+  "proceed": true,
+  "precheck": [],
+  "visuals": [],
+  "contentOps": {
+    "status": "pass",
+    "problems": [],
+    "safeWarnings": [],
+    "blockingWarnings": []
+  }
+}
