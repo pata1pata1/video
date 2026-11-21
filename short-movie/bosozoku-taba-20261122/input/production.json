@@ -1,9 +1,0 @@
-{
-  "contractVersion": "content-ops.production-request/1",
-  "campaignId": "xclip-bosozoku-taba-20261122",
-  "key": "main",
-  "requestId": "pr-xclip-bosozoku-taba-20261122-main-202611212220",
-  "requestPath": "campaigns/xclip-bosozoku-taba-20261122/production/video-main.json",
-  "productionId": "bosozoku-taba-20261122",
-  "importedAt": "2026-11-21T22:21:02.796Z"
-}
