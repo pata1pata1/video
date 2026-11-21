@@ -1,0 +1,9 @@
+{
+  "contractVersion": "content-ops.production-request/1",
+  "campaignId": "kyoho-elephant-20261122",
+  "key": "main",
+  "requestId": "pr-kyoho-elephant-20261122-main-202611211520",
+  "requestPath": "campaigns/kyoho-elephant-20261122/production/video-main.json",
+  "productionId": "kyoho-elephant-20261122",
+  "importedAt": "2026-11-21T15:20:17.210Z"
+}

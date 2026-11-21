@@ -1,0 +1,2066 @@
+{
+  "maxAttempts": 3,
+  "attempts": [
+    {
+      "attempt": 1,
+      "checkedAt": "2026-11-21T15:23:27.197Z",
+      "rulesVersion": "quality-v2",
+      "gate": "pass",
+      "overallQuality": 87,
+      "scores": {
+        "hookQuality": 70,
+        "visualPacing": 96,
+        "visualVariety": 90,
+        "onScreenTextLoad": 95,
+        "subtitleReadability": 94,
+        "narrationPacing": 91,
+        "audioQuality": 100,
+        "informationDensity": 100,
+        "visualStrength": 76,
+        "retentionRisk": 90
+      },
+      "blocking": [],
+      "metrics": {
+        "hookQuality": {
+          "score": 70,
+          "findings": [
+            "最初の画面が 3.7 秒間変わらない（3秒以内に画を変える）",
+            "冒頭に続きを見たくなる仕掛け（問い・意外性）がない"
+          ],
+          "fixes": [
+            "冒頭3秒の中で画面を1回以上変える（数字・キーワードのカット）",
+            "冒頭に問いか意外な一点を入れる（報道にある事実の範囲で）"
+          ]
+        },
+        "visualPacing": {
+          "score": 96,
+          "findings": [
+            "画面の切り替えが平均 4.5 秒に1回（目安 4 秒以内）",
+            "同じ画面が最長 6.1 秒続く（06.jpg。目安 6 秒以内）"
+          ],
+          "fixes": [
+            "1文ごと（2〜4秒）に画を変える。同じ画像を続けるならズーム先・切り抜きを変えて別カットにする"
+          ]
+        },
+        "visualVariety": {
+          "score": 90,
+          "findings": [
+            "全画面が同じレイアウト（同じ枠・同じ配色）"
+          ],
+          "fixes": [
+            "写真・映像・地図・図・アイコン・大きな数字で伝える。テキストカードは見出しだけに使う",
+            "レイアウトを章ごとに変える（全面の画・数字の大写し・地図・比較）"
+          ]
+        },
+        "onScreenTextLoad": {
+          "score": 95,
+          "findings": [
+            "12.jpg：ナレーションの文をそのまま画面に出している（「あなたはどう思う？」）"
+          ],
+          "fixes": [
+            "画面は短いキーワード・数字・見出しだけ（例：ナレーション「警視庁は39歳の男を逮捕しました」→ 画面「39歳の男を逮捕」）。説明・出典・注記はナレーションか概要欄へ"
+          ]
+        },
+        "subtitleReadability": {
+          "score": 94,
+          "findings": [
+            "2 枚の字幕が短時間で切り替わる・速すぎる"
+          ],
+          "fixes": []
+        },
+        "narrationPacing": {
+          "score": 91,
+          "findings": [
+            "ナレーションが遅い（5.9 字/秒。目安 6.5〜8.5）"
+          ],
+          "fixes": [
+            "尺を40〜55秒に絞る（事実を厳選）。出典の明示は必要な文だけにまとめ、言い回しを短くする（例：「捜査関係者によると」）。声の速さは 1.2〜1.3 を試す"
+          ]
+        },
+        "audioQuality": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "informationDensity": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "visualStrength": {
+          "score": 76,
+          "findings": [
+            "動く映像がない（静止画とズームだけ）"
+          ],
+          "fixes": [],
+          "evidence": {
+            "judgmentSource": "claude-visual-review",
+            "realFootageRatio": 0.67,
+            "diagramRatio": 0,
+            "cardRatio": 0,
+            "motionEvidence": {
+              "movingFrames": 0,
+              "measured": 23,
+              "maxDiff": 0.014
+            },
+            "repeatedVisualPatterns": [
+              {
+                "from": 1,
+                "to": 3,
+                "frames": 3
+              },
+              {
+                "from": 45.5,
+                "to": 48,
+                "frames": 2
+              }
+            ],
+            "sampledFrames": [
+              {
+                "t": 0,
+                "edge": 0.202,
+                "colors": 197,
+                "flat": 0.543,
+                "contrast": 0.412,
+                "photoLike": true,
+                "motion": 0.007
+              },
+              {
+                "t": 1,
+                "edge": 0.201,
+                "colors": 195,
+                "flat": 0.552,
+                "contrast": 0.414,
+                "photoLike": false,
+                "motion": 0.005
+              },
+              {
+                "t": 2,
+                "edge": 0.201,
+                "colors": 194,
+                "flat": 0.555,
+                "contrast": 0.413,
+                "photoLike": false,
+                "motion": 0.005
+              },
+              {
+                "t": 3,
+                "edge": 0.196,
+                "colors": 195,
+                "flat": 0.556,
+                "contrast": 0.413,
+                "photoLike": false,
+                "motion": 0.004
+              },
+              {
+                "t": 5,
+                "edge": 0.475,
+                "colors": 258,
+                "flat": 0.283,
+                "contrast": 0.349,
+                "photoLike": true,
+                "motion": 0.01
+              },
+              {
+                "t": 8,
+                "edge": 0.442,
+                "colors": 216,
+                "flat": 0.314,
+                "contrast": 0.337,
+                "photoLike": true,
+                "motion": 0
+              },
+              {
+                "t": 10.5,
+                "edge": 0.488,
+                "colors": 152,
+                "flat": 0.535,
+                "contrast": 0.321,
+                "photoLike": true,
+                "motion": 0.014
+              },
+              {
+                "t": 13,
+                "edge": 0.158,
+                "colors": 64,
+                "flat": 0.594,
+                "contrast": 0.304,
+                "photoLike": false,
+                "motion": 0.004
+              },
+              {
+                "t": 15.5,
+                "edge": 0.299,
+                "colors": 320,
+                "flat": 0.396,
+                "contrast": 0.536,
+                "photoLike": true,
+                "motion": 0.01
+              },
+              {
+                "t": 18,
+                "edge": 0.283,
+                "colors": 343,
+                "flat": 0.41,
+                "contrast": 0.531,
+                "photoLike": true,
+                "motion": 0.009
+              },
+              {
+                "t": 20.5,
+                "edge": 0.305,
+                "colors": 320,
+                "flat": 0.379,
+                "contrast": 0.522,
+                "photoLike": true,
+                "motion": 0
+              },
+              {
+                "t": 23,
+                "edge": 0.45,
+                "colors": 165,
+                "flat": 0.526,
+                "contrast": 0.342,
+                "photoLike": true,
+                "motion": 0.008
+              },
+              {
+                "t": 25.5,
+                "edge": 0.449,
+                "colors": 175,
+                "flat": 0.522,
+                "contrast": 0.354,
+                "photoLike": true,
+                "motion": 0.008
+              },
+              {
+                "t": 28,
+                "edge": 0.267,
+                "colors": 234,
+                "flat": 0.399,
+                "contrast": 0.511,
+                "photoLike": true,
+                "motion": 0.011
+              },
+              {
+                "t": 30.5,
+                "edge": 0.271,
+                "colors": 253,
+                "flat": 0.388,
+                "contrast": 0.509,
+                "photoLike": true,
+                "motion": 0.01
+              },
+              {
+                "t": 33,
+                "edge": 0.183,
+                "colors": 259,
+                "flat": 0.469,
+                "contrast": 0.472,
+                "photoLike": true,
+                "motion": 0.005
+              },
+              {
+                "t": 35.5,
+                "edge": 0.186,
+                "colors": 252,
+                "flat": 0.472,
+                "contrast": 0.472,
+                "photoLike": true,
+                "motion": 0
+              },
+              {
+                "t": 38,
+                "edge": 0.133,
+                "colors": 109,
+                "flat": 0.65,
+                "contrast": 0.323,
+                "photoLike": false,
+                "motion": 0.003
+              },
+              {
+                "t": 40.5,
+                "edge": 0.242,
+                "colors": 176,
+                "flat": 0.507,
+                "contrast": 0.453,
+                "photoLike": true,
+                "motion": 0.007
+              },
+              {
+                "t": 43,
+                "edge": 0.246,
+                "colors": 182,
+                "flat": 0.496,
+                "contrast": 0.469,
+                "photoLike": true,
+                "motion": 0.007
+              },
+              {
+                "t": 45.5,
+                "edge": 0.171,
+                "colors": 16,
+                "flat": 0.865,
+                "contrast": 0.366,
+                "photoLike": false,
+                "motion": 0.005
+              },
+              {
+                "t": 48,
+                "edge": 0.174,
+                "colors": 16,
+                "flat": 0.866,
+                "contrast": 0.37,
+                "photoLike": false,
+                "motion": 0.004
+              },
+              {
+                "t": 50.5,
+                "edge": 0.177,
+                "colors": 160,
+                "flat": 0.579,
+                "contrast": 0.415,
+                "photoLike": false,
+                "motion": 0.004
+              },
+              {
+                "t": 53.7,
+                "edge": 0.185,
+                "colors": 164,
+                "flat": 0.544,
+                "contrast": 0.414,
+                "photoLike": true,
+                "motion": null
+              }
+            ],
+            "strongestFrame": "f00（享保14年の『象之図』＋「天皇に会った象」）",
+            "weakestFrame": "f19〜f20（白黒にした同じ掛物の絵）",
+            "strengths": [
+              "冒頭からこの象そのものを描いた当時の絵（国立国会図書館所蔵）を大きく見せる",
+              "地図で長崎→京都→江戸の道のりが一目で分かる",
+              "京都御所・浜離宮など実在の場所の写真を挟んで、同じ型の画面を続けない"
+            ],
+            "weaknesses": [
+              "動く映像がない（静止画とズームだけ）",
+              "『象之図』を色を変えて5回使っている",
+              "子ゾウは現代の写真（イメージと表示）"
+            ],
+            "visualImpactAssessment": "江戸時代の本物の象の絵と見出しで、フィードで目を止める力はある。動きがないので中盤の引きは弱め"
+          }
+        },
+        "retentionRisk": {
+          "score": 90,
+          "findings": [
+            "最後が事務的な締め（「将軍への献上品から、見世物へ。この象の一生、あなたはどう思う？」）。最後まで見る理由・コメントする理由がない"
+          ],
+          "fixes": [
+            "最後は本題の一番強い一言か、視聴者への問いで終える（出典は概要欄にだけ書く）"
+          ]
+        }
+      },
+      "reviewNotes": [],
+      "visualEvidence": {
+        "judgmentSource": "claude-visual-review",
+        "realFootageRatio": 0.67,
+        "diagramRatio": 0,
+        "cardRatio": 0,
+        "motionEvidence": {
+          "movingFrames": 0,
+          "measured": 23,
+          "maxDiff": 0.014
+        },
+        "repeatedVisualPatterns": [
+          {
+            "from": 1,
+            "to": 3,
+            "frames": 3
+          },
+          {
+            "from": 45.5,
+            "to": 48,
+            "frames": 2
+          }
+        ],
+        "sampledFrames": [
+          {
+            "t": 0,
+            "edge": 0.202,
+            "colors": 197,
+            "flat": 0.543,
+            "contrast": 0.412,
+            "photoLike": true,
+            "motion": 0.007
+          },
+          {
+            "t": 1,
+            "edge": 0.201,
+            "colors": 195,
+            "flat": 0.552,
+            "contrast": 0.414,
+            "photoLike": false,
+            "motion": 0.005
+          },
+          {
+            "t": 2,
+            "edge": 0.201,
+            "colors": 194,
+            "flat": 0.555,
+            "contrast": 0.413,
+            "photoLike": false,
+            "motion": 0.005
+          },
+          {
+            "t": 3,
+            "edge": 0.196,
+            "colors": 195,
+            "flat": 0.556,
+            "contrast": 0.413,
+            "photoLike": false,
+            "motion": 0.004
+          },
+          {
+            "t": 5,
+            "edge": 0.475,
+            "colors": 258,
+            "flat": 0.283,
+            "contrast": 0.349,
+            "photoLike": true,
+            "motion": 0.01
+          },
+          {
+            "t": 8,
+            "edge": 0.442,
+            "colors": 216,
+            "flat": 0.314,
+            "contrast": 0.337,
+            "photoLike": true,
+            "motion": 0
+          },
+          {
+            "t": 10.5,
+            "edge": 0.488,
+            "colors": 152,
+            "flat": 0.535,
+            "contrast": 0.321,
+            "photoLike": true,
+            "motion": 0.014
+          },
+          {
+            "t": 13,
+            "edge": 0.158,
+            "colors": 64,
+            "flat": 0.594,
+            "contrast": 0.304,
+            "photoLike": false,
+            "motion": 0.004
+          },
+          {
+            "t": 15.5,
+            "edge": 0.299,
+            "colors": 320,
+            "flat": 0.396,
+            "contrast": 0.536,
+            "photoLike": true,
+            "motion": 0.01
+          },
+          {
+            "t": 18,
+            "edge": 0.283,
+            "colors": 343,
+            "flat": 0.41,
+            "contrast": 0.531,
+            "photoLike": true,
+            "motion": 0.009
+          },
+          {
+            "t": 20.5,
+            "edge": 0.305,
+            "colors": 320,
+            "flat": 0.379,
+            "contrast": 0.522,
+            "photoLike": true,
+            "motion": 0
+          },
+          {
+            "t": 23,
+            "edge": 0.45,
+            "colors": 165,
+            "flat": 0.526,
+            "contrast": 0.342,
+            "photoLike": true,
+            "motion": 0.008
+          },
+          {
+            "t": 25.5,
+            "edge": 0.449,
+            "colors": 175,
+            "flat": 0.522,
+            "contrast": 0.354,
+            "photoLike": true,
+            "motion": 0.008
+          },
+          {
+            "t": 28,
+            "edge": 0.267,
+            "colors": 234,
+            "flat": 0.399,
+            "contrast": 0.511,
+            "photoLike": true,
+            "motion": 0.011
+          },
+          {
+            "t": 30.5,
+            "edge": 0.271,
+            "colors": 253,
+            "flat": 0.388,
+            "contrast": 0.509,
+            "photoLike": true,
+            "motion": 0.01
+          },
+          {
+            "t": 33,
+            "edge": 0.183,
+            "colors": 259,
+            "flat": 0.469,
+            "contrast": 0.472,
+            "photoLike": true,
+            "motion": 0.005
+          },
+          {
+            "t": 35.5,
+            "edge": 0.186,
+            "colors": 252,
+            "flat": 0.472,
+            "contrast": 0.472,
+            "photoLike": true,
+            "motion": 0
+          },
+          {
+            "t": 38,
+            "edge": 0.133,
+            "colors": 109,
+            "flat": 0.65,
+            "contrast": 0.323,
+            "photoLike": false,
+            "motion": 0.003
+          },
+          {
+            "t": 40.5,
+            "edge": 0.242,
+            "colors": 176,
+            "flat": 0.507,
+            "contrast": 0.453,
+            "photoLike": true,
+            "motion": 0.007
+          },
+          {
+            "t": 43,
+            "edge": 0.246,
+            "colors": 182,
+            "flat": 0.496,
+            "contrast": 0.469,
+            "photoLike": true,
+            "motion": 0.007
+          },
+          {
+            "t": 45.5,
+            "edge": 0.171,
+            "colors": 16,
+            "flat": 0.865,
+            "contrast": 0.366,
+            "photoLike": false,
+            "motion": 0.005
+          },
+          {
+            "t": 48,
+            "edge": 0.174,
+            "colors": 16,
+            "flat": 0.866,
+            "contrast": 0.37,
+            "photoLike": false,
+            "motion": 0.004
+          },
+          {
+            "t": 50.5,
+            "edge": 0.177,
+            "colors": 160,
+            "flat": 0.579,
+            "contrast": 0.415,
+            "photoLike": false,
+            "motion": 0.004
+          },
+          {
+            "t": 53.7,
+            "edge": 0.185,
+            "colors": 164,
+            "flat": 0.544,
+            "contrast": 0.414,
+            "photoLike": true,
+            "motion": null
+          }
+        ],
+        "strongestFrame": "f00（享保14年の『象之図』＋「天皇に会った象」）",
+        "weakestFrame": "f19〜f20（白黒にした同じ掛物の絵）",
+        "strengths": [
+          "冒頭からこの象そのものを描いた当時の絵（国立国会図書館所蔵）を大きく見せる",
+          "地図で長崎→京都→江戸の道のりが一目で分かる",
+          "京都御所・浜離宮など実在の場所の写真を挟んで、同じ型の画面を続けない"
+        ],
+        "weaknesses": [
+          "動く映像がない（静止画とズームだけ）",
+          "『象之図』を色を変えて5回使っている",
+          "子ゾウは現代の写真（イメージと表示）"
+        ],
+        "visualImpactAssessment": "江戸時代の本物の象の絵と見出しで、フィードで目を止める力はある。動きがないので中盤の引きは弱め"
+      },
+      "humanComparison": null,
+      "rules": {
+        "version": "quality-v2",
+        "duration": {
+          "ideal": [
+            30,
+            55
+          ],
+          "max": 65
+        },
+        "visual": {
+          "avgMax": 4,
+          "staticMax": 6,
+          "imagesPerMinuteMin": 12
+        },
+        "onScreenText": {
+          "maxCharsPerElement": 12,
+          "maxElementsPerScreen": 2,
+          "maxCharsPerScreen": 20
+        },
+        "subtitle": {
+          "maxChars": 16,
+          "minSec": 0.8,
+          "maxCharsPerSec": 9
+        },
+        "narration": {
+          "charsPerSec": [
+            6.5,
+            8.5
+          ]
+        },
+        "audio": {
+          "lufs": [
+            -16,
+            -12
+          ],
+          "truePeakMax": -1
+        },
+        "visualStrength": {
+          "realShareFull": 0.6,
+          "eventShareFull": 0.25,
+          "footageShareFull": 0.3,
+          "drawnCapShare": 0.5,
+          "drawnCap": 55,
+          "noRealCap": 35,
+          "sameDesignRunMax": 2,
+          "overallCapBase": 50,
+          "overallCapSlope": 0.5
+        },
+        "gate": {
+          "overall": 70,
+          "critical": 50,
+          "floor": 40
+        },
+        "maxAttempts": 3
+      },
+      "weights": {
+        "visualStrength": 20,
+        "hookQuality": 18,
+        "visualPacing": 14,
+        "visualVariety": 10,
+        "onScreenTextLoad": 16,
+        "subtitleReadability": 7,
+        "narrationPacing": 12,
+        "audioQuality": 5,
+        "informationDensity": 6,
+        "retentionRisk": 12
+      }
+    },
+    {
+      "attempt": 2,
+      "checkedAt": "2026-11-21T15:28:02.005Z",
+      "rulesVersion": "quality-v2",
+      "gate": "pass",
+      "overallQuality": 87,
+      "scores": {
+        "hookQuality": 70,
+        "visualPacing": 96,
+        "visualVariety": 90,
+        "onScreenTextLoad": 95,
+        "subtitleReadability": 94,
+        "narrationPacing": 91,
+        "audioQuality": 100,
+        "informationDensity": 100,
+        "visualStrength": 76,
+        "retentionRisk": 90
+      },
+      "blocking": [],
+      "metrics": {
+        "hookQuality": {
+          "score": 70,
+          "findings": [
+            "最初の画面が 3.7 秒間変わらない（3秒以内に画を変える）",
+            "冒頭に続きを見たくなる仕掛け（問い・意外性）がない"
+          ],
+          "fixes": [
+            "冒頭3秒の中で画面を1回以上変える（数字・キーワードのカット）",
+            "冒頭に問いか意外な一点を入れる（報道にある事実の範囲で）"
+          ]
+        },
+        "visualPacing": {
+          "score": 96,
+          "findings": [
+            "画面の切り替えが平均 4.5 秒に1回（目安 4 秒以内）",
+            "同じ画面が最長 6.1 秒続く（06.jpg。目安 6 秒以内）"
+          ],
+          "fixes": [
+            "1文ごと（2〜4秒）に画を変える。同じ画像を続けるならズーム先・切り抜きを変えて別カットにする"
+          ]
+        },
+        "visualVariety": {
+          "score": 90,
+          "findings": [
+            "全画面が同じレイアウト（同じ枠・同じ配色）"
+          ],
+          "fixes": [
+            "写真・映像・地図・図・アイコン・大きな数字で伝える。テキストカードは見出しだけに使う",
+            "レイアウトを章ごとに変える（全面の画・数字の大写し・地図・比較）"
+          ]
+        },
+        "onScreenTextLoad": {
+          "score": 95,
+          "findings": [
+            "12.jpg：ナレーションの文をそのまま画面に出している（「あなたはどう思う？」）"
+          ],
+          "fixes": [
+            "画面は短いキーワード・数字・見出しだけ（例：ナレーション「警視庁は39歳の男を逮捕しました」→ 画面「39歳の男を逮捕」）。説明・出典・注記はナレーションか概要欄へ"
+          ]
+        },
+        "subtitleReadability": {
+          "score": 94,
+          "findings": [
+            "2 枚の字幕が短時間で切り替わる・速すぎる"
+          ],
+          "fixes": []
+        },
+        "narrationPacing": {
+          "score": 91,
+          "findings": [
+            "ナレーションが遅い（5.9 字/秒。目安 6.5〜8.5）"
+          ],
+          "fixes": [
+            "尺を40〜55秒に絞る（事実を厳選）。出典の明示は必要な文だけにまとめ、言い回しを短くする（例：「捜査関係者によると」）。声の速さは 1.2〜1.3 を試す"
+          ]
+        },
+        "audioQuality": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "informationDensity": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "visualStrength": {
+          "score": 76,
+          "findings": [
+            "動く映像がない（静止画とズームだけ）"
+          ],
+          "fixes": [],
+          "evidence": {
+            "judgmentSource": "claude-visual-review",
+            "realFootageRatio": 0.67,
+            "diagramRatio": 0,
+            "cardRatio": 0,
+            "motionEvidence": {
+              "movingFrames": 0,
+              "measured": 23,
+              "maxDiff": 0.014
+            },
+            "repeatedVisualPatterns": [
+              {
+                "from": 1,
+                "to": 3,
+                "frames": 3
+              },
+              {
+                "from": 45.5,
+                "to": 48,
+                "frames": 2
+              }
+            ],
+            "sampledFrames": [
+              {
+                "t": 0,
+                "edge": 0.202,
+                "colors": 197,
+                "flat": 0.543,
+                "contrast": 0.412,
+                "photoLike": true,
+                "motion": 0.007
+              },
+              {
+                "t": 1,
+                "edge": 0.201,
+                "colors": 195,
+                "flat": 0.552,
+                "contrast": 0.414,
+                "photoLike": false,
+                "motion": 0.005
+              },
+              {
+                "t": 2,
+                "edge": 0.201,
+                "colors": 194,
+                "flat": 0.555,
+                "contrast": 0.413,
+                "photoLike": false,
+                "motion": 0.005
+              },
+              {
+                "t": 3,
+                "edge": 0.196,
+                "colors": 195,
+                "flat": 0.556,
+                "contrast": 0.413,
+                "photoLike": false,
+                "motion": 0.004
+              },
+              {
+                "t": 5,
+                "edge": 0.475,
+                "colors": 258,
+                "flat": 0.283,
+                "contrast": 0.349,
+                "photoLike": true,
+                "motion": 0.01
+              },
+              {
+                "t": 8,
+                "edge": 0.442,
+                "colors": 216,
+                "flat": 0.314,
+                "contrast": 0.337,
+                "photoLike": true,
+                "motion": 0
+              },
+              {
+                "t": 10.5,
+                "edge": 0.488,
+                "colors": 152,
+                "flat": 0.535,
+                "contrast": 0.321,
+                "photoLike": true,
+                "motion": 0.014
+              },
+              {
+                "t": 13,
+                "edge": 0.158,
+                "colors": 64,
+                "flat": 0.594,
+                "contrast": 0.304,
+                "photoLike": false,
+                "motion": 0.004
+              },
+              {
+                "t": 15.5,
+                "edge": 0.299,
+                "colors": 320,
+                "flat": 0.396,
+                "contrast": 0.536,
+                "photoLike": true,
+                "motion": 0.01
+              },
+              {
+                "t": 18,
+                "edge": 0.283,
+                "colors": 343,
+                "flat": 0.41,
+                "contrast": 0.531,
+                "photoLike": true,
+                "motion": 0.009
+              },
+              {
+                "t": 20.5,
+                "edge": 0.305,
+                "colors": 320,
+                "flat": 0.379,
+                "contrast": 0.522,
+                "photoLike": true,
+                "motion": 0
+              },
+              {
+                "t": 23,
+                "edge": 0.45,
+                "colors": 165,
+                "flat": 0.526,
+                "contrast": 0.342,
+                "photoLike": true,
+                "motion": 0.008
+              },
+              {
+                "t": 25.5,
+                "edge": 0.449,
+                "colors": 175,
+                "flat": 0.522,
+                "contrast": 0.354,
+                "photoLike": true,
+                "motion": 0.008
+              },
+              {
+                "t": 28,
+                "edge": 0.267,
+                "colors": 234,
+                "flat": 0.399,
+                "contrast": 0.511,
+                "photoLike": true,
+                "motion": 0.011
+              },
+              {
+                "t": 30.5,
+                "edge": 0.271,
+                "colors": 253,
+                "flat": 0.388,
+                "contrast": 0.509,
+                "photoLike": true,
+                "motion": 0.01
+              },
+              {
+                "t": 33,
+                "edge": 0.183,
+                "colors": 259,
+                "flat": 0.469,
+                "contrast": 0.472,
+                "photoLike": true,
+                "motion": 0.005
+              },
+              {
+                "t": 35.5,
+                "edge": 0.186,
+                "colors": 252,
+                "flat": 0.472,
+                "contrast": 0.472,
+                "photoLike": true,
+                "motion": 0
+              },
+              {
+                "t": 38,
+                "edge": 0.133,
+                "colors": 109,
+                "flat": 0.65,
+                "contrast": 0.323,
+                "photoLike": false,
+                "motion": 0.003
+              },
+              {
+                "t": 40.5,
+                "edge": 0.242,
+                "colors": 176,
+                "flat": 0.507,
+                "contrast": 0.453,
+                "photoLike": true,
+                "motion": 0.007
+              },
+              {
+                "t": 43,
+                "edge": 0.246,
+                "colors": 182,
+                "flat": 0.496,
+                "contrast": 0.469,
+                "photoLike": true,
+                "motion": 0.007
+              },
+              {
+                "t": 45.5,
+                "edge": 0.17,
+                "colors": 16,
+                "flat": 0.865,
+                "contrast": 0.366,
+                "photoLike": false,
+                "motion": 0.005
+              },
+              {
+                "t": 48,
+                "edge": 0.175,
+                "colors": 16,
+                "flat": 0.866,
+                "contrast": 0.37,
+                "photoLike": false,
+                "motion": 0.004
+              },
+              {
+                "t": 50.5,
+                "edge": 0.176,
+                "colors": 162,
+                "flat": 0.582,
+                "contrast": 0.415,
+                "photoLike": false,
+                "motion": 0.004
+              },
+              {
+                "t": 53.84,
+                "edge": 0.185,
+                "colors": 173,
+                "flat": 0.539,
+                "contrast": 0.414,
+                "photoLike": true,
+                "motion": null
+              }
+            ],
+            "strongestFrame": "f00（享保14年の『象之図』＋「天皇に会った象」）",
+            "weakestFrame": "f19〜f20（白黒にした同じ掛物の絵）",
+            "strengths": [
+              "冒頭からこの象そのものを描いた当時の絵（国立国会図書館所蔵）を大きく見せる",
+              "地図で長崎→京都→江戸の道のりが一目で分かる",
+              "京都御所・浜離宮など実在の場所の写真を挟んで、同じ型の画面を続けない"
+            ],
+            "weaknesses": [
+              "動く映像がない（静止画とズームだけ）",
+              "『象之図』を色を変えて5回使っている",
+              "子ゾウは現代の写真（イメージと表示）"
+            ],
+            "visualImpactAssessment": "江戸時代の本物の象の絵と見出しで、フィードで目を止める力はある。動きがないので中盤の引きは弱め"
+          }
+        },
+        "retentionRisk": {
+          "score": 90,
+          "findings": [
+            "最後が事務的な締め（「将軍への献上品から、見世物へ。この象の一生、あなたはどう思う？」）。最後まで見る理由・コメントする理由がない"
+          ],
+          "fixes": [
+            "最後は本題の一番強い一言か、視聴者への問いで終える（出典は概要欄にだけ書く）"
+          ]
+        }
+      },
+      "reviewNotes": [],
+      "visualEvidence": {
+        "judgmentSource": "claude-visual-review",
+        "realFootageRatio": 0.67,
+        "diagramRatio": 0,
+        "cardRatio": 0,
+        "motionEvidence": {
+          "movingFrames": 0,
+          "measured": 23,
+          "maxDiff": 0.014
+        },
+        "repeatedVisualPatterns": [
+          {
+            "from": 1,
+            "to": 3,
+            "frames": 3
+          },
+          {
+            "from": 45.5,
+            "to": 48,
+            "frames": 2
+          }
+        ],
+        "sampledFrames": [
+          {
+            "t": 0,
+            "edge": 0.202,
+            "colors": 197,
+            "flat": 0.543,
+            "contrast": 0.412,
+            "photoLike": true,
+            "motion": 0.007
+          },
+          {
+            "t": 1,
+            "edge": 0.201,
+            "colors": 195,
+            "flat": 0.552,
+            "contrast": 0.414,
+            "photoLike": false,
+            "motion": 0.005
+          },
+          {
+            "t": 2,
+            "edge": 0.201,
+            "colors": 194,
+            "flat": 0.555,
+            "contrast": 0.413,
+            "photoLike": false,
+            "motion": 0.005
+          },
+          {
+            "t": 3,
+            "edge": 0.196,
+            "colors": 195,
+            "flat": 0.556,
+            "contrast": 0.413,
+            "photoLike": false,
+            "motion": 0.004
+          },
+          {
+            "t": 5,
+            "edge": 0.475,
+            "colors": 258,
+            "flat": 0.283,
+            "contrast": 0.349,
+            "photoLike": true,
+            "motion": 0.01
+          },
+          {
+            "t": 8,
+            "edge": 0.442,
+            "colors": 216,
+            "flat": 0.314,
+            "contrast": 0.337,
+            "photoLike": true,
+            "motion": 0
+          },
+          {
+            "t": 10.5,
+            "edge": 0.488,
+            "colors": 152,
+            "flat": 0.535,
+            "contrast": 0.321,
+            "photoLike": true,
+            "motion": 0.014
+          },
+          {
+            "t": 13,
+            "edge": 0.158,
+            "colors": 64,
+            "flat": 0.594,
+            "contrast": 0.304,
+            "photoLike": false,
+            "motion": 0.004
+          },
+          {
+            "t": 15.5,
+            "edge": 0.299,
+            "colors": 320,
+            "flat": 0.396,
+            "contrast": 0.536,
+            "photoLike": true,
+            "motion": 0.01
+          },
+          {
+            "t": 18,
+            "edge": 0.283,
+            "colors": 343,
+            "flat": 0.41,
+            "contrast": 0.531,
+            "photoLike": true,
+            "motion": 0.009
+          },
+          {
+            "t": 20.5,
+            "edge": 0.305,
+            "colors": 320,
+            "flat": 0.379,
+            "contrast": 0.522,
+            "photoLike": true,
+            "motion": 0
+          },
+          {
+            "t": 23,
+            "edge": 0.45,
+            "colors": 165,
+            "flat": 0.526,
+            "contrast": 0.342,
+            "photoLike": true,
+            "motion": 0.008
+          },
+          {
+            "t": 25.5,
+            "edge": 0.449,
+            "colors": 175,
+            "flat": 0.522,
+            "contrast": 0.354,
+            "photoLike": true,
+            "motion": 0.008
+          },
+          {
+            "t": 28,
+            "edge": 0.267,
+            "colors": 234,
+            "flat": 0.399,
+            "contrast": 0.511,
+            "photoLike": true,
+            "motion": 0.011
+          },
+          {
+            "t": 30.5,
+            "edge": 0.271,
+            "colors": 253,
+            "flat": 0.388,
+            "contrast": 0.509,
+            "photoLike": true,
+            "motion": 0.01
+          },
+          {
+            "t": 33,
+            "edge": 0.183,
+            "colors": 259,
+            "flat": 0.469,
+            "contrast": 0.472,
+            "photoLike": true,
+            "motion": 0.005
+          },
+          {
+            "t": 35.5,
+            "edge": 0.186,
+            "colors": 252,
+            "flat": 0.472,
+            "contrast": 0.472,
+            "photoLike": true,
+            "motion": 0
+          },
+          {
+            "t": 38,
+            "edge": 0.133,
+            "colors": 109,
+            "flat": 0.65,
+            "contrast": 0.323,
+            "photoLike": false,
+            "motion": 0.003
+          },
+          {
+            "t": 40.5,
+            "edge": 0.242,
+            "colors": 176,
+            "flat": 0.507,
+            "contrast": 0.453,
+            "photoLike": true,
+            "motion": 0.007
+          },
+          {
+            "t": 43,
+            "edge": 0.246,
+            "colors": 182,
+            "flat": 0.496,
+            "contrast": 0.469,
+            "photoLike": true,
+            "motion": 0.007
+          },
+          {
+            "t": 45.5,
+            "edge": 0.17,
+            "colors": 16,
+            "flat": 0.865,
+            "contrast": 0.366,
+            "photoLike": false,
+            "motion": 0.005
+          },
+          {
+            "t": 48,
+            "edge": 0.175,
+            "colors": 16,
+            "flat": 0.866,
+            "contrast": 0.37,
+            "photoLike": false,
+            "motion": 0.004
+          },
+          {
+            "t": 50.5,
+            "edge": 0.176,
+            "colors": 162,
+            "flat": 0.582,
+            "contrast": 0.415,
+            "photoLike": false,
+            "motion": 0.004
+          },
+          {
+            "t": 53.84,
+            "edge": 0.185,
+            "colors": 173,
+            "flat": 0.539,
+            "contrast": 0.414,
+            "photoLike": true,
+            "motion": null
+          }
+        ],
+        "strongestFrame": "f00（享保14年の『象之図』＋「天皇に会った象」）",
+        "weakestFrame": "f19〜f20（白黒にした同じ掛物の絵）",
+        "strengths": [
+          "冒頭からこの象そのものを描いた当時の絵（国立国会図書館所蔵）を大きく見せる",
+          "地図で長崎→京都→江戸の道のりが一目で分かる",
+          "京都御所・浜離宮など実在の場所の写真を挟んで、同じ型の画面を続けない"
+        ],
+        "weaknesses": [
+          "動く映像がない（静止画とズームだけ）",
+          "『象之図』を色を変えて5回使っている",
+          "子ゾウは現代の写真（イメージと表示）"
+        ],
+        "visualImpactAssessment": "江戸時代の本物の象の絵と見出しで、フィードで目を止める力はある。動きがないので中盤の引きは弱め"
+      },
+      "humanComparison": null,
+      "rules": {
+        "version": "quality-v2",
+        "duration": {
+          "ideal": [
+            30,
+            55
+          ],
+          "max": 65
+        },
+        "visual": {
+          "avgMax": 4,
+          "staticMax": 6,
+          "imagesPerMinuteMin": 12
+        },
+        "onScreenText": {
+          "maxCharsPerElement": 12,
+          "maxElementsPerScreen": 2,
+          "maxCharsPerScreen": 20
+        },
+        "subtitle": {
+          "maxChars": 16,
+          "minSec": 0.8,
+          "maxCharsPerSec": 9
+        },
+        "narration": {
+          "charsPerSec": [
+            6.5,
+            8.5
+          ]
+        },
+        "audio": {
+          "lufs": [
+            -16,
+            -12
+          ],
+          "truePeakMax": -1
+        },
+        "visualStrength": {
+          "realShareFull": 0.6,
+          "eventShareFull": 0.25,
+          "footageShareFull": 0.3,
+          "drawnCapShare": 0.5,
+          "drawnCap": 55,
+          "noRealCap": 35,
+          "sameDesignRunMax": 2,
+          "overallCapBase": 50,
+          "overallCapSlope": 0.5
+        },
+        "gate": {
+          "overall": 70,
+          "critical": 50,
+          "floor": 40
+        },
+        "maxAttempts": 3
+      },
+      "weights": {
+        "visualStrength": 20,
+        "hookQuality": 18,
+        "visualPacing": 14,
+        "visualVariety": 10,
+        "onScreenTextLoad": 16,
+        "subtitleReadability": 7,
+        "narrationPacing": 12,
+        "audioQuality": 5,
+        "informationDensity": 6,
+        "retentionRisk": 12
+      }
+    },
+    {
+      "attempt": 3,
+      "checkedAt": "2026-11-21T15:30:43.512Z",
+      "rulesVersion": "quality-v2",
+      "gate": "pass",
+      "overallQuality": 87,
+      "scores": {
+        "hookQuality": 70,
+        "visualPacing": 96,
+        "visualVariety": 90,
+        "onScreenTextLoad": 95,
+        "subtitleReadability": 94,
+        "narrationPacing": 91,
+        "audioQuality": 100,
+        "informationDensity": 100,
+        "visualStrength": 76,
+        "retentionRisk": 90
+      },
+      "blocking": [],
+      "metrics": {
+        "hookQuality": {
+          "score": 70,
+          "findings": [
+            "最初の画面が 3.7 秒間変わらない（3秒以内に画を変える）",
+            "冒頭に続きを見たくなる仕掛け（問い・意外性）がない"
+          ],
+          "fixes": [
+            "冒頭3秒の中で画面を1回以上変える（数字・キーワードのカット）",
+            "冒頭に問いか意外な一点を入れる（報道にある事実の範囲で）"
+          ]
+        },
+        "visualPacing": {
+          "score": 96,
+          "findings": [
+            "画面の切り替えが平均 4.5 秒に1回（目安 4 秒以内）",
+            "同じ画面が最長 6.1 秒続く（06.jpg。目安 6 秒以内）"
+          ],
+          "fixes": [
+            "1文ごと（2〜4秒）に画を変える。同じ画像を続けるならズーム先・切り抜きを変えて別カットにする"
+          ]
+        },
+        "visualVariety": {
+          "score": 90,
+          "findings": [
+            "全画面が同じレイアウト（同じ枠・同じ配色）"
+          ],
+          "fixes": [
+            "写真・映像・地図・図・アイコン・大きな数字で伝える。テキストカードは見出しだけに使う",
+            "レイアウトを章ごとに変える（全面の画・数字の大写し・地図・比較）"
+          ]
+        },
+        "onScreenTextLoad": {
+          "score": 95,
+          "findings": [
+            "12.jpg：ナレーションの文をそのまま画面に出している（「あなたはどう思う？」）"
+          ],
+          "fixes": [
+            "画面は短いキーワード・数字・見出しだけ（例：ナレーション「警視庁は39歳の男を逮捕しました」→ 画面「39歳の男を逮捕」）。説明・出典・注記はナレーションか概要欄へ"
+          ]
+        },
+        "subtitleReadability": {
+          "score": 94,
+          "findings": [
+            "2 枚の字幕が短時間で切り替わる・速すぎる"
+          ],
+          "fixes": []
+        },
+        "narrationPacing": {
+          "score": 91,
+          "findings": [
+            "ナレーションが遅い（5.9 字/秒。目安 6.5〜8.5）"
+          ],
+          "fixes": [
+            "尺を40〜55秒に絞る（事実を厳選）。出典の明示は必要な文だけにまとめ、言い回しを短くする（例：「捜査関係者によると」）。声の速さは 1.2〜1.3 を試す"
+          ]
+        },
+        "audioQuality": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "informationDensity": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "visualStrength": {
+          "score": 76,
+          "findings": [
+            "動く映像がない（静止画とズームだけ）"
+          ],
+          "fixes": [],
+          "evidence": {
+            "judgmentSource": "claude-visual-review",
+            "realFootageRatio": 0.67,
+            "diagramRatio": 0,
+            "cardRatio": 0,
+            "motionEvidence": {
+              "movingFrames": 0,
+              "measured": 23,
+              "maxDiff": 0.014
+            },
+            "repeatedVisualPatterns": [
+              {
+                "from": 1,
+                "to": 3,
+                "frames": 3
+              },
+              {
+                "from": 45.5,
+                "to": 48,
+                "frames": 2
+              }
+            ],
+            "sampledFrames": [
+              {
+                "t": 0,
+                "edge": 0.202,
+                "colors": 197,
+                "flat": 0.543,
+                "contrast": 0.412,
+                "photoLike": true,
+                "motion": 0.007
+              },
+              {
+                "t": 1,
+                "edge": 0.201,
+                "colors": 195,
+                "flat": 0.552,
+                "contrast": 0.414,
+                "photoLike": false,
+                "motion": 0.005
+              },
+              {
+                "t": 2,
+                "edge": 0.201,
+                "colors": 194,
+                "flat": 0.555,
+                "contrast": 0.413,
+                "photoLike": false,
+                "motion": 0.005
+              },
+              {
+                "t": 3,
+                "edge": 0.196,
+                "colors": 195,
+                "flat": 0.556,
+                "contrast": 0.413,
+                "photoLike": false,
+                "motion": 0.004
+              },
+              {
+                "t": 5,
+                "edge": 0.475,
+                "colors": 258,
+                "flat": 0.283,
+                "contrast": 0.349,
+                "photoLike": true,
+                "motion": 0.01
+              },
+              {
+                "t": 8,
+                "edge": 0.442,
+                "colors": 216,
+                "flat": 0.314,
+                "contrast": 0.337,
+                "photoLike": true,
+                "motion": 0
+              },
+              {
+                "t": 10.5,
+                "edge": 0.488,
+                "colors": 152,
+                "flat": 0.535,
+                "contrast": 0.321,
+                "photoLike": true,
+                "motion": 0.014
+              },
+              {
+                "t": 13,
+                "edge": 0.158,
+                "colors": 64,
+                "flat": 0.594,
+                "contrast": 0.304,
+                "photoLike": false,
+                "motion": 0.004
+              },
+              {
+                "t": 15.5,
+                "edge": 0.299,
+                "colors": 320,
+                "flat": 0.396,
+                "contrast": 0.536,
+                "photoLike": true,
+                "motion": 0.01
+              },
+              {
+                "t": 18,
+                "edge": 0.283,
+                "colors": 343,
+                "flat": 0.41,
+                "contrast": 0.531,
+                "photoLike": true,
+                "motion": 0.009
+              },
+              {
+                "t": 20.5,
+                "edge": 0.305,
+                "colors": 320,
+                "flat": 0.379,
+                "contrast": 0.522,
+                "photoLike": true,
+                "motion": 0
+              },
+              {
+                "t": 23,
+                "edge": 0.45,
+                "colors": 165,
+                "flat": 0.526,
+                "contrast": 0.342,
+                "photoLike": true,
+                "motion": 0.008
+              },
+              {
+                "t": 25.5,
+                "edge": 0.449,
+                "colors": 175,
+                "flat": 0.522,
+                "contrast": 0.354,
+                "photoLike": true,
+                "motion": 0.008
+              },
+              {
+                "t": 28,
+                "edge": 0.267,
+                "colors": 234,
+                "flat": 0.399,
+                "contrast": 0.511,
+                "photoLike": true,
+                "motion": 0.011
+              },
+              {
+                "t": 30.5,
+                "edge": 0.271,
+                "colors": 253,
+                "flat": 0.388,
+                "contrast": 0.509,
+                "photoLike": true,
+                "motion": 0.01
+              },
+              {
+                "t": 33,
+                "edge": 0.183,
+                "colors": 259,
+                "flat": 0.469,
+                "contrast": 0.472,
+                "photoLike": true,
+                "motion": 0.005
+              },
+              {
+                "t": 35.5,
+                "edge": 0.186,
+                "colors": 252,
+                "flat": 0.472,
+                "contrast": 0.472,
+                "photoLike": true,
+                "motion": 0
+              },
+              {
+                "t": 38,
+                "edge": 0.133,
+                "colors": 109,
+                "flat": 0.65,
+                "contrast": 0.323,
+                "photoLike": false,
+                "motion": 0.003
+              },
+              {
+                "t": 40.5,
+                "edge": 0.242,
+                "colors": 176,
+                "flat": 0.507,
+                "contrast": 0.453,
+                "photoLike": true,
+                "motion": 0.007
+              },
+              {
+                "t": 43,
+                "edge": 0.246,
+                "colors": 182,
+                "flat": 0.496,
+                "contrast": 0.469,
+                "photoLike": true,
+                "motion": 0.007
+              },
+              {
+                "t": 45.5,
+                "edge": 0.183,
+                "colors": 16,
+                "flat": 0.873,
+                "contrast": 0.372,
+                "photoLike": false,
+                "motion": 0.005
+              },
+              {
+                "t": 48,
+                "edge": 0.188,
+                "colors": 16,
+                "flat": 0.872,
+                "contrast": 0.376,
+                "photoLike": false,
+                "motion": 0.004
+              },
+              {
+                "t": 50.5,
+                "edge": 0.176,
+                "colors": 162,
+                "flat": 0.582,
+                "contrast": 0.415,
+                "photoLike": false,
+                "motion": 0.004
+              },
+              {
+                "t": 53.84,
+                "edge": 0.185,
+                "colors": 173,
+                "flat": 0.539,
+                "contrast": 0.414,
+                "photoLike": true,
+                "motion": null
+              }
+            ],
+            "strongestFrame": "f00（享保14年の『象之図』＋「天皇に会った象」）",
+            "weakestFrame": "f19〜f20（白黒にした同じ掛物の絵）",
+            "strengths": [
+              "冒頭からこの象そのものを描いた当時の絵（国立国会図書館所蔵）を大きく見せる",
+              "地図で長崎→京都→江戸の道のりが一目で分かる",
+              "京都御所・浜離宮など実在の場所の写真を挟んで、同じ型の画面を続けない"
+            ],
+            "weaknesses": [
+              "動く映像がない（静止画とズームだけ）",
+              "『象之図』を色を変えて5回使っている",
+              "子ゾウは現代の写真（イメージと表示）"
+            ],
+            "visualImpactAssessment": "江戸時代の本物の象の絵と見出しで、フィードで目を止める力はある。動きがないので中盤の引きは弱め"
+          }
+        },
+        "retentionRisk": {
+          "score": 90,
+          "findings": [
+            "最後が事務的な締め（「将軍への献上品から、見世物へ。この象の一生、あなたはどう思う？」）。最後まで見る理由・コメントする理由がない"
+          ],
+          "fixes": [
+            "最後は本題の一番強い一言か、視聴者への問いで終える（出典は概要欄にだけ書く）"
+          ]
+        }
+      },
+      "reviewNotes": [],
+      "visualEvidence": {
+        "judgmentSource": "claude-visual-review",
+        "realFootageRatio": 0.67,
+        "diagramRatio": 0,
+        "cardRatio": 0,
+        "motionEvidence": {
+          "movingFrames": 0,
+          "measured": 23,
+          "maxDiff": 0.014
+        },
+        "repeatedVisualPatterns": [
+          {
+            "from": 1,
+            "to": 3,
+            "frames": 3
+          },
+          {
+            "from": 45.5,
+            "to": 48,
+            "frames": 2
+          }
+        ],
+        "sampledFrames": [
+          {
+            "t": 0,
+            "edge": 0.202,
+            "colors": 197,
+            "flat": 0.543,
+            "contrast": 0.412,
+            "photoLike": true,
+            "motion": 0.007
+          },
+          {
+            "t": 1,
+            "edge": 0.201,
+            "colors": 195,
+            "flat": 0.552,
+            "contrast": 0.414,
+            "photoLike": false,
+            "motion": 0.005
+          },
+          {
+            "t": 2,
+            "edge": 0.201,
+            "colors": 194,
+            "flat": 0.555,
+            "contrast": 0.413,
+            "photoLike": false,
+            "motion": 0.005
+          },
+          {
+            "t": 3,
+            "edge": 0.196,
+            "colors": 195,
+            "flat": 0.556,
+            "contrast": 0.413,
+            "photoLike": false,
+            "motion": 0.004
+          },
+          {
+            "t": 5,
+            "edge": 0.475,
+            "colors": 258,
+            "flat": 0.283,
+            "contrast": 0.349,
+            "photoLike": true,
+            "motion": 0.01
+          },
+          {
+            "t": 8,
+            "edge": 0.442,
+            "colors": 216,
+            "flat": 0.314,
+            "contrast": 0.337,
+            "photoLike": true,
+            "motion": 0
+          },
+          {
+            "t": 10.5,
+            "edge": 0.488,
+            "colors": 152,
+            "flat": 0.535,
+            "contrast": 0.321,
+            "photoLike": true,
+            "motion": 0.014
+          },
+          {
+            "t": 13,
+            "edge": 0.158,
+            "colors": 64,
+            "flat": 0.594,
+            "contrast": 0.304,
+            "photoLike": false,
+            "motion": 0.004
+          },
+          {
+            "t": 15.5,
+            "edge": 0.299,
+            "colors": 320,
+            "flat": 0.396,
+            "contrast": 0.536,
+            "photoLike": true,
+            "motion": 0.01
+          },
+          {
+            "t": 18,
+            "edge": 0.283,
+            "colors": 343,
+            "flat": 0.41,
+            "contrast": 0.531,
+            "photoLike": true,
+            "motion": 0.009
+          },
+          {
+            "t": 20.5,
+            "edge": 0.305,
+            "colors": 320,
+            "flat": 0.379,
+            "contrast": 0.522,
+            "photoLike": true,
+            "motion": 0
+          },
+          {
+            "t": 23,
+            "edge": 0.45,
+            "colors": 165,
+            "flat": 0.526,
+            "contrast": 0.342,
+            "photoLike": true,
+            "motion": 0.008
+          },
+          {
+            "t": 25.5,
+            "edge": 0.449,
+            "colors": 175,
+            "flat": 0.522,
+            "contrast": 0.354,
+            "photoLike": true,
+            "motion": 0.008
+          },
+          {
+            "t": 28,
+            "edge": 0.267,
+            "colors": 234,
+            "flat": 0.399,
+            "contrast": 0.511,
+            "photoLike": true,
+            "motion": 0.011
+          },
+          {
+            "t": 30.5,
+            "edge": 0.271,
+            "colors": 253,
+            "flat": 0.388,
+            "contrast": 0.509,
+            "photoLike": true,
+            "motion": 0.01
+          },
+          {
+            "t": 33,
+            "edge": 0.183,
+            "colors": 259,
+            "flat": 0.469,
+            "contrast": 0.472,
+            "photoLike": true,
+            "motion": 0.005
+          },
+          {
+            "t": 35.5,
+            "edge": 0.186,
+            "colors": 252,
+            "flat": 0.472,
+            "contrast": 0.472,
+            "photoLike": true,
+            "motion": 0
+          },
+          {
+            "t": 38,
+            "edge": 0.133,
+            "colors": 109,
+            "flat": 0.65,
+            "contrast": 0.323,
+            "photoLike": false,
+            "motion": 0.003
+          },
+          {
+            "t": 40.5,
+            "edge": 0.242,
+            "colors": 176,
+            "flat": 0.507,
+            "contrast": 0.453,
+            "photoLike": true,
+            "motion": 0.007
+          },
+          {
+            "t": 43,
+            "edge": 0.246,
+            "colors": 182,
+            "flat": 0.496,
+            "contrast": 0.469,
+            "photoLike": true,
+            "motion": 0.007
+          },
+          {
+            "t": 45.5,
+            "edge": 0.183,
+            "colors": 16,
+            "flat": 0.873,
+            "contrast": 0.372,
+            "photoLike": false,
+            "motion": 0.005
+          },
+          {
+            "t": 48,
+            "edge": 0.188,
+            "colors": 16,
+            "flat": 0.872,
+            "contrast": 0.376,
+            "photoLike": false,
+            "motion": 0.004
+          },
+          {
+            "t": 50.5,
+            "edge": 0.176,
+            "colors": 162,
+            "flat": 0.582,
+            "contrast": 0.415,
+            "photoLike": false,
+            "motion": 0.004
+          },
+          {
+            "t": 53.84,
+            "edge": 0.185,
+            "colors": 173,
+            "flat": 0.539,
+            "contrast": 0.414,
+            "photoLike": true,
+            "motion": null
+          }
+        ],
+        "strongestFrame": "f00（享保14年の『象之図』＋「天皇に会った象」）",
+        "weakestFrame": "f19〜f20（白黒にした同じ掛物の絵）",
+        "strengths": [
+          "冒頭からこの象そのものを描いた当時の絵（国立国会図書館所蔵）を大きく見せる",
+          "地図で長崎→京都→江戸の道のりが一目で分かる",
+          "京都御所・浜離宮など実在の場所の写真を挟んで、同じ型の画面を続けない"
+        ],
+        "weaknesses": [
+          "動く映像がない（静止画とズームだけ）",
+          "『象之図』を色を変えて5回使っている",
+          "子ゾウは現代の写真（イメージと表示）"
+        ],
+        "visualImpactAssessment": "江戸時代の本物の象の絵と見出しで、フィードで目を止める力はある。動きがないので中盤の引きは弱め"
+      },
+      "humanComparison": null,
+      "rules": {
+        "version": "quality-v2",
+        "duration": {
+          "ideal": [
+            30,
+            55
+          ],
+          "max": 65
+        },
+        "visual": {
+          "avgMax": 4,
+          "staticMax": 6,
+          "imagesPerMinuteMin": 12
+        },
+        "onScreenText": {
+          "maxCharsPerElement": 12,
+          "maxElementsPerScreen": 2,
+          "maxCharsPerScreen": 20
+        },
+        "subtitle": {
+          "maxChars": 16,
+          "minSec": 0.8,
+          "maxCharsPerSec": 9
+        },
+        "narration": {
+          "charsPerSec": [
+            6.5,
+            8.5
+          ]
+        },
+        "audio": {
+          "lufs": [
+            -16,
+            -12
+          ],
+          "truePeakMax": -1
+        },
+        "visualStrength": {
+          "realShareFull": 0.6,
+          "eventShareFull": 0.25,
+          "footageShareFull": 0.3,
+          "drawnCapShare": 0.5,
+          "drawnCap": 55,
+          "noRealCap": 35,
+          "sameDesignRunMax": 2,
+          "overallCapBase": 50,
+          "overallCapSlope": 0.5
+        },
+        "gate": {
+          "overall": 70,
+          "critical": 50,
+          "floor": 40
+        },
+        "maxAttempts": 3
+      },
+      "weights": {
+        "visualStrength": 20,
+        "hookQuality": 18,
+        "visualPacing": 14,
+        "visualVariety": 10,
+        "onScreenTextLoad": 16,
+        "subtitleReadability": 7,
+        "narrationPacing": 12,
+        "audioQuality": 5,
+        "informationDensity": 6,
+        "retentionRisk": 12
+      }
+    }
+  ],
+  "latest": {
+    "attempt": 3,
+    "gate": "pass",
+    "overallQuality": 87,
+    "scores": {
+      "hookQuality": 70,
+      "visualPacing": 96,
+      "visualVariety": 90,
+      "onScreenTextLoad": 95,
+      "subtitleReadability": 94,
+      "narrationPacing": 91,
+      "audioQuality": 100,
+      "informationDensity": 100,
+      "visualStrength": 76,
+      "retentionRisk": 90
+    },
+    "escalation": null
+  }
+}

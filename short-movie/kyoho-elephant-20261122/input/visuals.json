@@ -1,0 +1,136 @@
+{
+  "policy": "historical-oddity/1",
+  "images": [
+    {
+      "file": "01.jpg",
+      "category": "historical-painting",
+      "description": "国立国会図書館所蔵『象之図』（享保14年渡来、パブリックドメイン）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "江戸時代",
+        "天皇に会った象"
+      ],
+      "realness": "event"
+    },
+    {
+      "file": "02.jpg",
+      "category": "photo-image",
+      "description": "アジアゾウの親子（現代の写真・イメージ。コモンズ CC BY-SA 4.0 Timothy A. Gonsalves）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "1728年 長崎へ",
+        "写真はイメージ"
+      ],
+      "realness": "generic-real"
+    },
+    {
+      "file": "03.jpg",
+      "category": "historical-print",
+      "description": "国立国会図書館所蔵『象のみつぎ』の挿絵「交趾象山」（パブリックドメイン）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "将軍吉宗への",
+        "献上品"
+      ],
+      "realness": "event"
+    },
+    {
+      "file": "04.jpg",
+      "category": "historical-painting",
+      "description": "『象之図』を暗くしたもの",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "メスは9月に死亡"
+      ],
+      "realness": "event"
+    },
+    {
+      "file": "05.jpg",
+      "category": "map-overview",
+      "description": "日本の地形図（コモンズ CC BY-SA 3.0 Alexrk2）に長崎・京都・江戸と道のり（おおよそ）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "74日・350余里",
+        "長崎 京都 江戸"
+      ],
+      "realness": "drawn"
+    },
+    {
+      "file": "06.jpg",
+      "category": "historical-print",
+      "description": "『象のみつぎ』の挿絵（象と人々）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "沿道に見物人",
+        "藩は費用を負担"
+      ],
+      "realness": "event"
+    },
+    {
+      "file": "07.jpg",
+      "category": "place-photo",
+      "description": "京都御所 紫宸殿（現在の写真。コモンズ CC0 Saigen Jiro）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "従四位を受け",
+        "天皇に拝謁"
+      ],
+      "realness": "real-object"
+    },
+    {
+      "file": "08.jpg",
+      "category": "place-photo",
+      "description": "浜離宮恩賜庭園（旧浜御殿。コモンズ CC BY 2.0 Guilhem Vellut）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "江戸・浜御殿へ",
+        "現在の浜離宮"
+      ],
+      "realness": "real-object"
+    },
+    {
+      "file": "09.jpg",
+      "category": "historical-painting",
+      "description": "『象之図』を赤く着色したもの",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "翌年「御用済み」"
+      ],
+      "realness": "event"
+    },
+    {
+      "file": "10.jpg",
+      "category": "historical-print",
+      "description": "国立国会図書館所蔵『象志』の「馴象図」（パブリックドメイン）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "1741年",
+        "見世物に"
+      ],
+      "realness": "event"
+    },
+    {
+      "file": "11.jpg",
+      "category": "historical-painting",
+      "description": "『象之図』の掛物（白黒）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "1742年",
+        "21歳で亡くなる"
+      ],
+      "realness": "event"
+    },
+    {
+      "file": "12.jpg",
+      "category": "historical-painting",
+      "description": "『象之図』",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "あなたはどう思う？"
+      ],
+      "realness": "event"
+    }
+  ],
+  "rules": [],
+  "prohibited": []
+}

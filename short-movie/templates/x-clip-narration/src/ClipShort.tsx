@@ -12,7 +12,7 @@ type Line = { text: string; start: number; end: number };
 type Script = {
   clip?: { file: string; start?: number; end: number; width: number; height: number };
   /** contain = whole clip, blurred copy behind it; cover = fill the screen (crops the sides). */
-  layout?: { fit?: "contain" | "cover"; videoCenterY?: number; titleY?: number; captionY?: number; zoom?: number };
+  layout?: { fit?: "contain" | "cover"; videoCenterY?: number; titleY?: number; captionY?: number; zoom?: number; titleMaxFont?: number };
   /** what people in the clip say (absolute seconds of the video), drawn white with a black outline */
   lines?: Line[];
   credit?: string;
@@ -32,9 +32,9 @@ const STYLES = {
 const MAX_WIDTH = WIDTH - 100;
 const ems = (line: string) => [...line].reduce((w, ch) => w + (/[\x20-\x7e]/.test(ch) ? 0.6 : 1), 0);
 
-const Telop: React.FC<{ text: string; kind: keyof typeof STYLES; y: number }> = ({ text, kind, y }) => {
+const Telop: React.FC<{ text: string; kind: keyof typeof STYLES; y: number; maxFont?: number }> = ({ text, kind, y, maxFont }) => {
   const st = STYLES[kind];
-  const fontSize = Math.min(st.maxFont, Math.floor(MAX_WIDTH / Math.max(...text.split("\n").map(ems))));
+  const fontSize = Math.min(maxFont ?? st.maxFont, Math.floor(MAX_WIDTH / Math.max(...text.split("\n").map(ems))));
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const pop = spring({ frame, fps, config: { damping: 14, stiffness: 260, mass: 0.6 } });
@@ -107,6 +107,8 @@ export const ClipShort: React.FC<ClipShortProps> = ({ script: raw, timeline }) =
   const total = totalFramesOf({ script: raw, timeline });
   // the title stays on screen from its start to the end; narration / dialogue sit lower, over the video
   const titleY = script.layout?.titleY ?? 330;
+  // a smaller title for clips whose video fills the top of the frame (default: the title style's 104)
+  const titleMaxFont = script.layout?.titleMaxFont;
   const y = script.layout?.captionY ?? 640;
   const cards = timeline.cards;
   // a dialogue line is hidden while a narration caption is on screen
@@ -122,7 +124,7 @@ export const ClipShort: React.FC<ClipShortProps> = ({ script: raw, timeline }) =
       ))}
       {cards.map((c, i) => (
         <Sequence key={`c${i}`} from={f(c.start)} durationInFrames={Math.max(1, (isTitle(c) ? total : Math.min(f(c.end), total)) - f(c.start))}>
-          <Telop text={c.text} kind={isTitle(c) ? "title" : "narration"} y={isTitle(c) ? titleY : y} />
+          <Telop text={c.text} kind={isTitle(c) ? "title" : "narration"} y={isTitle(c) ? titleY : y} maxFont={isTitle(c) ? titleMaxFont : undefined} />
         </Sequence>
       ))}
       {script.credit ? (

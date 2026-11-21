@@ -1,0 +1,15 @@
+{
+  "validatedAt": "2026-11-21T15:28:29.982Z",
+  "requestId": "pr-kyoho-elephant-20261122-main-202611211520",
+  "scriptSha256": "13e0c347139e2032205a03f111f02c531a82748d19781816a1d670d054f7802d",
+  "status": "pass",
+  "proceed": true,
+  "precheck": [],
+  "visuals": [],
+  "contentOps": {
+    "status": "pass",
+    "problems": [],
+    "safeWarnings": [],
+    "blockingWarnings": []
+  }
+}

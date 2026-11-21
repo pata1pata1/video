@@ -1,0 +1,25 @@
+{
+  "mp4Sha256": "1a4f8ccbb6edd95b41a364feb7d246f11d4be7fd180803c5019c077caa048ce6",
+  "reviewedAt": "2026-11-22T01:45:00+09:00",
+  "reviewedBy": "claude",
+  "judgments": {
+    "thumbStopping": true,
+    "visualImpact": true,
+    "understandableWithoutAudio": true,
+    "looksLikeSlidesOrCheapDiagram": false,
+    "looksAiGeneric": false
+  },
+  "strongestFrame": "f00（享保14年の『象之図』＋「天皇に会った象」）",
+  "weakestFrame": "f19〜f20（白黒にした同じ掛物の絵）",
+  "strengths": [
+    "冒頭からこの象そのものを描いた当時の絵（国立国会図書館所蔵）を大きく見せる",
+    "地図で長崎→京都→江戸の道のりが一目で分かる",
+    "京都御所・浜離宮など実在の場所の写真を挟んで、同じ型の画面を続けない"
+  ],
+  "weaknesses": [
+    "動く映像がない（静止画とズームだけ）",
+    "『象之図』を色を変えて5回使っている",
+    "子ゾウは現代の写真（イメージと表示）"
+  ],
+  "visualImpactAssessment": "江戸時代の本物の象の絵と見出しで、フィードで目を止める力はある。動きがないので中盤の引きは弱め"
+}

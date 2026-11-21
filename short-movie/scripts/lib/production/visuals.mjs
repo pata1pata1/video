@@ -30,8 +30,14 @@ export const PROHIBITED_CATEGORIES = {
   "identifiable-scene": "特定できる事件現場の写真",
 };
 
-/** 事件・犯罪の題材か（制作依頼の禁止表現・安全ルールから）。 @param {any} r */
-export const isCrimeRequest = (r) => (r.scriptRules?.prohibitedClaims ?? []).some((/** @type {any} */ p) => p.id === "culprit-asserted") || (r.scriptRules?.safetyRules ?? []).some((/** @type {string} */ s) => s.includes("容疑"));
+/**
+ * 事件・犯罪の題材か（制作依頼の禁止表現・安全ルールから）。
+ * content-ops はどの依頼にも基本の禁止表現（culprit-asserted・unreported-label）を付けるので、それだけでは事件と見なさない
+ * （2026-11-22：歴史の題材の絵・写真が「事件のニュースで使える種類ではない」で止まっていた）。事件の依頼にだけ付く禁止表現か、容疑の安全ルールで判断する。
+ * @param {any} r
+ */
+const CRIME_ONLY_CLAIMS = ["killing-asserted", "indicted-asserted", "guilty-asserted", "motive-asserted", "victim-workplace", "robbery-item-speculated", "location-speculated"];
+export const isCrimeRequest = (r) => (r.scriptRules?.prohibitedClaims ?? []).some((/** @type {any} */ p) => CRIME_ONLY_CLAIMS.includes(p.id)) || (r.scriptRules?.safetyRules ?? []).some((/** @type {string} */ s) => s.includes("容疑"));
 
 /** 台本の札から、安全な種類の画像の登録の雛形を作る（説明は章から）。 @param {any} script @param {any} r */
 export function draftVisuals(script, r) {
