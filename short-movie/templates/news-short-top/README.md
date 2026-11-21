@@ -41,7 +41,7 @@
 3. **auto の後は必ず候補の一覧（contact sheet）を見る**。Pexels は関係の薄い語でも何かを返すので、自動の選択は中身を保証しない。違えば `pick --force` で替える
 4. 札の `"image"` に `"<key>.mp4"`（写真は `"<key>.jpg"`）を書く。場面より映像が短いときは自動でスロー（0.5倍まで）。それより長い場面は映像を替えるか場面を分ける
 5. content-ops の依頼の動画は `input/visuals.json` にも登録する（事件以外は `category: "footage"`、事件は安全な種類〈`city-street`・`night-city`・`police-generic`〉に `motion: true`）。人物の顔が分かる映像・刃物・事件現場と特定できる映像は使わない
-- APIキーは環境変数 `PEXELS_API_KEY` か `short-movie/.env`（Git 管理外）。movie-trivia の `.env` は読まない（アプリは独立）
+- APIキーは環境変数 `PEXELS_API_KEY` か、共通remotionの `remotion/.env`（Git 管理外。movie-trivia と共通で、PC ごとに1回設定すればよい。2026-11-22）。`short-movie/.env` は古い置き場所として読むだけ
 - 取得した映像・写真・出典はその動画専用（`usageScope: "video"`）。公開後の `video:cleanup` で動画フォルダごと消える
 
 ## 新しい動画の作り方（共通remotion、2026-11-03〜。コマンドはすべて short-movie で実行）

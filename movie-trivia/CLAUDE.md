@@ -88,7 +88,7 @@ bgm/                        パターンが使う共通BGM（Git管理外）
 - `../short-movie` の production のうち、制作中の `robot-ai-20261030` だけが今もこの `node_modules` をジャンクションで借りている（`sm-engine-test` と新しい production は 2026-10-30 に共通remotionへ移った）。**robot-ai-20261030 の cleanup でジャンクションが外れるまで、`node_modules`の中身・依存（remotion・ffmpeg-static等）を変えない・消さない**
 - `../claude-course` のファイルはimportも変更もしない（共通処理は remotion の core を通して共有する）
 - Git：2026-10-06に初期化（コードと設定のみ。素材・音声・提供素材・BGMは .gitignore でローカルのみ）。push は指示があるまでしない
-- `.env`（Git管理外）に`PEXELS_API_KEY`。値は表示しない
+- `PEXELS_API_KEY` は共通remotionの `remotion/.env`（Git管理外）で一元管理（2026-11-22。short-movie と共通。Mac・Windows それぞれ1回設定すればよい）。環境変数があればそれが優先。`movie-trivia/.env` は古い置き場所として読むだけ（今後は不要）。値は表示しない
 - パターンには動画固有のもの（テーマ・台本・素材・図解・タイトル・サムネイルの文言・読み替え表・出典）を入れない
 
 ## YouTube投稿後の後片付け
