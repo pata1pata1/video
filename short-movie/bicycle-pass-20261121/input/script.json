@@ -9,9 +9,9 @@
   "clip": {
     "file": "source.mp4",
     "start": 0,
-    "end": 10.9,
-    "width": 540,
-    "height": 960
+    "end": 24.8,
+    "width": 1080,
+    "height": 1920
   },
   "layout": {
     "fit": "cover",
@@ -32,17 +32,57 @@
       "kind": "hook",
       "cards": [
         {
-          "text": "背後から迫る自転車、おばあちゃんが振り向いてかわす",
-          "caption": "背後から迫る自転車\nおばあちゃんが振り向いてかわす"
+          "text": "おばあちゃんを、ひこうとする高校生",
+          "caption": "おばあちゃんを\n轢こうとする高校生"
         }
       ]
     },
     {
-      "at": 4.4,
+      "at": 6.3,
       "kind": "transition",
       "cards": [
         {
           "text": "もう一度、スローで"
+        }
+      ]
+    },
+    {
+      "at": 13.4,
+      "kind": "transition",
+      "cards": [
+        {
+          "text": "これは危険ですね"
+        }
+      ]
+    },
+    {
+      "at": 15.2,
+      "kind": "transition",
+      "cards": [
+        {
+          "text": "一歩間違っていれば、"
+        },
+        {
+          "text": "おばあちゃんが転倒して"
+        },
+        {
+          "text": "大怪我をしていた"
+        },
+        {
+          "text": "可能性もあります"
+        }
+      ]
+    },
+    {
+      "at": 21.2,
+      "kind": "closing",
+      "cards": [
+        {
+          "text": "こんな高校生、",
+          "caption": "こんな高校生"
+        },
+        {
+          "text": "あなたはどう思う？"
         }
       ]
     }

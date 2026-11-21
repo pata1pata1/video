@@ -1,7 +1,7 @@
 {
-  "validatedAt": "2026-11-21T09:08:30.509Z",
+  "validatedAt": "2026-11-21T09:26:19.449Z",
   "requestId": "pr-xpost-bicycle-pass-20261121-main-202611210904",
-  "scriptSha256": "989d0033982c048dbb32cec6e7a8a05ddab61f6b13b8aad811352c0f13e43534",
+  "scriptSha256": "d6d4a79ff49d9a0db8059a078bcda3aae517561341fecd40b1e929fc06601db1",
   "status": "pass",
   "proceed": true,
   "precheck": [],
