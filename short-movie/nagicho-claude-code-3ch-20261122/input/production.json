@@ -1,0 +1,9 @@
+{
+  "contractVersion": "content-ops.production-request/1",
+  "campaignId": "nagicho-claude-code-3ch-20261122",
+  "key": "main",
+  "requestId": "pr-nagicho-claude-code-3ch-20261122-main-202611211827",
+  "requestPath": "campaigns/nagicho-claude-code-3ch-20261122/production/video-main.json",
+  "productionId": "nagicho-claude-code-3ch-20261122",
+  "importedAt": "2026-11-21T18:28:24.329Z"
+}

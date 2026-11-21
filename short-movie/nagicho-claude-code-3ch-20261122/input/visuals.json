@@ -1,0 +1,174 @@
+{
+  "policy": "news-short/own-material",
+  "images": [
+    {
+      "file": "01.jpg",
+      "category": "photo",
+      "realness": "event",
+      "layout": "title-card",
+      "description": "自社で制作した動画のコマ（この運用の実際の成果物）＋文字",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "AIにYouTube",
+        "3チャンネル任せた"
+      ]
+    },
+    {
+      "file": "02.jpg",
+      "category": "photo",
+      "realness": "subject",
+      "layout": "phones",
+      "description": "自社のターミナルの実際の出力・自社で作った動画のコマ・自作の図（他社の画面・ロゴなし）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "ニュース・開運・AI"
+      ]
+    },
+    {
+      "file": "03.jpg",
+      "category": "screenshot",
+      "realness": "event",
+      "layout": "terminal",
+      "description": "自社のターミナルの実際の出力",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "Claude Code",
+        "ターミナルで動くAI"
+      ]
+    },
+    {
+      "file": "04.jpg",
+      "category": "photo",
+      "realness": "event",
+      "layout": "full-bleed",
+      "description": "自社で制作した動画のコマ（この運用の実際の成果物）＋文字",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "1 調べる",
+        "題材と出典を確認"
+      ]
+    },
+    {
+      "file": "05.jpg",
+      "category": "photo",
+      "realness": "event",
+      "layout": "full-bleed",
+      "description": "自社で制作した動画のコマ（この運用の実際の成果物）＋文字",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "2 台本と画像",
+        "1画面ずつ作る"
+      ]
+    },
+    {
+      "file": "06.jpg",
+      "category": "photo",
+      "realness": "event",
+      "layout": "full-bleed",
+      "description": "自社で制作した動画のコマ（この運用の実際の成果物）＋文字",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "3 音声で動画に",
+        "読み上げ音声"
+      ]
+    },
+    {
+      "file": "07.jpg",
+      "category": "photo",
+      "realness": "event",
+      "layout": "full-bleed",
+      "description": "自社で制作した動画のコマ（この運用の実際の成果物）＋文字",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "4 品質チェック",
+        "点数で合否"
+      ]
+    },
+    {
+      "file": "08.jpg",
+      "category": "photo",
+      "realness": "event",
+      "layout": "full-bleed",
+      "description": "自社で制作した動画のコマ（この運用の実際の成果物）＋文字",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "5 非公開でUP",
+        "YouTube API"
+      ]
+    },
+    {
+      "file": "09.jpg",
+      "category": "screenshot",
+      "realness": "event",
+      "layout": "terminal",
+      "description": "自社のターミナルの実際の出力",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "24点 公開できず",
+        "画面が文字ばかり"
+      ]
+    },
+    {
+      "file": "10.jpg",
+      "category": "diagram",
+      "realness": "drawn",
+      "layout": "steps",
+      "description": "自社のターミナルの実際の出力・自社で作った動画のコマ・自作の図（他社の画面・ロゴなし）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "不合格→直す→作り直す",
+        "最大3回"
+      ]
+    },
+    {
+      "file": "11.jpg",
+      "category": "photo",
+      "realness": "event",
+      "layout": "full-bleed",
+      "description": "自社で制作した動画のコマ（この運用の実際の成果物）＋文字",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "合格",
+        "93点"
+      ]
+    },
+    {
+      "file": "12.jpg",
+      "category": "screenshot",
+      "realness": "event",
+      "layout": "terminal",
+      "description": "自社のターミナルの実際の出力",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "非公開で3本アップ",
+        "youtu.be ×3"
+      ]
+    },
+    {
+      "file": "13.jpg",
+      "category": "photo",
+      "realness": "event",
+      "layout": "full-bleed",
+      "description": "自社で制作した動画のコマ（この運用の実際の成果物）＋文字",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "公開は人が決める",
+        "AIは非公開まで"
+      ]
+    },
+    {
+      "file": "14.jpg",
+      "category": "diagram",
+      "realness": "drawn",
+      "layout": "title-card",
+      "description": "自社のターミナルの実際の出力・自社で作った動画のコマ・自作の図（他社の画面・ロゴなし）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "AIに任せたい作業は？",
+        "コメントで教えて"
+      ]
+    }
+  ],
+  "rules": [],
+  "prohibited": []
+}
