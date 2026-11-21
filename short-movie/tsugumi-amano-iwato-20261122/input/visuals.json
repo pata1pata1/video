@@ -1,0 +1,167 @@
+{
+  "policy": "tsugumi-kaiun/1",
+  "images": [
+    {
+      "file": "01.jpg",
+      "category": "ukiyo-e",
+      "realness": "event",
+      "description": "歌川国貞（三代豊国）「岩戸神楽之起顕」1856 の天照大御神（暗く加工）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "太陽が消えた日"
+      ],
+      "layout": "panel-text"
+    },
+    {
+      "file": "01b.jpg",
+      "category": "ukiyo-e",
+      "realness": "event",
+      "description": "春斎年昌「岩戸神楽之起顕」1889（暗く加工）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "闇に包まれた世界"
+      ],
+      "layout": "full-bleed"
+    },
+    {
+      "file": "02.jpg",
+      "category": "ukiyo-e",
+      "realness": "event",
+      "description": "歌川国貞「岩戸神楽之起顕」1856",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "古事記に伝わる",
+        "天岩戸の神話"
+      ],
+      "layout": "panel-text"
+    },
+    {
+      "file": "03.jpg",
+      "category": "ukiyo-e",
+      "realness": "event",
+      "description": "歌川国貞「岩戸神楽之起顕」1856（右の図・落ち着いた色に加工）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "弟の乱暴に",
+        "心を痛めて"
+      ],
+      "layout": "full-bleed"
+    },
+    {
+      "file": "04.jpg",
+      "category": "ukiyo-e",
+      "realness": "event",
+      "description": "歌川国貞「岩戸神楽之起顕」c1844（暗く加工）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "天も地も暗闇に"
+      ],
+      "layout": "panel-text"
+    },
+    {
+      "file": "05.jpg",
+      "category": "ukiyo-e",
+      "realness": "event",
+      "description": "歌川国貞「岩戸神楽之起顕」c1844",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "八百万の神々が",
+        "集まって相談"
+      ],
+      "layout": "full-bleed"
+    },
+    {
+      "file": "06.jpg",
+      "category": "ukiyo-e",
+      "realness": "event",
+      "description": "作者不詳「鶏と鏡を持つウズメ」（パブリックドメイン）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "鶏・鏡・勾玉"
+      ],
+      "layout": "panel-text"
+    },
+    {
+      "file": "07.jpg",
+      "category": "ukiyo-e",
+      "realness": "event",
+      "description": "魚屋北渓「春の岩戸」のアメノウズメ",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "アメノウズメの",
+        "踊り"
+      ],
+      "layout": "full-bleed"
+    },
+    {
+      "file": "08.jpg",
+      "category": "ukiyo-e",
+      "realness": "event",
+      "description": "春斎年昌「岩戸神楽之起顕」1889（右の神々）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "神々が大笑い"
+      ],
+      "layout": "panel-text"
+    },
+    {
+      "file": "09.jpg",
+      "category": "ukiyo-e",
+      "realness": "event",
+      "description": "歌川国貞「岩戸神楽之起顕」1856 の天照大御神",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "岩戸を少し開けると"
+      ],
+      "layout": "full-bleed"
+    },
+    {
+      "file": "10.jpg",
+      "category": "ukiyo-e",
+      "realness": "event",
+      "description": "春斎年昌「岩戸神楽之起顕」1889",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "世界に光が戻った"
+      ],
+      "layout": "panel-text"
+    },
+    {
+      "file": "11.jpg",
+      "category": "photo",
+      "realness": "real-object",
+      "description": "天岩戸神社 西本宮（Big Ben in Japan, CC BY-SA 2.0）",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "神話の舞台と伝わる",
+        "高千穂・天岩戸神社"
+      ],
+      "layout": "panel-text"
+    },
+    {
+      "file": "12.jpg",
+      "category": "ukiyo-e",
+      "realness": "event",
+      "description": "春斎年昌「岩戸神楽之起顕」1889 の天照大御神",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "あなたの岩戸は？"
+      ],
+      "layout": "full-bleed"
+    },
+    {
+      "file": "13.jpg",
+      "category": "map-overview",
+      "realness": "drawn",
+      "description": "九州の地形図（コモンズ CC BY-SA 3.0 Alexrk2）に高千穂町",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "神話の舞台と伝わる",
+        "宮崎県 高千穂町"
+      ],
+      "layout": "map"
+    }
+  ],
+  "rules": [],
+  "prohibited": []
+}

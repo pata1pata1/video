@@ -1,0 +1,234 @@
+{
+  "id": "tsugumi-amano-iwato-20261122",
+  "voice": {
+    "speaker": 31,
+    "name": "No.7（読み聞かせ）",
+    "speedScale": 1.38
+  },
+  "sentenceGap": 0.3,
+  "captionColor": "#6b3fa0",
+  "pronunciation": {
+    "天岩戸神社": "あまのいわとじんじゃ",
+    "天岩戸": "あまのいわと",
+    "岩戸": "いわと",
+    "八百万": "やおよろず",
+    "天安河原": "あまのやすかわら",
+    "勾玉": "まがたま",
+    "岩屋": "いわや",
+    "高千穂町": "たかちほちょう",
+    "古事記": "こじき",
+    "アメノタヂカラオ": "あめのたぢからお"
+  },
+  "sentences": [
+    {
+      "kind": "hook",
+      "cards": [
+        {
+          "text": "ある日、",
+          "image": "01.jpg"
+        },
+        {
+          "text": "世界から、太陽が消えました。",
+          "caption": "世界から\n太陽が消えました",
+          "image": "01b.jpg"
+        }
+      ],
+      "attribution": []
+    },
+    {
+      "kind": "fact",
+      "cards": [
+        {
+          "text": "古事記に伝わる、",
+          "image": "02.jpg"
+        },
+        {
+          "text": "天岩戸の神話です。"
+        }
+      ],
+      "factIds": [
+        "myth-source"
+      ],
+      "attribution": []
+    },
+    {
+      "kind": "fact",
+      "cards": [
+        {
+          "text": "太陽の神アマテラスは、",
+          "image": "03.jpg",
+          "caption": "太陽の神\nアマテラスは"
+        },
+        {
+          "text": "弟スサノオの乱暴に心を痛め、",
+          "caption": "弟スサノオの\n乱暴に心を痛め"
+        },
+        {
+          "text": "岩屋にこもってしまいます。",
+          "caption": "岩屋に\nこもってしまいます"
+        }
+      ],
+      "factIds": [
+        "amaterasu-hides"
+      ],
+      "attribution": []
+    },
+    {
+      "kind": "fact",
+      "cards": [
+        {
+          "text": "天も地も暗くなり、",
+          "image": "04.jpg"
+        },
+        {
+          "text": "世界は乱れました。"
+        }
+      ],
+      "factIds": [
+        "darkness"
+      ],
+      "attribution": []
+    },
+    {
+      "kind": "fact",
+      "cards": [
+        {
+          "text": "困った八百万の神々は、",
+          "image": "05.jpg",
+          "caption": "困った\n八百万の神々は"
+        },
+        {
+          "text": "天安河原に集まって、",
+          "caption": "天安河原に\n集まって"
+        },
+        {
+          "text": "相談します。"
+        }
+      ],
+      "factIds": [
+        "gods-gather"
+      ],
+      "attribution": []
+    },
+    {
+      "kind": "fact",
+      "cards": [
+        {
+          "text": "鶏を鳴かせ、",
+          "image": "06.jpg"
+        },
+        {
+          "text": "榊に勾玉と鏡をかけて、",
+          "caption": "榊に\n勾玉と鏡をかけて"
+        }
+      ],
+      "factIds": [
+        "preparations"
+      ],
+      "attribution": []
+    },
+    {
+      "kind": "fact",
+      "cards": [
+        {
+          "text": "アメノウズメが踊ると、",
+          "image": "07.jpg",
+          "caption": "アメノウズメが\n踊ると"
+        },
+        {
+          "text": "神々は、どっと笑いました。",
+          "image": "08.jpg",
+          "caption": "神々は\nどっと笑いました"
+        }
+      ],
+      "factIds": [
+        "uzume-laughter"
+      ],
+      "attribution": []
+    },
+    {
+      "kind": "fact",
+      "cards": [
+        {
+          "text": "外のにぎわいを不思議に思った",
+          "image": "09.jpg",
+          "caption": "外のにぎわいを\n不思議に思った"
+        },
+        {
+          "text": "アマテラスが、"
+        },
+        {
+          "text": "岩戸を少し開けると、",
+          "caption": "岩戸を\n少し開けると"
+        }
+      ],
+      "factIds": [
+        "amaterasu-peeks"
+      ],
+      "attribution": []
+    },
+    {
+      "kind": "fact",
+      "cards": [
+        {
+          "text": "力持ちのアメノタヂカラオが、",
+          "image": "10.jpg",
+          "caption": "力持ちの\nアメノタヂカラオが"
+        },
+        {
+          "text": "岩戸を開き、"
+        },
+        {
+          "text": "世界に光が戻りました。",
+          "caption": "世界に\n光が戻りました"
+        }
+      ],
+      "factIds": [
+        "tajikarao"
+      ],
+      "attribution": []
+    },
+    {
+      "kind": "fact",
+      "cards": [
+        {
+          "text": "この神話の舞台と伝わるのが、",
+          "image": "13.jpg",
+          "caption": "この神話の\n舞台と伝わるのが"
+        },
+        {
+          "text": "宮崎県高千穂町の天岩戸神社です。",
+          "caption": "宮崎県高千穂町の\n天岩戸神社です",
+          "image": "11.jpg"
+        }
+      ],
+      "factIds": [
+        "shrine"
+      ],
+      "attribution": []
+    },
+    {
+      "kind": "closing",
+      "cards": [
+        {
+          "text": "つらい時こそ、",
+          "image": "12.jpg"
+        },
+        {
+          "text": "笑いが光を呼ぶのかもしれません。",
+          "caption": "笑いが光を\n呼ぶのかもしれません"
+        },
+        {
+          "text": "あなたの心の岩戸は、",
+          "caption": "あなたの\n心の岩戸は"
+        },
+        {
+          "text": "開いていますか？",
+          "caption": "開いていますか？"
+        }
+      ],
+      "attribution": []
+    }
+  ],
+  "motion": {}
+}

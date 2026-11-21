@@ -1,0 +1,25 @@
+{
+  "mp4Sha256": "848f68cad5321b198380c740006b429d37f385d3cfc069c78ad9bf8043c01c87",
+  "reviewedAt": "2026-11-22T03:10:00+09:00",
+  "reviewedBy": "claude",
+  "judgments": {
+    "thumbStopping": true,
+    "visualImpact": true,
+    "understandableWithoutAudio": true,
+    "looksLikeSlidesOrCheapDiagram": false,
+    "looksAiGeneric": false
+  },
+  "strongestFrame": "f17〜f18（春斎年昌の浮世絵、光が戻る場面）",
+  "weakestFrame": "f08（暗くした国貞の図。何が描かれているか分かりにくい）",
+  "strengths": [
+    "江戸〜明治の浮世絵（パブリックドメイン）で神話の場面をそのまま見せる",
+    "藤色と金の落ち着いた配色で、事件向けの赤字・不穏な演出を使っていない",
+    "実在の天岩戸神社の写真で神話と場所をつなぐ",
+    "全面の浮世絵と枠つきの画面を交互にし、高千穂の地図を挟んだ"
+  ],
+  "weaknesses": [
+    "動く映像がない（静止画とズームだけ）",
+    "暗闇の場面は画が分かりにくい"
+  ],
+  "visualImpactAssessment": "浮世絵の色彩と光の構図でフィードで目を止める力がある。締めが長いので最後の数秒の引きはやや弱い"
+}
