@@ -84,6 +84,175 @@
       "matchPolicy": "auto",
       "source": "user-instruction",
       "addedAt": "2026-11-09T08:08:34.366Z"
+    },
+    {
+      "id": "company-661d39eb",
+      "surface": "アンジュール東京",
+      "readings": [
+        "あんじゅーるとうきょう"
+      ],
+      "readingConfirmed": true,
+      "kind": "company",
+      "aliases": [],
+      "misrecognitions": [
+        "アンジュール 東京"
+      ],
+      "contextHints": [],
+      "matchPolicy": "auto",
+      "source": "user-instruction",
+      "addedAt": "2026-11-22T21:10:10.887Z"
+    },
+    {
+      "id": "person-6d79b30e",
+      "surface": "鈴音りん",
+      "readings": [
+        "すずねりん"
+      ],
+      "readingConfirmed": true,
+      "kind": "person",
+      "aliases": [],
+      "misrecognitions": [
+        "鈴根りん",
+        "鈴音リン"
+      ],
+      "contextHints": [],
+      "matchPolicy": "auto",
+      "source": "user-instruction",
+      "addedAt": "2026-11-22T21:10:11.069Z"
+    },
+    {
+      "id": "person-c59ae389",
+      "surface": "角田",
+      "readings": [
+        "つのだ"
+      ],
+      "readingConfirmed": true,
+      "kind": "person",
+      "aliases": [],
+      "misrecognitions": [
+        "津野田",
+        "角野田"
+      ],
+      "contextHints": [],
+      "matchPolicy": "auto",
+      "source": "user-instruction",
+      "addedAt": "2026-11-22T21:10:11.258Z"
+    },
+    {
+      "id": "person-3e28593e",
+      "surface": "林尚宏",
+      "readings": [
+        "はやしなおひろ"
+      ],
+      "readingConfirmed": true,
+      "kind": "person",
+      "aliases": [],
+      "misrecognitions": [
+        "林直弘",
+        "林直宏",
+        "林尚弘"
+      ],
+      "contextHints": [],
+      "matchPolicy": "auto",
+      "source": "user-instruction",
+      "addedAt": "2026-11-22T21:10:11.447Z"
+    },
+    {
+      "id": "person-c2335b0c",
+      "surface": "溝口勇児",
+      "readings": [
+        "みぞぐちゆうじ"
+      ],
+      "readingConfirmed": true,
+      "kind": "person",
+      "aliases": [],
+      "misrecognitions": [
+        "溝口雄二",
+        "溝口裕二",
+        "溝口勇治"
+      ],
+      "contextHints": [],
+      "matchPolicy": "auto",
+      "source": "user-instruction",
+      "addedAt": "2026-11-22T21:10:11.632Z"
+    },
+    {
+      "id": "person-ca8eab70",
+      "surface": "オロチ美琴",
+      "readings": [
+        "おろちみこと"
+      ],
+      "readingConfirmed": true,
+      "kind": "person",
+      "aliases": [],
+      "misrecognitions": [
+        "オロチミコト",
+        "大蛇美琴"
+      ],
+      "contextHints": [],
+      "matchPolicy": "auto",
+      "source": "user-instruction",
+      "addedAt": "2026-11-22T21:16:04.750Z"
+    },
+    {
+      "id": "person-ae8a6fe6",
+      "surface": "神谷朱音",
+      "readings": [
+        "かみやあかね"
+      ],
+      "readingConfirmed": true,
+      "kind": "person",
+      "aliases": [],
+      "misrecognitions": [
+        "神谷金",
+        "神谷茜",
+        "神谷あかね"
+      ],
+      "contextHints": [],
+      "matchPolicy": "auto",
+      "source": "user-instruction",
+      "addedAt": "2026-11-22T21:16:04.933Z"
+    },
+    {
+      "id": "person-1b9ca3b0",
+      "surface": "あいり",
+      "readings": [
+        "あいり"
+      ],
+      "readingConfirmed": true,
+      "kind": "person",
+      "aliases": [],
+      "misrecognitions": [
+        "アイリス"
+      ],
+      "contextHints": [],
+      "matchPolicy": "auto",
+      "nameContextOnly": true,
+      "note": "キャバ嬢（アンジュール東京）。「アイリスさん」と誤認識された",
+      "source": "user-instruction",
+      "addedAt": "2026-11-22T21:16:14.558Z"
+    },
+    {
+      "id": "person-7716cea5",
+      "surface": "エンターテイナー折原",
+      "readings": [
+        "えんたーていなーおりはら"
+      ],
+      "readingConfirmed": true,
+      "kind": "person",
+      "aliases": [
+        "折原"
+      ],
+      "misrecognitions": [
+        "エンターテイナー、織原",
+        "エンターテイナー織原",
+        "織原"
+      ],
+      "contextHints": [],
+      "matchPolicy": "auto",
+      "note": "暴露系インフルエンサー",
+      "source": "user-instruction",
+      "addedAt": "2026-11-22T21:16:26.760Z"
     }
   ]
 }

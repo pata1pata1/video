@@ -138,6 +138,79 @@ function pauseCandidates(transcript: Transcript, pcm: Pcm, speechDb: number, dur
   return out;
 }
 
+/**
+ * Quiet stretches read from the audio alone, for where the word times are wrong (2026-11-23, an:
+ * whisper.cpp stretched words over a 31 s silence and over the 3 s head silence, so no word gap
+ * existed there). Runs of 50 ms windows that are all below the quiet level; a run the word-gap
+ * candidates already shorten is skipped. Speech never falls inside a run, so cutting it is as safe
+ * as a word-gap silence; the padding is the sentence pause (or the edge padding at the head / tail).
+ */
+function audioQuietCandidates(transcript: Transcript, pcm: Pcm, speechDb: number, duration: number, s: Settings["candidates"], pauses: Draft[]): Draft[] {
+  const minRun = s.audioQuietMinSeconds;
+  if (typeof minRun !== "number" || minRun <= 0) return [];
+  const quietDb = speechDb - s.quietMarginDb;
+  const win = 0.05;
+  const n = Math.floor(duration / win);
+  const runs: { from: number; to: number }[] = [];
+  let runStart = -1;
+  for (let i = 0; i <= n; i++) {
+    const quiet = i < n && levelOf(pcm, i * win, Math.min(duration, (i + 1) * win)).rmsDb <= quietDb;
+    if (quiet && runStart < 0) runStart = i;
+    if (!quiet && runStart >= 0) {
+      runs.push({ from: runStart * win, to: i === n ? duration : i * win });
+      runStart = -1;
+    }
+  }
+  const cuts = pauses.filter((p) => p.kind === "silence" && p.suggestion === "cut");
+  const covered = (a: number, b: number) => {
+    const iv = cuts.map((c) => [Math.max(a, c.start), Math.min(b, c.end)] as const).filter(([x, y]) => y > x).sort((p, q) => p[0] - q[0]);
+    let total = 0;
+    let reach = a;
+    for (const [x, y] of iv) {
+      if (y <= reach) continue;
+      total += y - Math.max(x, reach);
+      reach = y;
+    }
+    return total;
+  };
+  const words = transcript.segments.flatMap((seg) => seg.words.map((w) => ({ ...w, seg: seg.id })));
+  const mid = (w: { start: number; end: number }) => (w.start + w.end) / 2;
+  const pad = pausePadding(s, true);
+  const out: Draft[] = [];
+  for (const r of runs) {
+    const length = r.to - r.from;
+    if (length < minRun) continue;
+    // Already shortened to about the sentence pause by the word-gap rule.
+    if (length - covered(r.from, r.to) <= s.sentencePauseSeconds + 0.2) continue;
+    const head = r.from < win / 2;
+    const tail = r.to > duration - win / 2;
+    const start = head ? 0 : r.from + pad;
+    const end = tail ? duration : r.to - (head ? s.edgePaddingSeconds : pad);
+    if (end - start < 0.2) continue;
+    const lv = levelOf(pcm, start, end);
+    const inside = words.filter((w) => mid(w) >= start && mid(w) < end);
+    const where = head ? "冒頭の無音" : tail ? "末尾の無音" : `${length.toFixed(1)}秒の無音`;
+    out.push({
+      kind: "silence",
+      start: round3(start),
+      end: round3(end),
+      confidence: 0.7,
+      suggestion: "cut",
+      reason:
+        `${where}（音量だけで検出：${lv.rmsDb}dB＝話し声 ${speechDb}dB より十分小さい）。` +
+        (inside.length ? `文字起こしの時刻はここに「${inside.map((w) => w.text).join("").slice(0, 20)}」があることになっているが、声は無い（時刻のずれ）。` : "単語の隙間の候補から漏れていた。") +
+        (head || tail ? "" : `間を約${round3(pad * 2)}秒にする`),
+      text: "",
+      context: {
+        before: words.filter((w) => mid(w) < r.from).slice(-10).map((w) => w.text).join(""),
+        after: words.filter((w) => mid(w) >= r.to).slice(0, 10).map((w) => w.text).join(""),
+      },
+      segmentIds: [...new Set(inside.map((w) => w.seg))],
+    });
+  }
+  return out;
+}
+
 function fillerCandidates(segs: TranscriptSegment[], s: Settings["candidates"]): Draft[] {
   const out: Draft[] = [];
   const alt = (xs: string[]) => [...xs].sort((a, b) => b.length - a.length).map(escapeRegExp).join("|");
@@ -451,8 +524,10 @@ export function buildCutCandidates(
   // The speaker's own level: RMS over every word span.
   const speechDb = levelOfRanges(pcm, segs.flatMap((seg) => seg.words));
   const restarts = restartCandidates(segs);
+  const pauses = pauseCandidates(transcript, pcm, speechDb, duration, settings);
   const drafts = [
-    ...pauseCandidates(transcript, pcm, speechDb, duration, settings),
+    ...pauses,
+    ...audioQuietCandidates(transcript, pcm, speechDb, duration, settings, pauses),
     ...fillerCandidates(segs, settings),
     ...restarts,
     // (skip a repeat the per-segment restart rule already found)

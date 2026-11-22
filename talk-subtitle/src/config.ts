@@ -44,6 +44,13 @@ export const DEFAULT_SETTINGS = {
     keepPaddingSeconds: null as number | null,
     /** Head/tail: keep this much before the first / after the last word. */
     edgePaddingSeconds: 0.3,
+    /**
+     * Quiet stretches found from the audio alone (2026-11-23, an): whisper.cpp word times can run into
+     * a silence (a 31 s silence and the 3 s head silence were "covered" by stretched words, so the
+     * word-gap rule missed them). A quiet run (50 ms windows, all below the quiet level) at least this
+     * long that the word-gap candidates leave mostly uncut becomes a silence candidate too. null = off.
+     */
+    audioQuietMinSeconds: 1.0 as number | null,
     /** Consecutive sentences at least this similar are a retake. */
     retakeSimilarity: 0.6,
     retakeMinChars: 6,
