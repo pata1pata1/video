@@ -289,6 +289,47 @@ function restartCandidates(segs: TranscriptSegment[]): Draft[] {
 }
 
 /**
+ * A short phrase left hanging before a long pause, then the speaker goes on in other words
+ * (2026-11-23, an: 「今回の、」 … 7 s … 「こういった元キャストらの発信以降に」, cut on the user's
+ * instruction). A whole segment of at most DANGLING_MAX_CHARS that ends in 、 (not a sentence end)
+ * with at least DANGLING_MIN_PAUSE seconds before the next segment. Review only: 「今回の、こういった」
+ * can also be meant as one phrase.
+ */
+const DANGLING_MAX_CHARS = 6;
+const DANGLING_MIN_PAUSE = 2.0;
+function danglingCandidates(segs: TranscriptSegment[]): Draft[] {
+  const out: Draft[] = [];
+  segs.forEach((seg, i) => {
+    const next = segs[i + 1];
+    if (!next) return;
+    const text = seg.text.trim();
+    if (!/[、,]$/.test(text)) return;
+    const core = normalizeForCompare(text);
+    if (!core || core.length > DANGLING_MAX_CHARS) return;
+    const span = segSpan(seg);
+    const nextStart = segSpan(next).start;
+    if (nextStart - Math.max(span.start, span.end) < DANGLING_MIN_PAUSE) return;
+    // The same words again = a retake, found by the retake rules.
+    if (normalizeForCompare(next.text).startsWith(core)) return;
+    const start = Math.min(span.start, span.end, seg.start);
+    const end = Math.max(span.start, span.end, seg.end);
+    if (end - start < 0.1) return;
+    out.push({
+      kind: "restart",
+      start: round3(start),
+      end: round3(end),
+      confidence: 0.4,
+      suggestion: "review",
+      reason: `短い言いかけ「${text}」のあと${(nextStart - end).toFixed(1)}秒止まり、別の言い方で続けている（「${next.text.trim().slice(0, 15)}」）。言いかけを削る案（つながった言い回しなら残す。境目は音量で確認）`,
+      text,
+      context: neighbours(segs, i),
+      segmentIds: [seg.id],
+    });
+  });
+  return out;
+}
+
+/**
  * Repeated connectives at a phrase head: 「で。で、あと」「でで、だから」「このこの」. Whisper often puts
  * each 「で」 in its own segment, so this works on the word stream of the whole transcript, not per
  * segment. Whole words only (「でですね」 is で＋ですね, 「ところでできる」 is not a phrase head).
@@ -534,6 +575,7 @@ export function buildCutCandidates(
     ...connectiveRepeatCandidates(segs, settings).filter(
       (d) => !restarts.some((r) => Math.min(r.end, d.end) - Math.max(r.start, d.start) >= 0.5 * Math.min(r.end - r.start, d.end - d.start)),
     ),
+    ...danglingCandidates(segs),
     ...openingRetakeCandidates(segs, settings),
     ...retakeCandidates(segs, settings),
     ...markerCandidates(segs, settings),
