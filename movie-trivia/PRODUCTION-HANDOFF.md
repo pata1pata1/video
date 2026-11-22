@@ -17,6 +17,8 @@ movie-trivia：node scripts/mt.mjs new --project=<id> --pattern=pattern-0N
 
 ## story-long（2026-11-22、セット02 つぐみの開運チャンネルの横長）
 
+- **神秘的な世界観（2026-11-22、セット02 共通事項・毎回）**：映像とサムネイルの両方に、光・月・星・神社・空・霧・朝日や夕日・やわらかな発光を入れ、紫・紺・金・白系の色で神秘的・神聖・上品に。サムネイルは強すぎる煽りをせず、文字だけに頼らずビジュアルで引く。正本は `../../content-ops/workspaces/tsugumi-kaiun/creative-rules.md` 0章（ニュースMT・セット03 には使わない）
+
 `productionType: "story-long"` も同じ手順で受ける（`scripts/production.mjs` の SUPPORTED。pattern は pattern-02 だけ）。pattern-02 をそのまま使い、台本の `voice`（`{ "speaker": 31, "speakerName": "No.7", "speedScale": 1.38 }`）と `bgm`（自作の calm-pad。`../short-movie/scripts/make-bgm.mjs --name=<名前> --seconds=<尺+20>` で作り `bgm/` に置く。Git 管理外）で落ち着いた女性の語りにする。実在の人物の実名・写真は使わない。最初の動画は `tsugumi-sleep-habits-20261122`（眠りを妨げる夜の習慣7つ、long-v2 88）。
 
 ## コマンド
