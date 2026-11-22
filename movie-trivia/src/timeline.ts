@@ -108,7 +108,7 @@ export type ThumbnailDef = {
   /** pattern-02 face layout: photos side by side across the top (key + CSS object-position), a yellow kicker on a red band, white lines, and a red accent line. */
   faces?: { key: string; position?: string }[];
   /** "split": photo large on the right fading into a blurred copy, text on the left (Thumbnail.tsx SplitThumbnail). */
-  layout?: "split";
+  layout?: "split" | "mystic";
   /** split layout: width of the sharp photo on the right (px of 1280). */
   photoWidth?: number;
   kicker?: string;

@@ -33,6 +33,7 @@ export const Thumbnail: React.FC<{ variant: string }> = ({ variant }) => {
   if (def.case) return <CaseThumbnail c={def.case} />;
   if (def.faces) return <FacesThumbnail def={def} />;
   if (def.layout === "split") return <SplitThumbnail def={def} />;
+  if (def.layout === "mystic") return <MysticThumbnail def={def} />;
   const media = mediaFor(def.photo);
   const src = media?.mediaType === "video" ? videoFrameFile(def.photo, def.frame ?? L.image.videoFrame) : media?.file;
   const A = L.accentWord;
@@ -416,6 +417,74 @@ const SplitThumbnail: React.FC<{ def: (typeof SCRIPT.thumbnails)[number] }> = ({
       {def.note ? (
         <div style={{ position: "absolute", right: 22, bottom: 16, fontFamily: font.body, fontWeight: 700, fontSize: 22, color: "#FFFFFF", textShadow: "0 1px 4px rgba(0,0,0,0.95), 0 0 8px rgba(0,0,0,0.8)" }}>{def.note}</div>
       ) : null}
+    </AbsoluteFill>
+  );
+};
+
+/**
+ * Mystic layout (set 02 つぐみの開運チャンネル, 2026-11-22 user rule "神秘的な世界観"):
+ * a navy-to-purple night sky with stars, a glowing moon and low mist; the photo
+ * in a round gold-ringed frame on the right with a soft glow; refined Mincho
+ * text on the left in white and gold, no red bands or loud badges.
+ * Uses ribbon (small gold label), lines (white), accent (gold), question (white, under a thin gold rule).
+ */
+export const MysticThumbnail: React.FC<{ def: (typeof SCRIPT.thumbnails)[number] }> = ({ def }) => {
+  const media = mediaFor(def.photo);
+  const src = media?.mediaType === "video" ? videoFrameFile(def.photo, def.frame ?? L.image.videoFrame) : media?.file;
+  const GOLD = "linear-gradient(180deg, #FFF6D6 0%, #F3D27A 45%, #C9973A 100%)";
+  const mincho = (size: number): React.CSSProperties => ({ fontFamily: caseFont, fontWeight: 900, fontSize: size, whiteSpace: "nowrap", lineHeight: 1.12, letterSpacing: "0.02em" });
+  const circle = 520;
+  return (
+    <AbsoluteFill style={{ background: "linear-gradient(160deg, #0B1030 0%, #1B1650 45%, #3A2368 80%, #4B2C74 100%)", overflow: "hidden" }}>
+      {/* stars */}
+      {Array.from({ length: 90 }, (_, i) => {
+        const s = 1 + random(`st${i}`) ** 4 * 4;
+        return <div key={i} style={{ position: "absolute", left: `${random(`sx${i}`) * 100}%`, top: `${random(`sy${i}`) * 78}%`, width: s, height: s, borderRadius: "50%", background: "#FFFFFF", opacity: 0.35 + random(`so${i}`) * 0.6, boxShadow: s > 3 ? "0 0 8px 2px rgba(255,240,200,0.8)" : undefined }} />;
+      })}
+      {/* moon glow behind the photo */}
+      <AbsoluteFill style={{ background: "radial-gradient(circle 420px at 960px 330px, rgba(255,226,150,0.38), rgba(170,130,255,0.18) 55%, rgba(0,0,0,0) 80%)" }} />
+      {/* crescent moon top-left of the circle */}
+      <div style={{ position: "absolute", left: 640, top: 34, width: 120, height: 120, borderRadius: "50%", boxShadow: "inset -26px 10px 0 0 #FCEFC4", filter: "drop-shadow(0 0 18px rgba(255,230,160,0.9))", transform: "rotate(-20deg)" }} />
+      {/* photo in a round gold frame */}
+      {src ? (
+        <div style={{ position: "absolute", left: 960 - circle / 2, top: 330 - circle / 2, width: circle, height: circle, borderRadius: "50%", padding: 6, background: GOLD, boxShadow: "0 0 50px 10px rgba(255,220,140,0.45), 0 0 120px 30px rgba(150,110,255,0.35)" }}>
+          <div style={{ width: "100%", height: "100%", borderRadius: "50%", overflow: "hidden", position: "relative" }}>
+            <Img src={staticFile(src)} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: def.imagePosition ?? "center", filter: "saturate(0.8) brightness(0.95)" }} />
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(60,40,140,0.25), rgba(20,16,70,0.45))", mixBlendMode: "multiply" }} />
+            <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at 30% 20%, rgba(255,240,200,0.25), rgba(0,0,0,0) 55%)" }} />
+          </div>
+        </div>
+      ) : null}
+      {/* thin orbit ring */}
+      <div style={{ position: "absolute", left: 960 - circle / 2 - 26, top: 330 - circle / 2 - 26, width: circle + 52, height: circle + 52, borderRadius: "50%", border: "2px solid rgba(243,210,122,0.55)" }} />
+      {/* sparkles on the ring */}
+      {[[690, 520, 34], [1215, 140, 26], [1240, 470, 20], [700, 210, 18]].map(([x, y, sz]) => (
+        <div key={`${x}`} style={{ position: "absolute", left: x, top: y, fontSize: sz, color: "#FFF1C2", textShadow: "0 0 12px rgba(255,230,160,0.95)" }}>✦</div>
+      ))}
+      {/* mist along the bottom */}
+      <AbsoluteFill style={{ background: "radial-gradient(ellipse 900px 160px at 30% 105%, rgba(225,215,255,0.6), rgba(0,0,0,0) 70%), radial-gradient(ellipse 760px 170px at 85% 108%, rgba(210,200,255,0.5), rgba(0,0,0,0) 70%)" }} />
+      {/* text */}
+      <div style={{ position: "absolute", left: 60, top: 110 }}>
+        <div style={{ display: "inline-block", ...mincho(34), color: "#F3D27A", borderTop: "2px solid rgba(243,210,122,0.8)", borderBottom: "2px solid rgba(243,210,122,0.8)", padding: "6px 14px", textShadow: "0 2px 10px rgba(0,0,0,0.6)" }}>{def.ribbon}</div>
+        <div style={{ marginTop: 34 }}>
+          {def.lines.map((l) => (
+            <div key={l} style={{ ...mincho(84), color: "#FFFFFF", textShadow: "0 0 18px rgba(190,160,255,0.75), 0 4px 14px rgba(0,0,0,0.7)" }}>
+              {l}
+            </div>
+          ))}
+        </div>
+        <div style={{ position: "relative", marginTop: 6 }}>
+          <div style={{ ...mincho(def.accent.length > 5 ? 104 : 120), color: "#2A1A08", WebkitTextStroke: "10px #1A1036", textShadow: "0 0 26px rgba(255,220,140,0.6), 0 6px 18px rgba(0,0,0,0.8)" }}>{def.accent}</div>
+          <div style={{ ...mincho(def.accent.length > 5 ? 104 : 120), position: "absolute", left: 0, top: 0, color: "transparent", backgroundImage: GOLD, WebkitBackgroundClip: "text", backgroundClip: "text" }}>{def.accent}</div>
+        </div>
+        {def.question ? (
+          <div style={{ marginTop: 34, display: "flex", alignItems: "center", gap: 16 }}>
+            <div style={{ width: 46, height: 2, background: "#F3D27A" }} />
+            <div style={{ ...mincho(46), color: "#FFFFFF", textShadow: "0 0 14px rgba(190,160,255,0.8), 0 3px 10px rgba(0,0,0,0.7)" }}>{def.question}</div>
+            <div style={{ color: "#F3D27A", fontSize: 30 }}>✦</div>
+          </div>
+        ) : null}
+      </div>
     </AbsoluteFill>
   );
 };

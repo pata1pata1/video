@@ -586,6 +586,19 @@
         "big": "何個",
         "bottom": "当てはまる？"
       }
+    },
+    {
+      "id": "B",
+      "layout": "mystic",
+      "photo": "bed",
+      "frame": 39,
+      "imagePosition": "40% center",
+      "ribbon": "厚労省の睡眠ガイドより",
+      "lines": [
+        "眠りを妨げる"
+      ],
+      "accent": "夜の習慣7つ",
+      "question": "あなたは何個当てはまる？"
     }
   ],
   "subtitle": {
