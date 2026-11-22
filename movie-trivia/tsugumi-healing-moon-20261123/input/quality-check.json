@@ -1,0 +1,106 @@
+{
+  "maxAttempts": 3,
+  "latest": {
+    "attempt": 1,
+    "gate": "pass",
+    "overallQuality": 98,
+    "scores": {
+      "duration": 100,
+      "audio": 100,
+      "continuity": 100,
+      "variety": 100,
+      "licensing": 100,
+      "claims": 100,
+      "thumbnail": 100,
+      "visualStrength": 84
+    },
+    "escalation": null
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "checkedAt": "2026-11-22T16:13:27.192Z",
+      "rulesVersion": "healing-v1",
+      "gate": "pass",
+      "overallQuality": 98,
+      "scores": {
+        "duration": 100,
+        "audio": 100,
+        "continuity": 100,
+        "variety": 100,
+        "licensing": 100,
+        "claims": 100,
+        "thumbnail": 100,
+        "visualStrength": 84
+      },
+      "blocking": [],
+      "metrics": {
+        "duration": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "audio": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "continuity": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "variety": {
+          "score": 100,
+          "findings": [],
+          "fixes": [],
+          "evidence": {
+            "scenes": 17,
+            "distinct": 17,
+            "longestSec": 184
+          }
+        },
+        "licensing": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "claims": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "thumbnail": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "visualStrength": {
+          "score": 84,
+          "findings": [],
+          "fixes": [],
+          "evidence": {
+            "judgmentSource": "claude-review",
+            "realFootageRatio": 1
+          }
+        }
+      },
+      "reviewNotes": [
+        "17場面とも紺〜紫〜金の色味で統一。夕暮れの空 → 月 → 星空・天の川 → 月光の水面 → 霧の湖と森 → 海の鳥居 → 金色の霧 → 雲海の朝日 → 光の差す森 → 朝日と、夜から夜明けへの流れになっている",
+        "暗転・文字・人物なし。満月・天の川・霧の湖が特に神秘的",
+        "気になる点：金色の霧の湖（goldfog）の上端に電線と電柱が少し写る。海の鳥居（torii）は昼の映像で、ほかより明るく青い"
+      ],
+      "visualEvidence": {
+        "judgmentSource": "claude-review",
+        "realFootageRatio": 1,
+        "diagramRatio": 0,
+        "cardRatio": 0,
+        "motionEvidence": null,
+        "strongestFrame": null,
+        "weakestFrame": null
+      },
+      "mp4Sha256": "934deda787eea2fe350f8bb0d8a21a68e3aae3945a81d14a9e44d059f618c02c",
+      "escalation": null
+    }
+  ]
+}

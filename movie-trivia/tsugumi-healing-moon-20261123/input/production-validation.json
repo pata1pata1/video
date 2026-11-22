@@ -1,0 +1,10 @@
+{
+  "validatedAt": "2026-11-22T15:26:18.372Z",
+  "requestId": "pr-tsugumi-healing-moon-20261123-main-202611221523",
+  "scriptSha256": "b74d686637cedefb660174e5f815d60158f739f54aeefc4d33c75a40add79777",
+  "scriptFile": "input/healing.json",
+  "status": "pass",
+  "proceed": true,
+  "precheck": [],
+  "contentOps": null
+}

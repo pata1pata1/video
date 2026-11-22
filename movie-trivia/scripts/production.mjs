@@ -65,7 +65,18 @@ const writeJson = (/** @type {string} */ f, /** @type {any} */ v) => {
   fs.mkdirSync(path.dirname(f), { recursive: true });
   fs.writeFileSync(f, `${JSON.stringify(v, null, 2)}\n`);
 };
-const sha = (/** @type {string} */ f) => crypto.createHash("sha256").update(fs.readFileSync(f)).digest("hex");
+/** sha256（2 GB を超える長尺の MP4 もあるので、少しずつ読む）。 @param {string} f */
+const sha = (f) => {
+  const h = crypto.createHash("sha256");
+  const fd = fs.openSync(f, "r");
+  const buf = Buffer.alloc(8 << 20);
+  try {
+    for (let n; (n = fs.readSync(fd, buf, 0, buf.length, null)) > 0; ) h.update(buf.subarray(0, n));
+  } finally {
+    fs.closeSync(fd);
+  }
+  return h.digest("hex");
+};
 const printChecks = (/** @type {{ name: string, passed: boolean, reason: string }[]} */ checks) => {
   for (const c of checks) console.log(`  ${c.passed ? "✓" : "✗"} ${c.name.padEnd(15)} ${c.reason}`);
 };
