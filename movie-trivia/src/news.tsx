@@ -177,10 +177,18 @@ const rowWidth = (text: string) => [...text].reduce((w, ch) => w + (/[A-Za-z0-9.
 const CUT_AFTER = /[はがをにでとのもへや]/u;
 const WORD_START = /[\p{Script=Han}\p{Script=Katakana}「『（0-9A-Za-z]/u;
 
+/**
+ * Per-video subtitle override in the script (2026-11-22, set 02 story-long): `"subtitle": { "rowsPerPage": 1, "maxRowChars": 18 }`
+ * shows one row at a time. Without it the pattern's values are used (two rows, pattern maxRowChars) — other videos do not change.
+ */
+const SUB_SCRIPT = (SCRIPT as unknown as { subtitle?: { rowsPerPage?: number; maxRowChars?: number } }).subtitle ?? {};
+const ROWS_PER_PAGE = SUB_SCRIPT.rowsPerPage === 1 ? 1 : 2;
+const MAX_ROW_CHARS = SUB_SCRIPT.maxRowChars ?? SUB.maxRowChars;
+
 /** Splits text into rows that fit at the fixed size, cutting at 「、」 first, then after a particle. */
 function splitRows(text: string): string[] {
   if (text.includes("\n")) return text.split("\n");
-  const max = SUB.maxRowChars;
+  const max = MAX_ROW_CHARS;
   if (rowWidth(text) <= max) return [text];
   const chars = [...text];
   // the cut nearest the middle whose first part fits; 「、」 is preferred over a particle
@@ -212,12 +220,12 @@ const subtitlePages = captionCues.flatMap((cue) => {
   const pages: string[][] = [];
   for (const s of sentences) {
     const rows = splitRows(s);
-    for (let i = 0; i < rows.length; i += 2) pages.push(rows.slice(i, i + 2));
+    for (let i = 0; i < rows.length; i += ROWS_PER_PAGE) pages.push(rows.slice(i, i + ROWS_PER_PAGE));
   }
-  // short sentences that fit together on two rows share a page
+  // short sentences that fit together on two rows share a page (not when one row per page)
   const merged = pages.reduce<string[][]>((acc, p) => {
     const last = acc[acc.length - 1];
-    if (last && last.length === 1 && p.length === 1) last.push(p[0]);
+    if (ROWS_PER_PAGE === 2 && last && last.length === 1 && p.length === 1) last.push(p[0]);
     else acc.push([...p]);
     return acc;
   }, []);

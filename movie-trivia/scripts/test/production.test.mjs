@@ -182,3 +182,22 @@ test("3つの pattern の設定（2026-11-20、改善 A〜F）：尺は固定し
     assert.ok(v.timing.leadIn <= 0.3, `${p}：leadIn ${v.timing.leadIn}`);
   }
 });
+
+test("資料の文字（2026-11-22）：縮小した PDF の資料・小さい文字・目視なし・ナレーション不一致は fail、切り出して拡大した資料は通る", async () => {
+  const { documentReadabilityIssues } = await import("../lib/production/quality.mjs");
+  const vis = [{ lineId: "o1", key: "page" }, { lineId: "o2", key: "crop" }, { lineId: "c1", key: "stock" }];
+  const ledger = {
+    page: { provider: "web", sourceUrl: "https://example.go.jp/guide.pdf" },
+    crop: { provider: "web", sourceUrl: "https://example.go.jp/guide.pdf", document: { kind: "crop", smallestTextPx: 40 } },
+    stock: { provider: "pexels", sourceUrl: "https://www.pexels.com/video/1/" },
+  };
+  const ok = { documents: { crop: { readable: true, matchesNarration: true } } };
+  const issues = documentReadabilityIssues(vis, ledger, ok);
+  assert.equal(issues.length, 1, "PDF のページを document の記録なしで出したものだけ fail");
+  assert.match(issues[0], /page/);
+  assert.deepEqual(documentReadabilityIssues(vis.slice(1), ledger, ok), []);
+  const small = { ...ledger, crop: { ...ledger.crop, document: { kind: "crop", smallestTextPx: 18 } } };
+  assert.match(documentReadabilityIssues(vis.slice(1), small, ok).join(), /18px/);
+  assert.match(documentReadabilityIssues(vis.slice(1), ledger, null).join(), /目視/);
+  assert.match(documentReadabilityIssues(vis.slice(1), ledger, { documents: { crop: { readable: true, matchesNarration: false } } }).join(), /一致/);
+});

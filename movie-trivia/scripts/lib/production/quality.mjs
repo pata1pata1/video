@@ -22,6 +22,12 @@ export const LONG_QUALITY_RULES = {
   visual: { avgMax: 10, staticMax: 20 },
   /** 画面の文字（字幕は別）。キーワード・見出しだけ。 */
   onScreenText: { maxCharsPerElement: 14, maxElementsPerLine: 3 },
+  /**
+   * 資料・図表の画像（2026-11-22、ユーザー指示「細かい資料を縮小して並べない」）：画面に出す資料の文字は、1920×1080 の完成動画で
+   * この高さ（px）以上。台帳（asset-sources.json）の document.smallestTextPx と、Claude の目視（visual-review.json の documents[key]：
+   * readable・matchesNarration）の両方がそろわなければ fail。PDF から取った画像で document の記録がないものも fail（見逃さない）。
+   */
+  documentText: { minTextPx: 32 },
   /** ナレーションの速さ（字/秒）。pattern の speedScale で変わるので幅を広めに。 */
   narration: { charsPerSec: [5.5, 9.0] },
   audio: { lufs: [-18, -14], truePeakMax: -1 },
@@ -59,6 +65,39 @@ export function lineVisuals(script) {
       else if (v.diagram || v.stat || v.points || v.data || v.list || v.findings) (current = v.diagram ? `diagram:${v.diagram}` : `card:${l.id}`), (kind = "drawn");
       const texts = [v.headline, ...(v.findings?.items ?? []).map((/** @type {any} */ i) => i?.head ?? i), ...(v.data?.items ?? []).map((/** @type {any} */ i) => `${i.label}${i.value}`), ...(v.list?.items ?? []).map((/** @type {any} */ i) => i.head)].filter((x) => typeof x === "string");
       out.push({ lineId: l.id, sceneId: sc.id, key: current, kind, words: Array.isArray(v.words) ? v.words : [], texts });
+    }
+  }
+  return out;
+}
+
+/**
+ * 画面に出す資料・図表（台帳の document、または PDF から取った画像）の文字が読めるか。
+ * @param {{ lineId: string, key: string | null }[]} vis
+ * @param {Record<string, any> | undefined} ledger
+ * @param {any} review
+ * @returns {string[]}
+ */
+export function documentReadabilityIssues(vis, ledger, review) {
+  const R = LONG_QUALITY_RULES.documentText;
+  const out = [];
+  const keys = [...new Set(vis.map((v) => v.key).filter((k) => typeof k === "string" && ledger?.[k]))];
+  for (const key of keys) {
+    const src = ledger?.[/** @type {string} */ (key)];
+    const fromPdf = /\.pdf(\?|#|$)/iu.test(String(src.sourceUrl ?? ""));
+    if (!src.document && !fromPdf) continue;
+    const lines = vis.filter((v) => v.key === key).map((v) => v.lineId).join("・");
+    if (!src.document) {
+      out.push(`資料「${key}」（${lines}）：PDF から取った画像なのに台帳に document（文字の大きさ）がない。縮小した資料は読めない`);
+      continue;
+    }
+    const px = Number(src.document.smallestTextPx);
+    if (!(px > 0)) out.push(`資料「${key}」（${lines}）：台帳の document.smallestTextPx（完成動画での文字の高さ）がない`);
+    else if (px < R.minTextPx) out.push(`資料「${key}」（${lines}）：文字の高さ ${px}px（${R.minTextPx}px 以上。読めない資料を縮小して出さない）`);
+    const r = review?.documents?.[/** @type {string} */ (key)];
+    if (!r) out.push(`資料「${key}」（${lines}）：目視の確認（visual-review.json の documents）がない`);
+    else {
+      if (r.readable !== true) out.push(`資料「${key}」（${lines}）：目視で文字が読めない`);
+      if (r.matchesNarration !== true) out.push(`資料「${key}」（${lines}）：画面の資料とナレーションの内容が一致していない`);
     }
   }
   return out;
@@ -177,7 +216,10 @@ export function scoreLongQuality(i) {
       if (v.words.length > R.onScreenText.maxElementsPerLine) (s -= 8), f.push(`${v.lineId}：キーワードが ${v.words.length} 個（${R.onScreenText.maxElementsPerLine} 個まで）`);
       for (const t of [...v.words, ...v.texts]) if (len(t) > R.onScreenText.maxCharsPerElement) (s -= 5), f.push(`${v.lineId}：画面の文字「${t.slice(0, 16)}…」が ${len(t)} 字（${R.onScreenText.maxCharsPerElement} 字まで）`);
     }
-    m.onScreenTextLoad = { score: clamp(s), findings: f.slice(0, 12), fixes: f.length ? ["画面の文字は見出し・キーワードだけにし、詳しいことはナレーションで言う"] : [] };
+    // 資料・図表の文字が読めるか（読めない資料が1つでもあれば 0 点＝重要項目で fail）
+    const docIssues = documentReadabilityIssues(vis, i.ledger, i.visualReview);
+    if (docIssues.length) (s = 0), f.unshift(...docIssues);
+    m.onScreenTextLoad = { score: clamp(s), findings: f.slice(0, 12), fixes: f.length ? [...(docIssues.length ? ["資料は縮小して並べない：ナレーションで話している箇所だけを切り出して拡大するか、重要な数字を大きな文字・図に作り直す。台帳に document.smallestTextPx、visual-review.json の documents に readable・matchesNarration を書く"] : []), "画面の文字は見出し・キーワードだけにし、詳しいことはナレーションで言う"] : [] };
   }
   // ナレーションの速さ
   {

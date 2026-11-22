@@ -28,12 +28,6 @@
     "4割": "よんわり"
   },
   "media": {
-    "guide": {
-      "query": "(厚生労働省 健康づくりのための睡眠ガイド2023 表紙・公式資料)"
-    },
-    "check": {
-      "query": "(厚生労働省 Good Sleepガイド 睡眠健康度簡易チェック・公式資料)"
-    },
     "night1": {
       "query": "woman awake in bed at night"
     },
@@ -99,6 +93,15 @@
     },
     "sleep": {
       "query": "woman sleeping peacefully"
+    },
+    "doc_stat": {
+      "query": "(厚生労働省 睡眠ガイド2023 の数字を再構成した画像)"
+    },
+    "doc_night": {
+      "query": "(Good Sleepガイド 夜の習慣の切り出し)"
+    },
+    "doc_consult": {
+      "query": "(Good Sleepガイド 第5原則の切り出し)"
     }
   },
   "roster": [],
@@ -115,11 +118,7 @@
           ],
           "text": "40代、50代の女性の4割以上が、毎日の睡眠が6時間に届いていません。",
           "visual": {
-            "footage": "guide",
-            "headline": {
-              "title": "40〜50代の女性",
-              "sub": "4割以上が6時間未満"
-            }
+            "footage": "doc_stat"
           }
         },
         {
@@ -131,10 +130,7 @@
           ],
           "text": "厚生労働省の睡眠ガイドには、眠りの妨げになる夜の習慣が書かれています。",
           "visual": {
-            "footage": "check",
-            "headline": {
-              "title": "厚生労働省の睡眠ガイド"
-            }
+            "footage": "doc_night"
           }
         },
         {
@@ -532,9 +528,9 @@
           ],
           "text": "習慣を見直しても眠りの悩みが続くときは、ひとりで抱えずに、医師に相談してください。",
           "visual": {
-            "footage": "check",
+            "footage": "doc_consult",
             "headline": {
-              "title": "医師に相談を"
+              "title": "専門家に相談を"
             }
           }
         }
@@ -591,5 +587,9 @@
         "bottom": "当てはまる？"
       }
     }
-  ]
+  ],
+  "subtitle": {
+    "rowsPerPage": 1,
+    "maxRowChars": 18
+  }
 }
