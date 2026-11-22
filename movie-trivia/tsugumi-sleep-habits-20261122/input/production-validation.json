@@ -1,0 +1,14 @@
+{
+  "validatedAt": "2026-11-22T11:22:54.827Z",
+  "requestId": "pr-tsugumi-sleep-habits-20261122-main-202611221108",
+  "scriptSha256": "23889b46c2d6d168038a5f7ed371d8bb21de408fca0eee7e4991e991cf93dbd6",
+  "status": "pass",
+  "proceed": true,
+  "precheck": [],
+  "contentOps": {
+    "status": "pass",
+    "problems": [],
+    "safeWarnings": [],
+    "blockingWarnings": []
+  }
+}

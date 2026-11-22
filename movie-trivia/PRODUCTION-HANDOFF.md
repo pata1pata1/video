@@ -15,6 +15,10 @@ movie-trivia：node scripts/mt.mjs new --project=<id> --pattern=pattern-0N
   → node scripts/production.mjs result --render-status=started|rendered → content-ops：production record-result・record-quality
 ```
 
+## story-long（2026-11-22、セット02 つぐみの開運チャンネルの横長）
+
+`productionType: "story-long"` も同じ手順で受ける（`scripts/production.mjs` の SUPPORTED。pattern は pattern-02 だけ）。pattern-02 をそのまま使い、台本の `voice`（`{ "speaker": 31, "speakerName": "No.7", "speedScale": 1.38 }`）と `bgm`（自作の calm-pad。`../short-movie/scripts/make-bgm.mjs --name=<名前> --seconds=<尺+20>` で作り `bgm/` に置く。Git 管理外）で落ち着いた女性の語りにする。実在の人物の実名・写真は使わない。最初の動画は `tsugumi-sleep-habits-20261122`（眠りを妨げる夜の習慣7つ、long-v2 88）。
+
 ## コマンド
 
 | コマンド | 内容 |

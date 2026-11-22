@@ -23,8 +23,15 @@ const MOVIE_TRIVIA_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.ur
 /** 動画フォルダの置き場所（テストでは MOVIE_TRIVIA_PROJECTS_ROOT で一時ディレクトリ）。pattern は常に MOVIE_TRIVIA_ROOT/patterns。 */
 const projectsRoot = () => path.resolve(process.env.MOVIE_TRIVIA_PROJECTS_ROOT ?? MOVIE_TRIVIA_ROOT);
 const PATTERN = /^pattern-\d+$/;
-/** この consumer が受けられる依頼：news-long → movie-trivia、patterns/ にある pattern（新しい pattern も入る）。 */
-export const SUPPORTED = { "news-long": { targetProject: "movie-trivia", orientation: /** @type {const} */ ("landscape"), templates: (/** @type {string} */ t) => PATTERN.test(t) && fs.existsSync(path.join(MOVIE_TRIVIA_ROOT, "patterns", t, "config.json")) } };
+const patternExists = (/** @type {string} */ t) => PATTERN.test(t) && fs.existsSync(path.join(MOVIE_TRIVIA_ROOT, "patterns", t, "config.json"));
+/**
+ * この consumer が受けられる依頼：news-long → movie-trivia、patterns/ にある pattern（新しい pattern も入る）。
+ * story-long（2026-11-22、セット02 つぐみの開運チャンネルの横長）：pattern-02 をそのまま使い、声と BGM は台本の voice・bgm で変える（新しいエンジン・pattern は作らない）。
+ */
+export const SUPPORTED = {
+  "news-long": { targetProject: "movie-trivia", orientation: /** @type {const} */ ("landscape"), templates: patternExists },
+  "story-long": { targetProject: "movie-trivia", orientation: /** @type {const} */ ("landscape"), templates: (/** @type {string} */ t) => t === "pattern-02" && patternExists(t) },
+};
 const KINDS = ["hook", "fact", "unknown", "transition", "closing"];
 
 /** @param {string} id */
