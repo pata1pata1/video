@@ -16,6 +16,11 @@ import design03 from "../patterns/pattern-03/design.json";
 import subtitle03 from "../patterns/pattern-03/subtitle.json";
 import thumbnail03 from "../patterns/pattern-03/thumbnail.json";
 import voice03 from "../patterns/pattern-03/voice.json";
+import config04 from "../patterns/pattern-04/config.json";
+import design04 from "../patterns/pattern-04/design.json";
+import subtitle04 from "../patterns/pattern-04/subtitle.json";
+import thumbnail04 from "../patterns/pattern-04/thumbnail.json";
+import voice04 from "../patterns/pattern-04/voice.json";
 
 /** The settings every pattern has: keys found in both A and B, nested. */
 type Common<A, B> = A extends readonly unknown[] ? A : A extends object ? (B extends object ? { [K in keyof A & keyof B]: Common<A[K], B[K]> } : A) : A;
@@ -60,6 +65,17 @@ export type News = {
   label: { left: number; top: number; nameSize: number; subSize: number };
   status: Record<string, NewsStatus>;
   subtitle: { bottom: number; height: number };
+  /** pattern-04 (tech comparison): product card, product nav, spec number and comparison table over the footage. */
+  tech?: Tech;
+};
+export type Tech = {
+  panel: { fill: string; edge: string; radius: number };
+  /** Extra darkening of the footage while a spec or comparison table is shown. */
+  overlayDim: number;
+  product: { left: number; top: number; makerSize: number; nameSize: number; tagSize: number; bar: number };
+  nav: { right: number; top: number; size: number; gap: number };
+  spec: { labelSize: number; valueSize: number; unitSize: number; noteSize: number };
+  compare: { titleSize: number; headSize: number; cellSize: number; labelSize: number; width: number; rowHeight: number; noteSize: number };
 };
 export type Stage = {
   background: { blur: number; saturate: number; dim: number; zoomPerFrame: number; fadeFrames: number };
@@ -98,6 +114,7 @@ const PATTERNS: Record<string, Pattern> = {
   "pattern-01": { config: config01, design: design01, subtitle: subtitle01, thumbnail: thumbnail01, voice: voice01 },
   "pattern-02": { config: config02, design: design02, subtitle: subtitle02, thumbnail: thumbnail02, voice: voice02 },
   "pattern-03": { config: config03, design: design03, subtitle: subtitle03, thumbnail: thumbnail03, voice: voice03 },
+  "pattern-04": { config: config04, design: design04, subtitle: subtitle04, thumbnail: thumbnail04, voice: voice04 },
 };
 
 const id = (script as { pattern?: string }).pattern;

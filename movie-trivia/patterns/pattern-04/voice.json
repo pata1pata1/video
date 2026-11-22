@@ -1,0 +1,16 @@
+{
+  "engine": "VOICEVOX",
+  "engineUrl": "http://127.0.0.1:50021",
+  "speaker": 11,
+  "speakerName": "玄野武宏",
+  "style": "ノーマル",
+  "speedScale": 1.25,
+  "timing": {
+    "leadIn": 0.3,
+    "linePause": 0.3,
+    "scenePause": 0.8,
+    "tailOut": 2
+  },
+  "credit": "VOICEVOX:玄野武宏（エンディング画面と説明文に入れる）",
+  "tempoNote": "セット03 の声（Studio の既定文と同じ）。品質ゲートの 6.5〜8.5 字/秒に合わせて台本の voice.speedScale で調整する"
+}

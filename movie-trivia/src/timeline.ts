@@ -40,7 +40,17 @@ export type NewsDef = {
   profile?: string;
   /** Removes the card (the footage shows alone). */
   clear?: boolean;
+  /** pattern-04: a product card top-left (a script.products id). */
+  product?: string;
+  /** pattern-04: the product highlighted in the nav top-right from this line on ("" for none). */
+  focus?: string;
+  /** pattern-04: one big number in the middle (value in Orbitron, unit, label above, note below). */
+  spec?: { label: string; value: string; unit?: string; note?: string; product?: string };
+  /** pattern-04: a comparison table in the middle; columns are script.products ids, rows label + one cell per column. */
+  compare?: { title: string; columns: string[]; rows: { label: string; cells: string[] }[]; note?: string; highlight?: number };
 };
+/** pattern-04: a product being compared. */
+export type ProductEntry = { id: string; maker: string; name: string; short?: string; tag?: string; color: string };
 /** pattern-02: one person (or one case) in the list. */
 export type RosterEntry = {
   id: string;
@@ -108,7 +118,9 @@ export type ThumbnailDef = {
   /** pattern-02 face layout: photos side by side across the top (key + CSS object-position), a yellow kicker on a red band, white lines, and a red accent line. */
   faces?: { key: string; position?: string }[];
   /** "split": photo large on the right fading into a blurred copy, text on the left (Thumbnail.tsx SplitThumbnail). */
-  layout?: "split" | "mystic";
+  layout?: "split" | "mystic" | "versus";
+  /** versus layout (pattern-04): product ids shown side by side in their colors. */
+  products?: string[];
   /** mystic layout: brightness of the photo in the round frame (default 0.95; raise it for a dark night photo). */
   photoBrightness?: number;
   /** split layout: width of the sharp photo on the right (px of 1280). */
@@ -159,6 +171,8 @@ export const SCRIPT = script as unknown as {
   pattern: string;
   /** Overrides the pattern's voice (patterns/<pattern>/voice.json). */
   voice?: { speakerName?: string };
+  /** pattern-04: the products compared (nav, cards, table columns, versus thumbnail). */
+  products?: ProductEntry[];
   /** pattern-01: background footage for the whole video (scenes and lines may change it). */
   background?: string;
   /** pattern-01: a small note shown top-left for the whole video (e.g. where the quoted words come from). */

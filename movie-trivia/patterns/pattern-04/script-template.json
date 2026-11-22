@@ -1,0 +1,152 @@
+{
+  "id": "__ID__",
+  "pattern": "pattern-04",
+  "title": "（32字以内。結論か一番の驚きを先に）",
+  "titleTop": "",
+  "titleMain": "",
+  "titleSub": "",
+  "voice": {
+    "speaker": 11,
+    "speakerName": "玄野武宏",
+    "speedScale": 1.25
+  },
+  "subtitle": {
+    "rowsPerPage": 1,
+    "maxRowChars": 18
+  },
+  "bgm": {
+    "file": "bgm/<自作の曲>.mp3"
+  },
+  "pronunciation": {},
+  "products": [
+    {
+      "id": "a",
+      "maker": "（会社名）",
+      "name": "（製品名）",
+      "short": "（ナビ・表の短い名前）",
+      "tag": "（一言）",
+      "color": "#E8825A"
+    }
+  ],
+  "media": {
+    "hook1": {
+      "query": "（冒頭の映像）"
+    }
+  },
+  "scenes": [
+    {
+      "id": "opening",
+      "kind": "opening",
+      "lines": [
+        {
+          "id": "o1",
+          "kind": "hook",
+          "factIds": [],
+          "visual": {
+            "footage": "hook1",
+            "compare": {
+              "title": "（先出しの比較）",
+              "columns": [
+                "a"
+              ],
+              "rows": [
+                {
+                  "label": "（項目）",
+                  "cells": [
+                    "（値）"
+                  ]
+                }
+              ]
+            }
+          },
+          "text": "（結論か一番の驚き）"
+        },
+        {
+          "id": "o2",
+          "kind": "fact",
+          "notice": true,
+          "factIds": [],
+          "visual": {
+            "clear": true
+          },
+          "text": "（注意書き：数字は各社の自社発表・確認日）"
+        }
+      ]
+    },
+    {
+      "id": "c1",
+      "kind": "chapter",
+      "number": 1,
+      "heading": "（製品名）",
+      "lines": [
+        {
+          "id": "c1-1",
+          "kind": "fact",
+          "factIds": [],
+          "visual": {
+            "footage": "c1",
+            "product": "a",
+            "focus": "a"
+          },
+          "text": "（何の製品か）"
+        },
+        {
+          "id": "c1-2",
+          "kind": "fact",
+          "factIds": [],
+          "visual": {
+            "spec": {
+              "label": "（項目）",
+              "value": "（数字）",
+              "product": "a"
+            }
+          },
+          "text": "（数字）"
+        }
+      ]
+    },
+    {
+      "id": "ending",
+      "kind": "ending",
+      "lines": [
+        {
+          "id": "e1",
+          "kind": "closing",
+          "factIds": [],
+          "visual": {
+            "footage": "end"
+          },
+          "text": "（結論。意見は意見と言う）"
+        },
+        {
+          "id": "e2",
+          "kind": "closing",
+          "factIds": [],
+          "text": "（コメント）"
+        },
+        {
+          "id": "e3",
+          "kind": "closing",
+          "factIds": [],
+          "text": "（高評価・チャンネル登録）"
+        }
+      ]
+    }
+  ],
+  "thumbnails": [
+    {
+      "id": "A",
+      "layout": "versus",
+      "photo": "hook1",
+      "products": [
+        "a"
+      ],
+      "ribbon": "（帯）",
+      "lines": [
+        "（右上の補足）"
+      ],
+      "accent": "（結論）",
+      "question": "（問い）"
+    }
+  ]
+}

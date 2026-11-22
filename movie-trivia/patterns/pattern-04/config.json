@@ -1,0 +1,61 @@
+{
+  "id": "pattern-04",
+  "name": "テック比較（製品カード＋比較表＋大きな数字）",
+  "basedOn": "2026-11-23、セット03 なぎちょAI の AI 製品比較のために Claude が設計（ユーザー指示「pattern にこだわらず新しいパターンを作る」）。全面の映像と大きな字幕は pattern-02 の描画（src/news.tsx）を使い、人物の札の代わりに製品カード・比較表・数字カード・右上の製品ナビを足す",
+  "video": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30
+  },
+  "structure": {
+    "durationRangeSeconds": [
+      60,
+      1500
+    ],
+    "durationRule": "尺は固定しない（2026-11-20、改善 C）。題材と素材で Claude が決め、content-ops の production decide-format（long.durationSec）に理由を書く。それが制作依頼の目標になり、品質ゲート long-v2 はその 0.7〜1.4 倍を見る。2〜4分は1つの話・実写が少ない題材の候補で、上限ではない（資料・証言・映像が豊富なら長くてよい）。durationRangeSeconds は形として成り立つ範囲だけ",
+    "chapters": "製品ごと（またはテーマごと）の章＋最後にまとめの比較の章。章の数は比べる数に合わせる",
+    "scenes": [
+      "opening",
+      "chapter × N",
+      "ending"
+    ],
+    "openingSeconds": 15,
+    "openingRule": "最初の 3 秒に結論か一番の驚きの1文と、比べる製品が分かる画（比較表の先出し・製品カード）。→ 何を比べるか（1文）→ 注意書き（数字は各社の自社発表・確認日、notice、30 秒以内）",
+    "chapterRule": "章の1文目で visual.product（製品カード）と visual.focus（右上のナビ）。数字は visual.spec で1つずつ大きく。最後の章で visual.compare（比較表）。カードの間は映像だけの文を挟み、カードを続けない",
+    "endingLines": 3,
+    "endingRule": "1文目で結論（どれを選ぶか、意見は意見と言う）→ コメント → 高評価・チャンネル登録",
+    "tooShort": "目安より短くても事実を水増ししない（推測・脚色で埋めない）。題材に必要な長さで終え、尺の判断を見直す",
+    "hookRule": "最初の 3 秒：結論か一番の驚きの1文＋比べるものが分かる画（比較表・製品カード）。タイトル画面・「今回は〜」から始めない",
+    "noticeRule": "注意書き：数字・ベンチマークは各社の自社発表で第三者の検証ではない・料金と提供範囲は確認日時点。フックの直後（30 秒以内）に notice: true",
+    "titleRule": "タイトル（改善 F）：32 字以内を目安に短く具体的に。結論か一番の驚きを先に。【】の飾り・誇張（「ヤバすぎる」など事実でない強調）・事実と違う表現は使わない。容疑段階なら「〜の疑い」"
+  },
+  "pacing": {
+    "linesPerCaption": 1,
+    "footageLinesPerShot": [
+      1,
+      3
+    ],
+    "diagramStepsPerDiagram": [
+      2,
+      5
+    ],
+    "statPerLine": 1,
+    "pointsMax": 4
+  },
+  "transition": {
+    "visualLeadSeconds": 0.3,
+    "fadeFrames": 10,
+    "captionHoldSeconds": 0.3
+  },
+  "media": {
+    "fit": "映像・写真は左の画面枠（16:9）に cover で。写真は少しずつ寄る",
+    "loop": "pingpong",
+    "continueAcrossUses": true,
+    "sharedClipMaxSeconds": 20,
+    "credit": "右上に小さく。イメージ映像は「※映像はイメージです」"
+  },
+  "production": {
+    "requiredInputs": [],
+    "approvals": []
+  }
+}

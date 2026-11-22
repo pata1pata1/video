@@ -1,0 +1,7 @@
+{
+  "bgm": null,
+  "bgmNote": "標準は自作の落ち着いたBGM（scripts/make-bgm.mjs など、著作権の心配がないもの）を台本の bgm で声の下に",
+  "belowVoiceDb": 22,
+  "sfx": null,
+  "sfxNote": "効果音なし"
+}

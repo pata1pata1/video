@@ -34,6 +34,7 @@ export const Thumbnail: React.FC<{ variant: string }> = ({ variant }) => {
   if (def.faces) return <FacesThumbnail def={def} />;
   if (def.layout === "split") return <SplitThumbnail def={def} />;
   if (def.layout === "mystic") return <MysticThumbnail def={def} />;
+  if (def.layout === "versus") return <VersusThumbnail def={def} />;
   const media = mediaFor(def.photo);
   const src = media?.mediaType === "video" ? videoFrameFile(def.photo, def.frame ?? L.image.videoFrame) : media?.file;
   const A = L.accentWord;
@@ -484,6 +485,48 @@ export const MysticThumbnail: React.FC<{ def: (typeof SCRIPT.thumbnails)[number]
             <div style={{ color: "#F3D27A", fontSize: 30 }}>✦</div>
           </div>
         ) : null}
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+/**
+ * Versus layout (pattern-04 tech comparison, 2026-11-23): dark navy with a faint
+ * grid and the footage frame behind, a small ribbon, the products side by side in
+ * their colors (maker small, name big), then the accent line and a question.
+ * Product and company names only, no people. Uses ribbon, products, lines (product
+ * row heading, optional), accent and question.
+ */
+export const VersusThumbnail: React.FC<{ def: (typeof SCRIPT.thumbnails)[number] }> = ({ def }) => {
+  const media = mediaFor(def.photo);
+  const src = media?.mediaType === "video" ? videoFrameFile(def.photo, def.frame ?? L.image.videoFrame) : media?.file;
+  const products = (def.products ?? []).map((id) => {
+    const p = (SCRIPT.products ?? []).find((x) => x.id === id);
+    if (!p) throw new Error(`thumbnail ${def.id}: no product "${id}" in script.products`);
+    return p;
+  });
+  const gap = 22;
+  const w = (1280 - 2 * 48 - gap * (products.length - 1)) / Math.max(1, products.length);
+  const text = (size: number, c: string): React.CSSProperties => ({ fontFamily: font.body, fontWeight: 900, fontSize: size, color: c, whiteSpace: "nowrap", lineHeight: 1.1 });
+  return (
+    <AbsoluteFill style={{ background: "linear-gradient(160deg, #050913 0%, #0A1630 55%, #0B1D3F 100%)", overflow: "hidden" }}>
+      {src ? <Img src={staticFile(src)} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: def.imagePosition ?? "center", opacity: 0.28, filter: "saturate(0.6) blur(2px)" }} /> : null}
+      <AbsoluteFill style={{ backgroundImage: "linear-gradient(rgba(80,160,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(80,160,255,0.08) 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
+      <AbsoluteFill style={{ background: "radial-gradient(ellipse 900px 380px at 50% 46%, rgba(30,167,255,0.22), rgba(0,0,0,0) 70%)" }} />
+      <div style={{ position: "absolute", left: 48, top: 36, display: "inline-block", padding: "6px 22px", background: "#1EA7FF", ...text(40, "#04101F") }}>{def.ribbon}</div>
+      {def.lines?.[0] ? <div style={{ position: "absolute", right: 48, top: 42, ...text(40, "#FFFFFF"), textShadow: "0 4px 12px rgba(0,0,0,0.7)" }}>{def.lines[0]}</div> : null}
+      <div style={{ position: "absolute", left: 48, right: 48, top: 130, display: "flex", gap }}>
+        {products.map((p) => (
+          <div key={p.id} style={{ width: w, height: 250, borderRadius: 22, background: "rgba(6,12,26,0.85)", border: `4px solid ${p.color}`, boxShadow: `0 0 34px ${p.color}66`, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 8 }}>
+            <div style={text(34, p.color)}>{p.maker}</div>
+            <div style={{ ...text(p.name.length > 12 && !p.short ? 50 : 64, "#FFFFFF"), textAlign: "center", whiteSpace: "normal", padding: "0 10px" }}>{p.short ?? p.name}</div>
+            {p.short ? <div style={{ ...text(30, "rgba(255,255,255,0.78)"), marginTop: 4 }}>{p.name}</div> : null}
+          </div>
+        ))}
+      </div>
+      <div style={{ position: "absolute", left: 0, right: 0, top: 410, textAlign: "center" }}>
+        <div style={{ ...text(def.accent.length > 12 ? 92 : 112, "#FFE23B"), WebkitTextStroke: "14px #000", paintOrder: "stroke fill", textShadow: "0 8px 22px rgba(0,0,0,0.7)" }}>{def.accent}</div>
+        {def.question ? <div style={{ marginTop: 16, ...text(56, "#FFFFFF"), WebkitTextStroke: "10px #000", paintOrder: "stroke fill" }}>{def.question}</div> : null}
       </div>
     </AbsoluteFill>
   );

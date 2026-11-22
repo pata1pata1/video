@@ -1,0 +1,10 @@
+{
+  "contractVersion": "content-ops.production-request/1",
+  "campaignId": "nagicho-frontier-models-20261123",
+  "key": "main",
+  "requestId": "pr-nagicho-frontier-models-20261123-main-202611221955",
+  "requestPath": "campaigns/nagicho-frontier-models-20261123/production/video-main.json",
+  "productionId": "nagicho-frontier-models-20261123",
+  "pattern": "pattern-04",
+  "importedAt": "2026-11-22T19:55:10.546Z"
+}

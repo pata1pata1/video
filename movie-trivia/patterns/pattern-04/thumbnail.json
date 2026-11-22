@@ -1,0 +1,73 @@
+{
+  "inherits": "design.json。script の thumbnails[] に layout: \"versus\"（製品を色分けして並べ、結論か問いを大きく。Thumbnail.tsx VersusThumbnail）",
+  "size": {
+    "width": 1280,
+    "height": 720
+  },
+  "variants": [
+    "A",
+    "B",
+    "C"
+  ],
+  "color": {
+    "red": "#E5262E",
+    "yellow": "#FFE23B",
+    "text": "#FFFFFF",
+    "outline": "#000000",
+    "accentWord": "#FFE23B",
+    "badgeBig": "#FFFFFF"
+  },
+  "layout": {
+    "image": {
+      "videoFrame": 90,
+      "note": "映像を全面に敷く（動画素材なら連番の90コマ目。台本の frame で変更、imagePosition で位置調整）"
+    },
+    "shade": {
+      "gradient": "linear-gradient(90deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.45) 50%, rgba(0,0,0,0.1) 80%)",
+      "note": "全体を暗くし、四隅と文字の側（左）をさらに暗くする"
+    },
+    "left": 52,
+    "ribbon": {
+      "size": 50,
+      "top": 44,
+      "rotate": -2,
+      "note": "暗い赤の帯に白文字（例：「未解決」「実話」「判決」）"
+    },
+    "lines": {
+      "size": 112,
+      "outline": 16,
+      "note": "白文字に黒の太縁取り。1〜2行"
+    },
+    "accentWord": {
+      "size": 168,
+      "sizeIfLong": 130,
+      "longOver": 6,
+      "outline": 20,
+      "note": "赤い特大の文字＋赤い光（色は color.accentWord）"
+    },
+    "badge": {
+      "size": 300,
+      "right": 40,
+      "bottom": 40,
+      "rotate": 6,
+      "topSize": 40,
+      "bigSize": 96,
+      "bigSizeIfLong": 76,
+      "bigLongOver": 4,
+      "bottomSize": 34,
+      "note": "右下の暗い赤の丸。「懲役」「〇年」など（任意）"
+    },
+    "small": {
+      "size": 36,
+      "bottom": 44,
+      "barWidth": 8,
+      "note": "左下に黒地の補足（任意）"
+    },
+    "textGlow": "0 4px 10px rgba(0,0,0,0.55)"
+  },
+  "rules": [
+    "製品名と会社名だけ。人物の写真・名前は使わない",
+    "数字は台本と同じもの。誇張・根拠のない順位づけ（最強・神など）は使わない",
+    "文言は少なく大きく：上に小さな帯、中央に製品の列、下に結論か問い"
+  ]
+}

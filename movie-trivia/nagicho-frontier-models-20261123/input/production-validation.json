@@ -1,0 +1,14 @@
+{
+  "validatedAt": "2026-11-22T20:09:46.870Z",
+  "requestId": "pr-nagicho-frontier-models-20261123-main-202611221955",
+  "scriptSha256": "6a51c31b04850d9e5c81b113b2d87b2313c60dac8d4d018bae0b7d68c6c979c6",
+  "status": "pass",
+  "proceed": true,
+  "precheck": [],
+  "contentOps": {
+    "status": "pass",
+    "problems": [],
+    "safeWarnings": [],
+    "blockingWarnings": []
+  }
+}

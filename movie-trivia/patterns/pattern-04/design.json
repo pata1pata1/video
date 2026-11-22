@@ -1,0 +1,179 @@
+{
+  "style": "news",
+  "hud": false,
+  "decorations": [
+    "画面いっぱいに映像（少し暗く）",
+    "左上：製品カード（作った会社・製品名・一言）か見出しの札",
+    "右上：比べる製品のナビ（今の製品を明るく）",
+    "中央：比較表・大きな数字（出ている間は映像をさらに暗く）",
+    "下に大きな字幕（白の極太・黒い縁取り）",
+    "フォント：Noto Sans JP（500・700・900）、数字と英字は Orbitron"
+  ],
+  "noDecorations": [
+    "比較表・数字カード・製品カードを同時に出すこと",
+    "人物の写真・実名（企業名と製品名だけ）",
+    "自社発表のベンチマークを公平な比較のように見せる演出"
+  ],
+  "font": {
+    "family": "NotoSansJP",
+    "weights": [
+      "500",
+      "700",
+      "900"
+    ],
+    "display": "Orbitron"
+  },
+  "color": {
+    "bg": "#060A14",
+    "card": "#0E1626",
+    "ink": "#FFFFFF",
+    "inkSoft": "#B9C2CF",
+    "inkFaint": "#6E7A8A",
+    "line": "rgba(255,255,255,0.18)",
+    "accent": "#1EA7FF",
+    "accentSoft": "rgba(30,167,255,0.16)",
+    "accentOnDark": "#4CC3FF",
+    "cool": "#7CF0D8",
+    "coolSoft": "rgba(124,240,216,0.16)",
+    "onAccent": "#FFFFFF"
+  },
+  "paper": {
+    "glow": "radial-gradient(ellipse at 30% 30%, rgba(40,70,120,0.35) 0%, rgba(11,15,22,0) 60%)"
+  },
+  "glow": {
+    "blur": 14
+  },
+  "dim": {
+    "title": 0.5,
+    "chapter": 0.6,
+    "stat": 0.55
+  },
+  "title": {
+    "topSize": 50,
+    "mainSize": 104,
+    "subSize": 44,
+    "left": 140,
+    "top": 300,
+    "barWidth": 300,
+    "accentDiscWhenNoFootage": false,
+    "accentDiscHighlight": "#FF4A50"
+  },
+  "chapterCard": {
+    "labelFormat": "第{n}章",
+    "labelSize": 44,
+    "headingSize": 110,
+    "barWidth": 240,
+    "progressDots": false
+  },
+  "chapterTag": {
+    "left": 72,
+    "top": 56,
+    "size": 30,
+    "badge": 46
+  },
+  "statCard": {
+    "valueSize": 260,
+    "unitSize": 96,
+    "labelSize": 46,
+    "countUpSeconds": 1
+  },
+  "pointsCard": {
+    "titleSize": 60,
+    "itemSize": 48,
+    "width": 1240,
+    "staggerFrames": 12
+  },
+  "footageCredit": {
+    "size": 22,
+    "right": 72,
+    "top": 62,
+    "label": "映像："
+  },
+  "ending": {
+    "title": "ご視聴ありがとうございました",
+    "titleSize": 96,
+    "buttons": [
+      {
+        "icon": "💬",
+        "label": "コメント",
+        "atLine": 2
+      },
+      {
+        "icon": "👍",
+        "label": "高評価",
+        "atLine": 3
+      },
+      {
+        "icon": "🔔",
+        "label": "チャンネル登録",
+        "atLine": 3,
+        "accent": true
+      }
+    ],
+    "voiceCredit": "VOICEVOX:{speakerName}"
+  },
+  "news": {
+    "screen": {
+      "creditSize": 22,
+      "illustrative": "※映像はイメージです",
+      "illustrativePhoto": "※画像はイメージです",
+      "source": "出典：",
+      "dim": 0.3,
+      "photoTop": 30,
+      "photoHeight": 800
+    },
+    "label": {
+      "left": 44,
+      "top": 40,
+      "nameSize": 52,
+      "subSize": 30
+    },
+    "status": {
+      "unknown": {
+        "label": "",
+        "color": "#3E4756"
+      }
+    },
+    "subtitle": {
+      "bottom": 36,
+      "height": 230
+    },
+    "tech": {
+      "panel": {
+        "fill": "rgba(8,14,28,0.86)",
+        "edge": "rgba(120,190,255,0.35)",
+        "radius": 18
+      },
+      "overlayDim": 0.62,
+      "product": {
+        "left": 44,
+        "top": 40,
+        "makerSize": 30,
+        "nameSize": 72,
+        "tagSize": 34,
+        "bar": 10
+      },
+      "nav": {
+        "right": 36,
+        "top": 80,
+        "size": 32,
+        "gap": 10
+      },
+      "spec": {
+        "labelSize": 44,
+        "valueSize": 200,
+        "unitSize": 72,
+        "noteSize": 36
+      },
+      "compare": {
+        "titleSize": 44,
+        "headSize": 38,
+        "cellSize": 40,
+        "labelSize": 34,
+        "width": 1640,
+        "rowHeight": 96,
+        "noteSize": 32
+      }
+    }
+  }
+}

@@ -1,8 +1,8 @@
 import React from "react";
 import { AbsoluteFill, Audio, Img, interpolate, Sequence, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { usePop } from "./components";
-import { type News, PATTERN } from "./pattern";
-import { AUDIO_SRC, captionCues, lineStart, mediaFor, type MediaSource, NARRATION, type RosterEntry, SCRIPT, SPEAKER_NAME, videoFrameFile } from "./timeline";
+import { type News, PATTERN, type Tech } from "./pattern";
+import { AUDIO_SRC, captionCues, lineStart, mediaFor, type MediaSource, NARRATION, type ProductEntry, type RosterEntry, SCRIPT, SPEAKER_NAME, type Visual, videoFrameFile } from "./timeline";
 import { color, font } from "./theme";
 
 /**
@@ -18,7 +18,20 @@ const SUB = PATTERN.subtitle;
 // ---------------------------------------------------------------- timeline
 
 /** The label top-left: a person (from the roster) or a plain heading. */
-type Label = { kind: "person"; entry: RosterEntry } | { kind: "heading"; title: string; sub?: string };
+type Label = { kind: "person"; entry: RosterEntry } | { kind: "heading"; title: string; sub?: string } | { kind: "product"; entry: ProductEntry };
+/** pattern-04: what is shown in the middle (a spec number or a comparison table). */
+type Center = { kind: "spec"; spec: NonNullable<Visual["spec"]> } | { kind: "compare"; compare: NonNullable<Visual["compare"]> };
+const T = () => {
+  const t = N().tech;
+  if (!t) throw new Error("product / spec / compare / focus need design.news.tech (pattern-04)");
+  return t as Tech;
+};
+const PRODUCTS = new Map((SCRIPT.products ?? []).map((p) => [p.id, p]));
+const productOf = (id: string, where: string): ProductEntry => {
+  const p = PRODUCTS.get(id);
+  if (!p) throw new Error(`${where}: no product "${id}" (add it to "products" in the script)`);
+  return p;
+};
 type Span<T> = { value: T; from: number; to: number };
 
 const ROSTER = new Map((SCRIPT.roster ?? []).map((r) => [r.id, r]));
@@ -44,9 +57,11 @@ function spans<T>(events: { at: number; value: T }[]): Span<T>[] {
 const timeline = (() => {
   const media: { at: number; value: string }[] = [];
   const labels: { at: number; value: Label | null }[] = [];
+  const centers: { at: number; value: Center | null }[] = [];
+  const focus: { at: number; value: string }[] = [];
   let first = true;
-  // built at import, so only for pattern-02 scripts (other patterns import this module too)
-  if (!PATTERN.design.news) return { media: spans(media), labels: spans(labels) };
+  // built at import, so only for pattern-02 / pattern-04 scripts (other patterns import this module too)
+  if (!PATTERN.design.news) return { media: spans(media), labels: spans(labels), centers: spans(centers), focus: spans(focus) };
   for (const scene of SCRIPT.scenes) {
     for (const line of scene.lines) {
       const at = first ? 0 : lineStart(line.id) - LEAD;
@@ -56,11 +71,23 @@ const timeline = (() => {
       if (v.footage) media.push({ at, value: v.footage });
       // a label stays until another label, `clear`, or new footage without one
       if (v.profile) labels.push({ at, value: { kind: "person", entry: entryOf(v.profile, line.id) } });
+      else if (v.product) labels.push({ at, value: { kind: "product", entry: productOf(v.product, line.id) } });
       else if (v.headline) labels.push({ at, value: { kind: "heading", title: v.headline.title.replace(/\n/g, " "), sub: v.headline.sub } });
       else if (v.clear || v.footage) labels.push({ at, value: null });
+      // the middle (pattern-04) stays until another spec/table, `clear`, or new footage
+      if (v.spec) centers.push({ at, value: { kind: "spec", spec: v.spec } });
+      else if (v.compare) {
+        for (const c of v.compare.columns) productOf(c, line.id);
+        for (const r of v.compare.rows) if (r.cells.length !== v.compare.columns.length) throw new Error(`${line.id}: compare row "${r.label}" needs ${v.compare.columns.length} cells`);
+        centers.push({ at, value: { kind: "compare", compare: v.compare } });
+      } else if (v.clear || v.footage) centers.push({ at, value: null });
+      if (v.focus !== undefined) {
+        if (v.focus) productOf(v.focus, line.id);
+        focus.push({ at, value: v.focus });
+      }
     }
   }
-  return { media: spans(media), labels: spans(labels) };
+  return { media: spans(media), labels: spans(labels), centers: spans(centers), focus: spans(focus) };
 })();
 
 const endingFrom = (() => {
@@ -151,6 +178,23 @@ const LabelView: React.FC<{ label: Label; startFrame: number; durationInFrames: 
       </div>
     );
   }
+  if (label.kind === "product") {
+    const p = label.entry;
+    const P = T().product;
+    const panel = T().panel;
+    return (
+      <div style={{ position: "absolute", left: P.left, top: P.top, ...move }}>
+        <div style={{ display: "flex", alignItems: "stretch", background: panel.fill, border: `2px solid ${panel.edge}`, borderRadius: panel.radius, overflow: "hidden", boxShadow: "0 16px 40px rgba(0,0,0,0.55)" }}>
+          <div style={{ width: P.bar, background: p.color }} />
+          <div style={{ padding: "18px 34px 22px 26px" }}>
+            <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: P.makerSize, color: p.color, letterSpacing: "0.04em" }}>{p.maker}</div>
+            <div style={{ fontFamily: font.body, fontWeight: 900, fontSize: P.nameSize, color: "#FFFFFF", lineHeight: 1.15, whiteSpace: "nowrap" }}>{p.name}</div>
+            {p.tag ? <div style={{ marginTop: 6, fontFamily: font.body, fontWeight: 700, fontSize: P.tagSize, color: color.inkSoft }}>{p.tag}</div> : null}
+          </div>
+        </div>
+      </div>
+    );
+  }
   const e = label.entry;
   const s = N().status[e.status];
   return (
@@ -165,6 +209,100 @@ const LabelView: React.FC<{ label: Label; startFrame: number; durationInFrames: 
         <span style={{ fontFamily: font.body, fontWeight: 900, fontSize: L.subSize, color: s.color === "#3E4756" ? "#C9D1DB" : s.color }}>{e.result}</span>
       </div>
     </div>
+  );
+};
+
+// ---------------------------------------------------------------- pattern-04: nav, spec, table
+
+/** The products top-right; the one being talked about is lit in its color. */
+const Nav: React.FC<{ focus: string }> = ({ focus }) => {
+  const V = T().nav;
+  const list = SCRIPT.products ?? [];
+  return (
+    <div style={{ position: "absolute", right: V.right, top: V.top, display: "flex", gap: V.gap }}>
+      {list.map((p) => {
+        const on = p.id === focus;
+        return (
+          <div
+            key={p.id}
+            style={{
+              padding: "8px 18px",
+              borderRadius: 999,
+              fontFamily: font.body,
+              fontWeight: 900,
+              fontSize: V.size,
+              color: on ? "#06101E" : "rgba(255,255,255,0.72)",
+              background: on ? p.color : "rgba(8,14,28,0.72)",
+              border: `2px solid ${on ? p.color : "rgba(255,255,255,0.22)"}`,
+              boxShadow: on ? `0 0 22px ${p.color}88` : undefined,
+              whiteSpace: "nowrap",
+            }}
+          >
+            {p.short ?? p.name}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+const CenterView: React.FC<{ center: Center; startFrame: number; durationInFrames: number }> = ({ center, startFrame, durationInFrames }) => {
+  const opacity = useCrossfade(startFrame, durationInFrames);
+  const frame = useCurrentFrame();
+  const p = usePop(2, 18);
+  const X = T();
+  const dim = <AbsoluteFill style={{ background: `rgba(2,6,14,${X.overlayDim})` }} />;
+  if (center.kind === "spec") {
+    const S = X.spec;
+    const sp = center.spec;
+    const tint = sp.product ? productOf(sp.product, "spec").color : color.accentOnDark;
+    return (
+      <AbsoluteFill style={{ opacity }}>
+        {dim}
+        <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", paddingBottom: 170, transform: `scale(${0.92 + 0.08 * p})` }}>
+          <div style={{ fontFamily: font.body, fontWeight: 900, fontSize: S.labelSize, color: "#FFFFFF", padding: "6px 26px", borderLeft: `10px solid ${tint}`, background: "rgba(8,14,28,0.7)" }}>{sp.label}</div>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 18, marginTop: 10 }}>
+            <div style={{ fontFamily: font.display, fontWeight: 900, fontSize: S.valueSize, color: tint, lineHeight: 1.05, textShadow: `0 0 40px ${tint}66`, whiteSpace: "nowrap" }}>{sp.value}</div>
+            {sp.unit ? <div style={{ fontFamily: font.body, fontWeight: 900, fontSize: S.unitSize, color: "#FFFFFF" }}>{sp.unit}</div> : null}
+          </div>
+          {sp.note ? <div style={{ marginTop: 8, fontFamily: font.body, fontWeight: 700, fontSize: S.noteSize, color: color.inkSoft }}>{sp.note}</div> : null}
+        </AbsoluteFill>
+      </AbsoluteFill>
+    );
+  }
+  const C = X.compare;
+  const cp = center.compare;
+  const cols = cp.columns.map((c) => productOf(c, "compare"));
+  const labelW = 300;
+  const colW = (C.width - labelW) / cols.length;
+  const rowIn = (i: number) => interpolate(frame, [6 + i * 6, 16 + i * 6], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  return (
+    <AbsoluteFill style={{ opacity }}>
+      {dim}
+      <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", paddingBottom: 190 }}>
+        <div style={{ fontFamily: font.body, fontWeight: 900, fontSize: C.titleSize, color: "#FFFFFF", marginBottom: 18, opacity: p }}>{cp.title}</div>
+        <div style={{ width: C.width, background: X.panel.fill, border: `2px solid ${X.panel.edge}`, borderRadius: X.panel.radius, overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,0.6)" }}>
+          <div style={{ display: "flex", height: C.rowHeight, borderBottom: "2px solid rgba(255,255,255,0.14)" }}>
+            <div style={{ width: labelW }} />
+            {cols.map((c, i) => (
+              <div key={c.id} style={{ width: colW, display: "flex", alignItems: "center", justifyContent: "center", gap: 12, background: cp.highlight === i ? `${c.color}26` : undefined }}>
+                <div style={{ width: 16, height: 16, borderRadius: 4, background: c.color }} />
+                <div style={{ fontFamily: font.body, fontWeight: 900, fontSize: C.headSize, color: "#FFFFFF", whiteSpace: "nowrap" }}>{c.short ?? c.name}</div>
+              </div>
+            ))}
+          </div>
+          {cp.rows.map((r, ri) => (
+            <div key={r.label} style={{ display: "flex", height: C.rowHeight, opacity: rowIn(ri), transform: `translateY(${(1 - rowIn(ri)) * 14}px)`, borderBottom: ri < cp.rows.length - 1 ? "1px solid rgba(255,255,255,0.10)" : undefined }}>
+              <div style={{ width: labelW, display: "flex", alignItems: "center", paddingLeft: 30, fontFamily: font.body, fontWeight: 700, fontSize: C.labelSize, color: color.inkSoft }}>{r.label}</div>
+              {r.cells.map((cell, ci) => (
+                <div key={`${ci}`} style={{ width: colW, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: font.body, fontWeight: 900, fontSize: C.cellSize, color: "#FFFFFF", whiteSpace: "nowrap", background: cp.highlight === ci ? `${cols[ci].color}1A` : undefined }}>{cell}</div>
+              ))}
+            </div>
+          ))}
+        </div>
+        {cp.note ? <div style={{ marginTop: 14, fontFamily: font.body, fontWeight: 700, fontSize: C.noteSize, color: color.inkSoft }}>{cp.note}</div> : null}
+      </AbsoluteFill>
+    </AbsoluteFill>
   );
 };
 
@@ -304,6 +442,16 @@ export const NewsVideo: React.FC<{ withAudio: boolean }> = ({ withAudio }) => {
           </Sequence>
         );
       })}
+      {timeline.centers.map((s) => {
+        if (!s.value) return null;
+        const [start, end] = frames(s);
+        const duration = end - start + FADE;
+        return (
+          <Sequence key={`c${s.from}`} from={start} durationInFrames={duration} name={`center ${s.value.kind}`} layout="none">
+            <CenterView center={s.value} startFrame={start} durationInFrames={duration} />
+          </Sequence>
+        );
+      })}
       {timeline.labels.map((s) => {
         if (!s.value) return null;
         const [start, end] = frames(s);
@@ -311,6 +459,15 @@ export const NewsVideo: React.FC<{ withAudio: boolean }> = ({ withAudio }) => {
         return (
           <Sequence key={`l${s.from}`} from={start} durationInFrames={duration} name="label" layout="none">
             <LabelView label={s.value} startFrame={start} durationInFrames={duration} />
+          </Sequence>
+        );
+      })}
+      {timeline.focus.map((s) => {
+        if (!s.value && s.value !== "") return null;
+        const [start, end] = frames(s);
+        return (
+          <Sequence key={`f${s.from}`} from={start} durationInFrames={end - start} name="nav" layout="none">
+            <Nav focus={s.value} />
           </Sequence>
         );
       })}
