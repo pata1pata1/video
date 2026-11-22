@@ -12,12 +12,15 @@
 //   node scripts/production.mjs result --project=<id> --render-status=started|rendered|failed|published [--started-at=] [--completed-at=]
 //                                                                                    content-ops へ返す結果（output/production-result.json）
 
+import { spawnSync } from "node:child_process";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { media, productionRequest as pr } from "./lib/engine.mjs";
 import { LONG_QUALITY_RULES, scoreLongQuality } from "./lib/production/quality.mjs";
+import { HEALING_QUALITY_RULES, scoreHealingQuality } from "./lib/production/healing-quality.mjs";
+import { HEALING_TEMPLATE, healingIssues } from "./healing.mjs";
 
 const MOVIE_TRIVIA_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 /** 動画フォルダの置き場所（テストでは MOVIE_TRIVIA_PROJECTS_ROOT で一時ディレクトリ）。pattern は常に MOVIE_TRIVIA_ROOT/patterns。 */
@@ -31,6 +34,8 @@ const patternExists = (/** @type {string} */ t) => PATTERN.test(t) && fs.existsS
 export const SUPPORTED = {
   "news-long": { targetProject: "movie-trivia", orientation: /** @type {const} */ ("landscape"), templates: patternExists },
   "story-long": { targetProject: "movie-trivia", orientation: /** @type {const} */ ("landscape"), templates: (/** @type {string} */ t) => t === "pattern-02" && patternExists(t) },
+  // ヒーリング音楽の長尺（2026-11-23、セット02）：語りなし。動画の中身は input/healing.json、組み立ては scripts/healing.mjs（ffmpeg）、品質ゲートは healing-v1
+  "healing-long": { targetProject: "movie-trivia", orientation: /** @type {const} */ ("landscape"), templates: (/** @type {string} */ t) => t === HEALING_TEMPLATE },
 };
 const KINDS = ["hook", "fact", "unknown", "transition", "closing"];
 
@@ -43,6 +48,7 @@ export function files(id) {
     projectJson: path.join(dir, "project.json"),
     link: path.join(dir, "input", "production.json"),
     script: path.join(dir, "input", "script.json"),
+    healing: path.join(dir, "input", "healing.json"),
     validation: path.join(dir, "input", "production-validation.json"),
     quality: path.join(dir, "input", "quality-check.json"),
     visualReview: path.join(dir, "input", "visual-review.json"),
@@ -138,6 +144,15 @@ const COMMANDS = {
   validate(o) {
     const id = req(o, "project");
     const { f, link, request: r } = linked(id);
+    if (r.targetTemplate === HEALING_TEMPLATE) {
+      // ヒーリング（語りなし）：content-ops の台本の検証（文ごとの事実）はなく、healing.json の形・場面・効果の断定と煽りを確かめる
+      if (!fs.existsSync(f.healing)) throw new pr.HandoffError(`${id}/input/healing.json がありません（healing.mjs new）`);
+      const hi = healingIssues(readJson(f.healing));
+      for (const p of hi) console.log(`  ✗ ${p}`);
+      writeJson(f.validation, { validatedAt: new Date().toISOString(), requestId: r.requestId, scriptSha256: sha(f.healing), scriptFile: "input/healing.json", status: hi.length ? "fail" : "pass", proceed: !hi.length, precheck: hi.map((problem) => ({ line: "-", problem })), contentOps: null });
+      console.log(`検証：${hi.length ? "fail・進めない" : "pass・曲・映像の組み立てに進める"}`);
+      return hi.length ? 1 : 0;
+    }
     if (!fs.existsSync(f.script)) throw new pr.HandoffError(`${id}/input/script.json がありません`);
     const pre = precheckScript(readJson(f.script), r);
     for (const p of pre) console.log(`  ✗ 事前確認（${p.line}）${p.problem}`);
@@ -156,7 +171,8 @@ const COMMANDS = {
     const checks = [...rd.checks];
     const v = fs.existsSync(f.validation) ? readJson(f.validation) : null;
     checks.push({ name: "validation", passed: !!v?.proceed, reason: v ? `台本の検証 ${v.status}（${v.validatedAt}）${v.proceed ? "" : "・進めない"}` : "台本の検証がまだ（production.mjs validate）" });
-    const same = !!v && fs.existsSync(f.script) && v.scriptSha256 === sha(f.script) && v.requestId === r.requestId;
+    const checked = r.targetTemplate === HEALING_TEMPLATE ? f.healing : f.script;
+    const same = !!v && fs.existsSync(checked) && v.scriptSha256 === sha(checked) && v.requestId === r.requestId;
     checks.push({ name: "scriptUnchanged", passed: same, reason: same ? "検証した台本のまま" : "検証の後に台本・依頼が変わった（validate をやり直す）" });
     printChecks(checks);
     const ok = checks.every((c) => c.passed);
@@ -166,6 +182,7 @@ const COMMANDS = {
   async "quality-check"(o) {
     const id = req(o, "project");
     const f = files(id);
+    if (fs.existsSync(f.healing)) return healingQualityCheck(id, o);
     for (const [p, what] of [[f.script, "input/script.json"], [f.narration, "audio/narration.json（narration の後）"], [f.mp4, `output/${id}.mp4（encode の後）`]]) if (!fs.existsSync(p)) throw new pr.HandoffError(`${id}/${what} がありません`);
     const script = readJson(f.script);
     const patternFile = path.join(MOVIE_TRIVIA_ROOT, "patterns", script.pattern ?? "-", "config.json");
@@ -213,7 +230,7 @@ const COMMANDS = {
       startedAt: o["started-at"] ?? new Date().toISOString(),
       completedAt: o["completed-at"] ?? null,
       scriptPath: rel(f.script),
-      audioPath: rel(path.join(f.dir, "audio", "narration.wav")),
+      audioPath: rel(path.join(f.dir, "audio", fs.existsSync(f.healing) ? "music.wav" : "narration.wav")),
       subtitlePath: rel(path.join(f.dir, "audio", "narration.srt")),
       videoPath: rel(f.mp4),
       durationSec: typeof durationSec === "number" ? Math.round(durationSec * 100) / 100 : null,
@@ -230,6 +247,49 @@ const COMMANDS = {
     return 0;
   },
 };
+
+/** ffmpeg で暗転（ほぼ真っ黒が 1.5 秒以上）と無音（-50 dB 以下が 3 秒以上）を探す。 @param {string} mp4 */
+function findGaps(mp4) {
+  const r = spawnSync("ffmpeg", ["-hide_banner", "-i", mp4, "-vf", "blackdetect=d=1.5:pix_th=0.03", "-af", "silencedetect=n=-50dB:d=3", "-f", "null", "-"], { stdio: ["ignore", "ignore", "pipe"], maxBuffer: 1 << 28 });
+  const log = r.stderr.toString();
+  const black = [...log.matchAll(/black_start:([\d.]+) black_end:([\d.]+)/g)].map((m) => [Number(m[1]), Number(m[2])]);
+  const starts = [...log.matchAll(/silence_start: ([\d.]+)/g)].map((m) => Number(m[1]));
+  const ends = [...log.matchAll(/silence_end: ([\d.]+)/g)].map((m) => Number(m[1]));
+  return { black, silence: starts.map((s, n) => [s, ends[n] ?? Infinity]) };
+}
+
+/** healing-v1（ヒーリング音楽の長尺）。 @param {string} id @param {Record<string, string>} o */
+async function healingQualityCheck(id, o) {
+  const f = files(id);
+  if (!fs.existsSync(f.mp4)) throw new pr.HandoffError(`${id}/output/${id}.mp4 がありません（healing.mjs render の後）`);
+  const mp4Sha = sha(f.mp4);
+  let visualReview = fs.existsSync(f.visualReview) ? readJson(f.visualReview) : null;
+  if (visualReview && visualReview.mp4Sha256 !== mp4Sha) {
+    console.log("  ※ visual-review.json は別の MP4 を見た判断なので使いません");
+    visualReview = null;
+  }
+  /** @type {any} */
+  let request = null;
+  try {
+    request = linked(id).request;
+  } catch {
+    request = null;
+  }
+  const loud = await media.measureLoudness(f.mp4);
+  const thumbnails = fs.existsSync(f.output) ? fs.readdirSync(f.output).filter((x) => /^thumbnail-.+\.png$/.test(x)) : [];
+  const q = scoreHealingQuality({ healing: readJson(f.healing), script: fs.existsSync(f.script) ? readJson(f.script) : {}, ledger: fs.existsSync(f.ledger) ? readJson(f.ledger) : {}, mp4Duration: await media.getDuration(f.mp4), audio: { integratedLufs: loud.integratedLufs, truePeakDb: loud.truePeakDb }, gaps: findGaps(f.mp4), thumbnails, visualReview, durationTarget: request?.video?.durationTargetSec ?? null });
+  for (const [k, v] of Object.entries(q.metrics)) {
+    console.log(`  ${String(v.score).padStart(3)} ${k}`);
+    for (const x of v.findings) console.log(`        - ${x}`);
+  }
+  console.log(`overallQuality ${q.overallQuality}・QUALITY_GATE = ${q.gate}${q.blocking.length ? `（${q.blocking.join("・")}）` : ""}`);
+  const entry = { rulesVersion: q.rulesVersion, gate: q.gate, overallQuality: q.overallQuality, scores: q.scores, blocking: q.blocking, metrics: q.metrics, reviewNotes: visualReview?.notes ?? [], visualEvidence: { judgmentSource: visualReview ? "claude-review" : null, realFootageRatio: 1, diagramRatio: 0, cardRatio: 0, motionEvidence: null, strongestFrame: null, weakestFrame: null }, mp4Sha256: mp4Sha };
+  const out = o.out ? path.resolve(o.out) : f.quality;
+  const rec = pr.appendQualityAttempt(out, entry, HEALING_QUALITY_RULES.maxAttempts);
+  console.log(`試行 ${rec.latest.attempt}/${rec.maxAttempts}`);
+  console.log(`記録：content-ops で npm run co -- production record-quality --campaign=… --key=… --quality=${out}`);
+  return q.gate === "pass" ? 0 : 1;
+}
 
 /** @param {Record<string, string>} o @param {string} k */
 function req(o, k) {

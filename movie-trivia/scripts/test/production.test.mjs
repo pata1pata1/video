@@ -201,3 +201,24 @@ test("資料の文字（2026-11-22）：縮小した PDF の資料・小さい�
   assert.match(documentReadabilityIssues(vis.slice(1), ledger, null).join(), /目視/);
   assert.match(documentReadabilityIssues(vis.slice(1), ledger, { documents: { crop: { readable: true, matchesNarration: false } } }).join(), /一致/);
 });
+
+test("ヒーリング音楽の長尺 healing-v1（2026-11-23）：効果の断定・煽り・短い尺・同じ映像の連続・暗転・目視なしは fail、整ったものは pass", async () => {
+  const { scoreHealingQuality } = await import("../lib/production/healing-quality.mjs");
+  const { healingIssues, claimIssues } = await import("../healing.mjs");
+  const scenes = Array.from({ length: 12 }, (_, i) => ({ footage: `f${i}`, seconds: 255.5 }));
+  const healing = { template: "healing-01", title: "月と星のヒーリング 心ほどける夜のひととき 50分", description: "寝る前のひとときに", durationSec: 3000, fadeSec: 6, scenes };
+  const ledger = Object.fromEntries([...scenes.map((s) => s.footage), "photo"].map((k) => [k, { provider: "pexels", mediaType: "video" }]));
+  const script = { thumbnails: [{ id: "A", layout: "mystic", photo: "photo", ribbon: "語りなし 50分", lines: ["月と星の"], accent: "ヒーリング" }] };
+  const base = { healing, script, ledger, mp4Duration: 3000, audio: { integratedLufs: -18, truePeakDb: -2 }, gaps: { black: [], silence: [] }, thumbnails: ["thumbnail-A.png"], visualReview: { mystic: true, score: 85 } };
+  assert.deepEqual(healingIssues(healing), []);
+  assert.equal(scoreHealingQuality(base).gate, "pass");
+  assert.ok(claimIssues("警告⚠非常に強力 運気が動き始めます 20000hz 100人中97人").length >= 3);
+  const bad = (/** @type {any} */ over) => scoreHealingQuality({ ...base, ...over });
+  assert.ok(bad({ healing: { ...healing, title: "見逃さないで 願いが叶います" } }).blocking.includes("claims"));
+  assert.ok(bad({ mp4Duration: 2000 }).blocking.includes("duration"));
+  assert.ok(bad({ gaps: { black: [[600, 604]], silence: [] } }).blocking.includes("continuity"));
+  assert.ok(bad({ visualReview: null }).blocking.includes("visualStrength"));
+  const same = { ...healing, scenes: scenes.map((s) => ({ ...s, footage: "f0" })) };
+  assert.ok(healingIssues(same).some((x) => x.includes("同じ映像")));
+  assert.ok(bad({ healing: same }).scores.variety < 100);
+});

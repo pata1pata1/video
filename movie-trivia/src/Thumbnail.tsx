@@ -449,7 +449,7 @@ export const MysticThumbnail: React.FC<{ def: (typeof SCRIPT.thumbnails)[number]
       {src ? (
         <div style={{ position: "absolute", left: 960 - circle / 2, top: 330 - circle / 2, width: circle, height: circle, borderRadius: "50%", padding: 6, background: GOLD, boxShadow: "0 0 50px 10px rgba(255,220,140,0.45), 0 0 120px 30px rgba(150,110,255,0.35)" }}>
           <div style={{ width: "100%", height: "100%", borderRadius: "50%", overflow: "hidden", position: "relative" }}>
-            <Img src={staticFile(src)} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: def.imagePosition ?? "center", filter: "saturate(0.8) brightness(0.95)" }} />
+            <Img src={staticFile(src)} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: def.imagePosition ?? "center", filter: `saturate(0.8) brightness(${def.photoBrightness ?? 0.95})` }} />
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(60,40,140,0.25), rgba(20,16,70,0.45))", mixBlendMode: "multiply" }} />
             <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at 30% 20%, rgba(255,240,200,0.25), rgba(0,0,0,0) 55%)" }} />
           </div>

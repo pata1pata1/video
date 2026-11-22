@@ -109,6 +109,8 @@ export type ThumbnailDef = {
   faces?: { key: string; position?: string }[];
   /** "split": photo large on the right fading into a blurred copy, text on the left (Thumbnail.tsx SplitThumbnail). */
   layout?: "split" | "mystic";
+  /** mystic layout: brightness of the photo in the round frame (default 0.95; raise it for a dark night photo). */
+  photoBrightness?: number;
   /** split layout: width of the sharp photo on the right (px of 1280). */
   photoWidth?: number;
   kicker?: string;

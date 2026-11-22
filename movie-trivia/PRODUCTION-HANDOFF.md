@@ -21,6 +21,19 @@ movie-trivia：node scripts/mt.mjs new --project=<id> --pattern=pattern-0N
 
 `productionType: "story-long"` も同じ手順で受ける（`scripts/production.mjs` の SUPPORTED。pattern は pattern-02 だけ）。pattern-02 をそのまま使い、台本の `voice`（`{ "speaker": 31, "speakerName": "No.7", "speedScale": 1.38 }`）と `bgm`（自作の calm-pad。`../short-movie/scripts/make-bgm.mjs --name=<名前> --seconds=<尺+20>` で作り `bgm/` に置く。Git 管理外）で落ち着いた女性の語りにする。実在の人物の実名・写真は使わない。最初の動画は `tsugumi-sleep-habits-20261122`（眠りを妨げる夜の習慣7つ、long-v2 88）。
 
+## healing-long（2026-11-23、セット02 のヒーリング音楽の長尺）
+
+`productionType: "healing-long"`（template `healing-01`）。語りも字幕もない 50 分前後の映像と音楽。
+
+1. `node scripts/healing.mjs new --project=<id>`（mt.mjs new の pattern-02 の箱＋ `input/healing.json`。script.json はサムネイルと映像の検索語だけに使い、`scenes` は空にする）→ `node scripts/production.mjs import --campaign=<id> --key=main --project=<id>`
+2. script.json の `media` に `{ "<key>": { "query": "..." } }` → `node scripts/mt.mjs pexels candidates --project=<id>`（一覧を見て選ぶ）→ `pexels pick --scene=<key> --video=<id>`。サムネイルの写真は `--kind=photo` で探し `--photo=<id>`
+3. `input/healing.json`：`title`・`description`（効果の断定・煽りをしない）・`durationSec`（既定 3000）・`fadeSec`（6）・`speed`（0.6）・`music`（seed・movementSec）・`scenes`（`{ footage, seconds }`、60〜300 秒、同じ映像を続けない。合計から溶かしの重なりを引いて durationSec ±3%）→ `node scripts/production.mjs validate --project=<id>`
+4. `node scripts/healing.mjs music`（audio/music.wav：楽章ごとに調・和音・鈴の間隔・響きを変える自作の生成音源、-18 LUFS）→ `healing.mjs render`（関所を通す。場面ごとに 0.6 倍・前向き＋逆向きのループ・色と発光・周辺減光 → 溶かしてつなぐ → 曲）→ `healing.mjs frames`（場面ごとのコマと一覧 sheet.jpg を目視）
+5. script.json の `thumbnails[]` に `"layout": "mystic"`（夜の写真は `photoBrightness` で明るく）→ `node scripts/mt.mjs thumbnails`
+6. `input/visual-review.json`（`mp4Sha256`・`mystic: true`・`score`・`notes`）→ `node scripts/production.mjs quality-check`（healing-v1、`scripts/lib/production/healing-quality.mjs`）→ `result --render-status=rendered`
+
+最初の動画は `tsugumi-healing-moon-20261123`（月と星のヒーリング 50分）。
+
 ## コマンド
 
 | コマンド | 内容 |
