@@ -52,10 +52,11 @@ await runCli(async () => {
   console.log(`確認動画を作成中: cut.mp4 ${fmtTime(from)}–${fmtTime(to)}（${(to - from).toFixed(1)}秒）、preset ${plan.preset.name}`);
   // Same picture and sound as the final render: brightness, BGM and loudness (-14 LUFS, measured over the whole video).
   const mix = await prepareRenderAudio(paths, plan.duration);
-  if (mix) console.log(`  BGM: ${mix.bgm}（声より ${mix.belowVoiceDb} LU 下）`);
-  const { filter: audioFilter } = await loudnormFilter(mix?.file ?? paths.cutFinal, -14, -1.5);
-  const used = await burnRange(paths, plan, from, to, output, { audioFilter, audioInput: mix?.file });
-  if (mix) fs.rmSync(path.dirname(mix.file), { recursive: true, force: true });
+  if (mix.bgm) console.log(`  BGM: ${mix.bgm}（声より ${mix.belowVoiceDb} LU 下）`);
+  console.log(`  声を ${mix.limit.gainDb}dB 上げ、ピークを ${mix.limit.limitDb}dB で抑える`);
+  const { filter: audioFilter } = await loudnormFilter(mix.file, -14, -1.5);
+  const used = await burnRange(paths, plan, from, to, output, { audioFilter, audioInput: mix.file });
+  fs.rmSync(path.dirname(mix.file), { recursive: true, force: true });
   for (const c of used) console.log(`  ${c.id}  ${fmtTime(c.start)}–${fmtTime(c.end)}  ${c.lines.length}行  「${c.lines.join(" ／ ")}」`);
   console.log(`→ ${path.relative(paths.root, output)}`);
 });

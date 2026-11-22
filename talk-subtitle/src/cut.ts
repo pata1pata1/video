@@ -89,6 +89,28 @@ export type CutPlan = {
   decisionsFingerprint: string;
 };
 
+/**
+ * Times of the frames a decoder actually gives (frame=best_effort_timestamp_time), not the packets.
+ * cut.mp4 can end with a packet that decodes to no frame (2026-11-23, an: 13228 packets, 13227
+ * frames), so a re-encode of it has one packet fewer although no picture is lost.
+ */
+export async function decodedFrameTimestamps(file: string): Promise<number[]> {
+  const { stdout } = await runTool("ffprobe", [
+    "-v", "error",
+    "-select_streams", "v:0",
+    "-show_entries", "frame=best_effort_timestamp_time",
+    "-of", "csv=p=0",
+    file,
+  ], { timeoutMs: 30 * 60 * 1000 });
+  return stdout
+    .split(/\r?\n/)
+    .map((l) => l.trim().replace(/,$/, ""))
+    .filter((l) => l !== "" && l !== "N/A")
+    .map(Number)
+    .filter((n) => Number.isFinite(n))
+    .sort((a, b) => a - b);
+}
+
 export async function frameTimestamps(file: string): Promise<number[]> {
   const { stdout } = await runTool("ffprobe", [
     "-v", "error",

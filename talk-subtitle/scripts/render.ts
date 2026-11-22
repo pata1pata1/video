@@ -1,6 +1,6 @@
 // Phase 3 final: intermediate/cut.mp4 + the approved subtitles (burned in, input/subtitle-style.json)
 // + loudness normalised to -14 LUFS (true peak ≤ -1.5 dBTP) → output/final.mp4, then verified.
-//   npm run render -- --project=<id> [--force]
+//   npm run render -- --project=<id> [--force] [--check-only]（--check-only：書き出し済みの final.partial.mp4 を検証だけし直す）
 // Written to output/final.partial.mp4 first and renamed only when every check passes.
 // Report: output/final.report.json.
 
@@ -8,7 +8,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { approvedBurnCues, burnWhole, loudnormFilter, prepareRenderAudio } from "../src/burn.ts";
 import { fmtTime, parseArgs, runCli, UserError } from "../src/cli.ts";
-import { audioLagMs, frameTimestamps, grayFrame, monoFloat, outToSrc, readWav16, type Timemap } from "../src/cut.ts";
+import { audioLagMs, decodedFrameTimestamps, frameTimestamps, grayFrame, monoFloat, outToSrc, readWav16, type Timemap } from "../src/cut.ts";
 import { probeMedia, runTool } from "../src/engine.ts";
 import { assertSourceUnchanged, assertWritable, loadProject, sha256File, writeJsonAtomic } from "../src/project.ts";
 import { checkCutInputs } from "../src/subtitles.ts";
@@ -40,21 +40,30 @@ await runCli(async () => {
 
   // Loudness: measure, then one linear gain (loudnorm with the measured values).
   // BGM (input/bgm/): mixed under the voice first, then the mix is normalised as one.
-  const mix = await prepareRenderAudio(paths, plan.duration);
-  if (mix) console.log(`BGM: ${mix.bgm}（声より ${mix.belowVoiceDb} LU 下、ゲイン ${mix.gainDb}dB、声の間は大きく・話す間は小さく）`);
+  const mix = await prepareRenderAudio(paths, plan.duration, { targetLufs: TARGET_LUFS, truePeakDb: TARGET_TP });
+  if (mix.bgm) console.log(`BGM: ${mix.bgm}（声より ${mix.belowVoiceDb} LU 下、ゲイン ${mix.gainDb}dB、声の間は大きく・話す間は小さく）`);
+  console.log(`声を ${mix.limit.gainDb}dB 上げ、ピークを ${mix.limit.limitDb}dB で抑えました（大きい瞬間だけ）`);
   console.log("音量を測定中…");
-  const { before, filter: audioFilter } = await loudnormFilter(mix?.file ?? paths.cutFinal, TARGET_LUFS, TARGET_TP);
-  console.log(`  ${mix ? "声＋BGM" : "cut.mp4"}: ${before.integratedLufs} LUFS、true peak ${before.truePeakDb} dBTP、LRA ${before.loudnessRangeLu} LU`);
+  const { before, filter: audioFilter } = await loudnormFilter(mix.file, TARGET_LUFS, TARGET_TP);
+  console.log(`  ${mix.bgm ? "声＋BGM" : "声"}（ピークを抑えた後）: ${before.integratedLufs} LUFS、true peak ${before.truePeakDb} dBTP、LRA ${before.loudnessRangeLu} LU`);
 
-  console.log("全編を書き出し中（字幕の画像を作ってから H.264 で書き出し。数分かかります）…");
-  const t0 = Date.now();
-  fs.rmSync(partial, { force: true });
-  const { parts } = await burnWhole(paths, plan, partial, { audioFilter, audioInput: mix?.file, timeoutMs: 3 * 60 * 60 * 1000, log: (s) => console.log(s), // A long video in parts: the shared engine's encoder lowers the peak until the AAC is under the check's
-    // limit; with -1.5 here it overshot to -2.1 dBTP and -14.6 LUFS (live-talk).
-    loudness: { targetLufs: TARGET_LUFS, truePeakDb: TP_LIMIT } });
-  if (parts > 1) console.log(`  ${parts} 区間に分けて焼き込み、つなぎました`);
-  if (mix) fs.rmSync(path.dirname(mix.file), { recursive: true, force: true });
-  console.log(`  書き出し ${((Date.now() - t0) / 1000).toFixed(0)}秒`);
+  // --check-only: check an existing output/final.partial.mp4 again (after a fix to the checks), without burning.
+  const checkOnly = args.has("check-only");
+  if (checkOnly && !fs.existsSync(partial)) throw new UserError("--check-only: output/final.partial.mp4 がありません。");
+  if (checkOnly) {
+    console.log("書き出し済みの output/final.partial.mp4 を検証します（書き出しはしません）");
+    fs.rmSync(path.dirname(mix.file), { recursive: true, force: true });
+  } else {
+    console.log("全編を書き出し中（字幕の画像を作ってから H.264 で書き出し。数分かかります）…");
+    const t0 = Date.now();
+    fs.rmSync(partial, { force: true });
+    const { parts } = await burnWhole(paths, plan, partial, { audioFilter, audioInput: mix.file, timeoutMs: 3 * 60 * 60 * 1000, log: (s) => console.log(s), // A long video in parts: the shared engine's encoder lowers the peak until the AAC is under the check's
+      // limit; with -1.5 here it overshot to -2.1 dBTP and -14.6 LUFS (live-talk).
+      loudness: { targetLufs: TARGET_LUFS, truePeakDb: TP_LIMIT } });
+    if (parts > 1) console.log(`  ${parts} 区間に分けて焼き込み、つなぎました`);
+    fs.rmSync(path.dirname(mix.file), { recursive: true, force: true });
+    console.log(`  書き出し ${((Date.now() - t0) / 1000).toFixed(0)}秒`);
+  }
 
   // ---- checks ----
   console.log("検証中…");
@@ -73,10 +82,12 @@ await runCli(async () => {
   if (rotation !== 0) problems.push(`回転情報が付いている（${rotation}°）`);
 
   const times = await frameTimestamps(partial);
-  const cutFrames = cutReport.actual.frames;
+  // Compared with the frames cut.mp4 really decodes to (its packet count can be one more, see decodedFrameTimestamps).
+  const cutTimes = await decodedFrameTimestamps(paths.cutFinal);
+  const cutFrames = cutTimes.length;
+  if (cutFrames !== cutReport.actual.frames) console.log(`  cut.mp4: パケット ${cutReport.actual.frames}・取り出せるフレーム ${cutFrames}（フレームの数で比べます）`);
   if (times.length !== cutFrames) problems.push(`フレーム数が cut.mp4 と違う（${times.length}／${cutFrames}）`);
   // Every frame keeps its cut.mp4 time (no duplicated or shifted timestamps).
-  const cutTimes = await frameTimestamps(paths.cutFinal);
   const maxFrameShiftMs = Math.round(Math.max(0, ...times.map((t, i) => Math.abs(t - (cutTimes[i] ?? Infinity)))) * 1e5) / 100;
   const dupTimes = times.filter((t, i) => i > 0 && t <= times[i - 1] + 1e-6).length;
   if (dupTimes) problems.push(`同じ時刻のフレームが ${dupTimes} 組ある`);
@@ -84,7 +95,9 @@ await runCli(async () => {
   const lastGap = times.length > 1 ? times[times.length - 1] - times[times.length - 2] : 0;
   const videoSeconds = times.length ? times[times.length - 1] + lastGap : 0;
   const audioSeconds = Number(a?.duration ?? 0);
-  if (Math.abs(videoSeconds - cutReport.actual.videoSeconds) > 0.02) problems.push(`映像の長さが cut.mp4 と ${(videoSeconds - cutReport.actual.videoSeconds).toFixed(3)}秒違う`);
+  const cutGap = cutTimes.length > 1 ? cutTimes[cutTimes.length - 1] - cutTimes[cutTimes.length - 2] : 0;
+  const cutVideoSeconds = cutTimes.length ? cutTimes[cutTimes.length - 1] + cutGap : 0;
+  if (Math.abs(videoSeconds - cutVideoSeconds) > 0.02) problems.push(`映像の長さが cut.mp4 と ${(videoSeconds - cutVideoSeconds).toFixed(3)}秒違う`);
   // AAC is written in 1024-sample frames (21.3 ms at 48 kHz), so the re-encoded length rounds up by up to
   // about two frames (63.670 s → 63.700 s seen on 2026-11-04; the old 0.03 s limit failed on that by chance).
   const AAC_SLACK_SECONDS = (2 * 1024) / 48000 + 0.001;
@@ -178,7 +191,7 @@ await runCli(async () => {
     output: "final.mp4",
     ok: problems.length === 0,
     problems,
-    inputs: { cut: "intermediate/cut.mp4", cutFrames, bgm: mix ? { file: `input/bgm/${mix.bgm}`, belowVoiceDb: mix.belowVoiceDb, gainDb: mix.gainDb } : null, brightness: loadSettings(paths).render.brightness, subtitlesApproved: true, preset: plan.preset.name, sourceSha256 },
+    inputs: { cut: "intermediate/cut.mp4", cutFrames, bgm: mix.bgm ? { file: `input/bgm/${mix.bgm}`, belowVoiceDb: mix.belowVoiceDb, gainDb: mix.gainDb } : null, peakLimit: mix.limit, brightness: loadSettings(paths).render.brightness, subtitlesApproved: true, preset: plan.preset.name, sourceSha256 },
     file: { bytes: fs.statSync(partial).size, sha256: await sha256File(partial), formatSeconds: info.durationSeconds },
     video: { codec: v.codec_name, width, height, rotation, rFrameRate: v.r_frame_rate, avgFps: Math.round(fpsOf(v.avg_frame_rate) * 1000) / 1000, frames: times.length, seconds: Math.round(videoSeconds * 1e6) / 1e6 },
     audio: { codec: a?.codec_name, sampleRate: Number(a?.sample_rate), channels: Number(a?.channels), seconds: audioSeconds },

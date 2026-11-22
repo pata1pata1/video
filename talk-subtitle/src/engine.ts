@@ -13,6 +13,7 @@ export {
   burnOverlayGraph,
   concatMedia,
   encodeAacLoudnorm,
+  limitPeaksTowardLoudness,
   muxVideoAudio,
   detectSilence,
   extractAudio,

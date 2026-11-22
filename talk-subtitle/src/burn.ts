@@ -11,8 +11,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import { UserError } from "./cli.ts";
+import { frameTimestamps } from "./cut.ts";
 import { loadSettings } from "./config.ts";
-import { burnOverlayGraph, concatMedia, encodeAacLoudnorm, extractAudio, loudnormApplyFilter, measureLoudness, mixVoiceWithBgm, muxVideoAudio } from "./engine.ts";
+import { burnOverlayGraph, concatMedia, encodeAacLoudnorm, extractAudio, limitPeaksTowardLoudness, loudnormApplyFilter, measureLoudness, mixVoiceWithBgm, muxVideoAudio } from "./engine.ts";
 import type { ProjectPaths } from "./paths.ts";
 import { readJson, readJsonIfExists } from "./project.ts";
 import { bundleCompositions, measureTextEm, renderStillPng } from "./render.ts";
@@ -29,20 +30,32 @@ const AUDIO_EXT = /\.(mp3|wav|m4a|aac|flac|ogg)$/i;
  * The audio of the render: cut.mp4's voice, plus the BGM in input/bgm/ when there is one
  * (mixed once by the shared engine, intermediate/render-audio/mix.wav). null = no BGM (use cut.mp4's audio).
  */
-export async function prepareRenderAudio(paths: ProjectPaths, duration: number): Promise<{ file: string; bgm: string; gainDb: number; belowVoiceDb: number } | null> {
+export async function prepareRenderAudio(paths: ProjectPaths, duration: number, loudness: { targetLufs: number; truePeakDb: number } = { targetLufs: -14, truePeakDb: -1.5 }): Promise<{ file: string; bgm: string | null; gainDb: number; belowVoiceDb: number; limit: { gainDb: number; limitDb: number } }> {
   const dir = path.join(paths.input, "bgm");
   const files = fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => AUDIO_EXT.test(f)) : [];
-  if (files.length === 0) return null;
   if (files.length > 1) throw new UserError(`input/bgm/ に音声が ${files.length} 個あります（1曲だけにしてください）: ${files.join(", ")}`);
   const belowVoiceDb = loadSettings(paths).render.bgmBelowVoiceDb;
   const work = path.join(paths.intermediate, "render-audio");
   fs.mkdirSync(work, { recursive: true });
-  const voice = path.join(work, "voice.wav");
-  const mix = path.join(work, "mix.wav");
-  await extractAudio(paths.cutFinal, voice, { sampleRate: 48000, channels: 2, overwrite: true });
-  const r = await mixVoiceWithBgm(voice, path.join(dir, files[0]), mix, { durationSeconds: duration, belowVoiceDb, overwrite: true });
-  fs.rmSync(voice, { force: true });
-  return { file: mix, bgm: files[0], gainDb: Math.round(r.gainDb * 10) / 10, belowVoiceDb };
+  let source = paths.cutFinal;
+  let bgm: string | null = null;
+  let gainDb = 0;
+  if (files.length === 1) {
+    const voice = path.join(work, "voice.wav");
+    const mix = path.join(work, "mix.wav");
+    await extractAudio(paths.cutFinal, voice, { sampleRate: 48000, channels: 2, overwrite: true });
+    const r = await mixVoiceWithBgm(voice, path.join(dir, files[0]), mix, { durationSeconds: duration, belowVoiceDb, overwrite: true });
+    fs.rmSync(voice, { force: true });
+    source = mix;
+    bgm = files[0];
+    gainDb = Math.round(r.gainDb * 10) / 10;
+  }
+  // Raise toward the target and limit the peaks first (2026-11-23, an: a 21 dB crest kept the
+  // linear loudness pass at -15.8 LUFS). The loudness pass after this needs only a small gain.
+  const limited = path.join(work, "limited.wav");
+  const l = await limitPeaksTowardLoudness(source, limited, { ...loudness, overwrite: true });
+  if (source !== paths.cutFinal) fs.rmSync(source, { force: true });
+  return { file: limited, bgm, gainDb, belowVoiceDb, limit: { gainDb: l.gainDb, limitDb: l.limitDb } };
 }
 
 /** Measured one-pass linear loudnorm to the target (the same filter for the final render and the check clips). */
@@ -119,6 +132,13 @@ export async function burnWhole(
     }
   }
   bounds.push(plan.duration);
+  // Each part starts on a real frame of cut.mp4 (2026-11-23, an: the frames there sit up to 8 ms off the
+  // 1/60 grid, so a part starting at a whole second re-timed its frames by 3.3 ms and lost one frame).
+  const frames = await frameTimestamps(paths.cutFinal);
+  for (let k = 1; k < bounds.length - 1; k++) {
+    const f = frames.find((t) => t >= bounds[k] - 1e-6);
+    if (f !== undefined && f < bounds[k + 1]) bounds[k] = Math.round(f * 1e6) / 1e6;
+  }
   const work = path.join(paths.intermediate, "render-parts");
   fs.rmSync(work, { recursive: true, force: true });
   fs.mkdirSync(work, { recursive: true });
@@ -131,7 +151,7 @@ export async function burnWhole(
       parts.push(file);
     }
     const joined = path.join(work, "joined.mp4");
-    // Exact part lengths (whole seconds): the demuxer's own per-file durations were ~0.7 ms short each (live-talk).
+    // Exact part lengths (from frame to frame): the demuxer's own per-file durations were ~0.7 ms short each (live-talk).
     await concatMedia(parts, joined, { overwrite: true, durations: bounds.slice(1).map((b, k) => b - bounds[k]) });
     for (const p of parts) fs.rmSync(p, { force: true });
     const wav = path.join(work, "audio.wav");

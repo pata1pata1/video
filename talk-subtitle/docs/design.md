@@ -371,11 +371,13 @@ npm run decide -- --project=<id> --accept-term=t1 --reject-term=t2 --term-text=t
 
 ### 14.3 最終書き出し（output/final.mp4）
 
-`npm run render -- --project=<id> [--force]` → `output/final.mp4`・`output/final.report.json`
+`npm run render -- --project=<id> [--force] [--check-only]` → `output/final.mp4`・`output/final.report.json`（`--check-only`：書き出し済みの `final.partial.mp4` を検証だけし直す）
 
 - 前提：元動画が登録時のまま（sha256）、cut.mp4 が今の承認から作られている（timemap）、字幕が承認済み
 - 字幕は 14.2 と同じ方法（字幕ごとの透明 PNG を ffmpeg で重ねる）で全編に焼き込む。cut.mp4 をシークせずに読み、`-fps_mode passthrough` でフレームの時刻をそのまま保つ
 - 音量：cut.mp4 を測ってから loudnorm（測定値を渡す2パス）で -14 LUFS・true peak -1.5 dBTP に合わせる。一定のゲインで true peak が上限を超える時（例：-29.3 LUFS・-6.86 dBTP → +15.3 dB 必要）は loudnorm が自動で dynamic（ピークを抑えながら合わせる）になる。AAC 192kbps・48kHz
+- **ピークを先に抑える（2026-11-23、an）**：平均に比べてピークが大きい声（-24.8 LUFS・-3.7 dBTP、差21dB）は、一定のゲインでは -15.8 LUFS で止まった。共通エンジンの `limitPeaksTowardLoudness` で、声を目標まで上げてから alimiter（4倍の標本化・true peak の上限より 1dB 下・遅れの補正あり）でピークだけを抑え、その後で今までの loudnorm をかける（subtitle-clip も同じ）
+- **区間に分けて焼き込むときの境目（2026-11-23、an）**：cut.mp4 のフレームは 1/60 秒の目盛りから最大 8ms ずれることがあるので、境目は cut.mp4 の実際のフレームの時刻にする（整数秒にすると後半が 3.3ms ずれて1フレーム減った）。フレーム数の比較は、cut.mp4 が実際に取り出せるフレーム（最後のパケットが絵にならないことがある）で行う
 - フレームの時刻：エンコーダーの時刻の単位を入力に合わせる（`-enc_time_base:v demux`）。合わせないと 1/60 秒に丸められ、cut.mp4 の不均一な時刻（iPhone 由来）で同じ時刻のフレームができる
 - 一度 `final.partial.mp4` に書き、検証がすべて通った時だけ `final.mp4` にする。検証：1920×1080・回転なし、フレーム数と長さが cut.mp4 と同じ、映像と音声の開始時刻、ラウドネス（±0.5 LU）と true peak（≤ -1.0 dBTP、ebur128）、音声を timemap 経由で元の音声と相互相関（10か所・±10ms）、映像を cut.mp4 と比較（字幕より上の部分）、全字幕が画面に出ているか（各字幕の中央で下部が cut.mp4 と違う）、全フレームのデコード、元動画の sha256
 
