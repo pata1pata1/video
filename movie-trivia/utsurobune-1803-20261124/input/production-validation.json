@@ -1,0 +1,14 @@
+{
+  "validatedAt": "2026-11-23T16:38:56.484Z",
+  "requestId": "pr-utsurobune-1803-20261124-main-202611231633",
+  "scriptSha256": "b9bb7ac290555b980ef73c427e66b918fd5ab1d532c1ebee90fc89b5b0ec4759",
+  "status": "pass",
+  "proceed": true,
+  "precheck": [],
+  "contentOps": {
+    "status": "pass",
+    "problems": [],
+    "safeWarnings": [],
+    "blockingWarnings": []
+  }
+}

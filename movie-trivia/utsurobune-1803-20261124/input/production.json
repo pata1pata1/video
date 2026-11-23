@@ -1,0 +1,10 @@
+{
+  "contractVersion": "content-ops.production-request/1",
+  "campaignId": "utsurobune-1803-20261124",
+  "key": "main",
+  "requestId": "pr-utsurobune-1803-20261124-main-202611231633",
+  "requestPath": "campaigns/utsurobune-1803-20261124/production/video-main.json",
+  "productionId": "utsurobune-1803-20261124",
+  "pattern": "pattern-03",
+  "importedAt": "2026-11-23T16:33:44.041Z"
+}
