@@ -1,0 +1,116 @@
+{
+  "maxAttempts": 3,
+  "latest": {
+    "attempt": 1,
+    "gate": "pass",
+    "overallQuality": 82,
+    "scores": {
+      "visualStrength": 64,
+      "hookQuality": 70,
+      "visualPacing": 100,
+      "onScreenTextLoad": 100,
+      "duration": 100,
+      "narrationPacing": 100,
+      "audioQuality": 100,
+      "structure": 100
+    },
+    "escalation": null
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "checkedAt": "2026-11-23T21:10:20.915Z",
+      "rulesVersion": "long-v2",
+      "gate": "pass",
+      "overallQuality": 82,
+      "scores": {
+        "visualStrength": 64,
+        "hookQuality": 70,
+        "visualPacing": 100,
+        "onScreenTextLoad": 100,
+        "duration": 100,
+        "narrationPacing": 100,
+        "audioQuality": 100,
+        "structure": 100
+      },
+      "blocking": [],
+      "metrics": {
+        "duration": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "hookQuality": {
+          "score": 70,
+          "findings": [
+            "最初の画がイメージ映像（talk・Pexels）。題材そのものの映像・写真で始める"
+          ],
+          "fixes": [
+            "冒頭 3 秒はこの出来事の一番強い映像・写真と結論の1文。タイトル画面・イメージ映像・「今回は〜」で始めない"
+          ]
+        },
+        "visualPacing": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "visualStrength": {
+          "score": 64,
+          "findings": [
+            "この出来事そのものの素材（Pexels 以外）0%（25% で満点）",
+            "目視：4秒ごとのコマ（30枚）を目視。冒頭0秒はスマホに話しかける人の実写と「12月11日 音声が変わる」の札",
+            "目視：機能カード（音声・音声入力・Space・画像）、数字カード（12月11日・なし・Plus・50%）、まとめの比較表。文字は公式の発表どおり",
+            "目視：ChatGPT の実際の画面は収録していない（作らない）。背景は Pexels のイメージ映像（※映像はイメージです）",
+            "目視：弱いところ：スマホを操作する手の映像が6回出る。実物の画面がないので、映像は話の中身を直接は見せていない"
+          ],
+          "fixes": [
+            "この出来事そのものの映像・公式素材・報道写真（権利と出典を確認）を探す。イメージ映像と図だけで構成しない"
+          ],
+          "evidence": {
+            "judgmentSource": "measured+claude-review",
+            "realFootageRatio": 1,
+            "eventRatio": 0,
+            "movingRatio": 1
+          }
+        },
+        "onScreenTextLoad": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "narrationPacing": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "audioQuality": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "structure": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        }
+      },
+      "reviewNotes": [
+        "4秒ごとのコマ（30枚）を目視。冒頭0秒はスマホに話しかける人の実写と「12月11日 音声が変わる」の札",
+        "機能カード（音声・音声入力・Space・画像）、数字カード（12月11日・なし・Plus・50%）、まとめの比較表。文字は公式の発表どおり",
+        "ChatGPT の実際の画面は収録していない（作らない）。背景は Pexels のイメージ映像（※映像はイメージです）",
+        "弱いところ：スマホを操作する手の映像が6回出る。実物の画面がないので、映像は話の中身を直接は見せていない"
+      ],
+      "visualEvidence": {
+        "judgmentSource": "measured+claude-review",
+        "realFootageRatio": 1,
+        "diagramRatio": null,
+        "cardRatio": null,
+        "motionEvidence": null,
+        "strongestFrame": null,
+        "weakestFrame": null
+      },
+      "mp4Sha256": "e9ddc5bfefffb26e9fd7f0bb15065952b76e395f0ac2593aeef8330a31ce1724",
+      "escalation": null
+    }
+  ]
+}
