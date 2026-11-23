@@ -1,0 +1,536 @@
+{
+  "id": "tsugumi-year-end-prep-20261124",
+  "pattern": "pattern-02",
+  "title": "正月飾り、29日と31日は避けて｜年神様を迎える5つの日付",
+  "titleTop": "國學院大學・農林水産省などの紹介より",
+  "titleMain": "年神様を迎える5つの日付",
+  "titleSub": "あなたの家はいつ？",
+  "program": "つぐみの開運チャンネル",
+  "asOf": "2026年11月24日時点",
+  "voice": {
+    "speaker": 31,
+    "speakerName": "No.7",
+    "speedScale": 1.42
+  },
+  "bgm": {
+    "file": "bgm/tsugumi-calm-pad-long.wav",
+    "belowVoiceDb": 22
+  },
+  "pronunciation": {
+    "年神様": "としがみさま",
+    "歳神様": "としがみさま",
+    "正月事始め": "しょうがつことはじめ",
+    "鬼宿日": "きしゅくにち",
+    "依代": "よりしろ",
+    "苦立て": "クダテ",
+    "一夜飾り": "イチヤカザリ",
+    "鏡開き": "かがみびらき",
+    "鏡もち": "かがみもち",
+    "無病息災": "むびょうそくさい",
+    "大晦日": "おおみそか",
+    "穢れ": "けがれ",
+    "29日": "にじゅうくにち",
+    "28日": "にじゅうはちにち",
+    "30日": "さんじゅうにち",
+    "31日": "さんじゅういちにち",
+    "26日": "にじゅうろくにち",
+    "13日": "じゅうさんにち",
+    "11日": "じゅういちにち"
+  },
+  "media": {
+    "shrine-night": {
+      "query": "japanese shrine night lanterns"
+    },
+    "moon": {
+      "query": "full moon night sky clouds"
+    },
+    "clean": {
+      "query": "cleaning wiping floor home"
+    },
+    "broom": {
+      "query": "sweeping with broom"
+    },
+    "temple": {
+      "query": "japanese temple roof"
+    },
+    "calendar": {
+      "query": "calendar december"
+    },
+    "kadomatsu": {
+      "query": "（ウィキメディア・コモンズ CC0：kadomatsu）"
+    },
+    "pine": {
+      "query": "pine tree branches"
+    },
+    "shimekazari": {
+      "query": "（ウィキメディア・コモンズ CC0：shimekazari）"
+    },
+    "kagami": {
+      "query": "（ウィキメディア・コモンズ CC0：kagami）"
+    },
+    "osechi": {
+      "query": "（ウィキメディア・コモンズ CC0：osechi）"
+    },
+    "mochi": {
+      "query": "（ウィキメディア・コモンズ CC0：mochi）"
+    },
+    "torii": {
+      "query": "（ウィキメディア・コモンズ CC0：torii）"
+    },
+    "sunrise": {
+      "query": "sunrise over sea golden"
+    },
+    "kadomatsu-sky": {
+      "query": "（ウィキメディア・コモンズ CC0：門松の竹と松）"
+    }
+  },
+  "roster": [],
+  "subtitle": {
+    "rowsPerPage": 1,
+    "maxRowChars": 18
+  },
+  "scenes": [
+    {
+      "id": "opening",
+      "kind": "opening",
+      "lines": [
+        {
+          "id": "o1",
+          "kind": "hook",
+          "factIds": [
+            "kazaru"
+          ],
+          "text": "正月飾り、29日に飾っていませんか？",
+          "visual": {
+            "footage": "kadomatsu",
+            "headline": {
+              "title": "正月飾りは何日に？"
+            }
+          }
+        },
+        {
+          "id": "o2",
+          "kind": "fact",
+          "factIds": [
+            "toshigami"
+          ],
+          "text": "お正月は、年神様という神様を、家にお迎えする行事です。",
+          "visual": {
+            "footage": "shrine-night"
+          }
+        },
+        {
+          "id": "o3",
+          "kind": "transition",
+          "factIds": [],
+          "text": "12月13日から1月11日まで、準備の日付を5つ見ていきます。",
+          "visual": {
+            "footage": "calendar",
+            "headline": {
+              "title": "年神様を迎える5つの日付"
+            }
+          }
+        },
+        {
+          "id": "o5",
+          "kind": "transition",
+          "factIds": [],
+          "notice": true,
+          "text": "どれも年中行事の言い伝えで、地域や家によって違いがあります。",
+          "visual": {
+            "footage": "moon"
+          }
+        }
+      ]
+    },
+    {
+      "id": "c1",
+      "kind": "chapter",
+      "number": 1,
+      "heading": "12月13日 正月事始め",
+      "lines": [
+        {
+          "id": "c1a",
+          "kind": "fact",
+          "factIds": [
+            "jikohajime"
+          ],
+          "text": "1つ目は、12月13日、正月事始めです。",
+          "visual": {
+            "footage": "temple",
+            "headline": {
+              "title": "① 12月13日 正月事始め"
+            }
+          }
+        },
+        {
+          "id": "c1b",
+          "kind": "fact",
+          "factIds": [
+            "jikohajime"
+          ],
+          "text": "お正月を迎える準備を、始める日とされています。",
+          "visual": {
+            "footage": "calendar"
+          }
+        },
+        {
+          "id": "c1c",
+          "kind": "fact",
+          "factIds": [
+            "jikohajime"
+          ],
+          "text": "昔の暦の12月13日は、鬼宿日という、縁起の良い日でした。",
+          "visual": {
+            "footage": "moon"
+          }
+        },
+        {
+          "id": "c1d",
+          "kind": "fact",
+          "factIds": [
+            "susuharai"
+          ],
+          "text": "今でもこの日に、すす払いをする神社やお寺が、多く残っています。",
+          "visual": {
+            "footage": "broom"
+          }
+        }
+      ]
+    },
+    {
+      "id": "c2",
+      "kind": "chapter",
+      "number": 2,
+      "heading": "28日までに大掃除",
+      "lines": [
+        {
+          "id": "c2a",
+          "kind": "fact",
+          "factIds": [
+            "souji28"
+          ],
+          "text": "2つ目は、大掃除を28日までに終えることです。",
+          "visual": {
+            "footage": "clean",
+            "headline": {
+              "title": "② 大掃除は28日までに"
+            }
+          }
+        },
+        {
+          "id": "c2b",
+          "kind": "fact",
+          "factIds": [
+            "souji28"
+          ],
+          "text": "29日は「苦」の字が付くので、縁起が良くないとされています。",
+          "visual": {
+            "footage": "calendar"
+          }
+        },
+        {
+          "id": "c2c",
+          "kind": "fact",
+          "factIds": [
+            "souji28"
+          ],
+          "text": "昔の暦で大晦日だった30日と、大晦日の31日も、避けるのが良いとされます。",
+          "visual": {
+            "footage": "clean"
+          }
+        }
+      ]
+    },
+    {
+      "id": "c3",
+      "kind": "chapter",
+      "number": 3,
+      "heading": "正月飾りを飾る日",
+      "lines": [
+        {
+          "id": "c3a",
+          "kind": "fact",
+          "factIds": [
+            "kazaru"
+          ],
+          "text": "3つ目は、正月飾りを飾る日です。",
+          "visual": {
+            "footage": "kadomatsu",
+            "headline": {
+              "title": "③ 正月飾りを飾る日"
+            }
+          }
+        },
+        {
+          "id": "c3b",
+          "kind": "fact",
+          "factIds": [
+            "kadomatsu"
+          ],
+          "text": "門松は、年神様が降りてくるときの目印、依代とされています。",
+          "visual": {
+            "footage": "kadomatsu"
+          }
+        },
+        {
+          "id": "c3c",
+          "kind": "fact",
+          "factIds": [
+            "kadomatsu"
+          ],
+          "text": "松は「祀る」につながる木、竹は長寿のしるしです。",
+          "visual": {
+            "footage": "pine"
+          }
+        },
+        {
+          "id": "c3d",
+          "kind": "fact",
+          "factIds": [
+            "shimekazari"
+          ],
+          "text": "玄関のしめ飾りは、穢れを清め、災いが入るのを断つ印とされます。",
+          "visual": {
+            "footage": "shimekazari"
+          }
+        },
+        {
+          "id": "c3e",
+          "kind": "fact",
+          "factIds": [
+            "kazaru"
+          ],
+          "text": "飾るのは、26日から28日、または30日が一般的です。",
+          "visual": {
+            "footage": "shimekazari",
+            "headline": {
+              "title": "26〜28日・30日"
+            }
+          }
+        },
+        {
+          "id": "c3f",
+          "kind": "fact",
+          "factIds": [
+            "kazaru"
+          ],
+          "text": "29日は「苦立て」といって、避けたほうがよいとされます。",
+          "visual": {
+            "footage": "calendar",
+            "headline": {
+              "title": "29日・31日は避ける"
+            }
+          }
+        },
+        {
+          "id": "c3g",
+          "kind": "fact",
+          "factIds": [
+            "kazaru"
+          ],
+          "text": "31日は「一夜飾り」といって、年神様に誠意を欠くとされています。",
+          "visual": {
+            "footage": "kadomatsu-sky"
+          }
+        }
+      ]
+    },
+    {
+      "id": "c4",
+      "kind": "chapter",
+      "number": 4,
+      "heading": "鏡もちとおせち",
+      "lines": [
+        {
+          "id": "c4a",
+          "kind": "fact",
+          "factIds": [
+            "kagami"
+          ],
+          "text": "4つ目は、鏡もちです。",
+          "visual": {
+            "footage": "kagami",
+            "headline": {
+              "title": "④ 鏡もちとおせち"
+            }
+          }
+        },
+        {
+          "id": "c4b",
+          "kind": "fact",
+          "factIds": [
+            "kagami"
+          ],
+          "text": "鏡もちは、お迎えした年神様への、お供え物です。",
+          "visual": {
+            "footage": "kagami"
+          }
+        },
+        {
+          "id": "c4c",
+          "kind": "fact",
+          "factIds": [
+            "kagami"
+          ],
+          "text": "2つの丸いおもちは、太陽と月を表すといわれています。",
+          "visual": {
+            "footage": "moon"
+          }
+        },
+        {
+          "id": "c4d",
+          "kind": "fact",
+          "factIds": [
+            "kagami"
+          ],
+          "text": "福が重なる、円満に年を重ねる、という意味も込められています。",
+          "visual": {
+            "footage": "mochi"
+          }
+        },
+        {
+          "id": "c4e",
+          "kind": "fact",
+          "factIds": [
+            "osechi"
+          ],
+          "text": "おせち料理も、もとは節目の日に、神様に供えた料理だといわれています。",
+          "visual": {
+            "footage": "osechi"
+          }
+        }
+      ]
+    },
+    {
+      "id": "c5",
+      "kind": "chapter",
+      "number": 5,
+      "heading": "1月11日 鏡開き",
+      "lines": [
+        {
+          "id": "c5a",
+          "kind": "fact",
+          "factIds": [
+            "kagamibiraki"
+          ],
+          "text": "5つ目は、1月11日の鏡開きです。",
+          "visual": {
+            "footage": "torii",
+            "headline": {
+              "title": "⑤ 1月11日 鏡開き"
+            }
+          }
+        },
+        {
+          "id": "c5b",
+          "kind": "fact",
+          "factIds": [
+            "kagamibiraki"
+          ],
+          "text": "お供えした鏡もちを下ろして、無病息災を願っていただきます。",
+          "visual": {
+            "footage": "mochi"
+          }
+        },
+        {
+          "id": "c5c",
+          "kind": "fact",
+          "factIds": [
+            "kagamibiraki"
+          ],
+          "text": "「割る」は縁起が良くないので、「開く」という言葉を使います。",
+          "visual": {
+            "footage": "kagami"
+          }
+        }
+      ]
+    },
+    {
+      "id": "ending",
+      "kind": "ending",
+      "lines": [
+        {
+          "id": "e1",
+          "kind": "closing",
+          "factIds": [
+            "jikohajime",
+            "souji28"
+          ],
+          "text": "13日に準備を始めて、28日までに家を整える。",
+          "visual": {
+            "footage": "sunrise",
+            "headline": {
+              "title": "13日に始めて28日までに"
+            }
+          }
+        },
+        {
+          "id": "e2",
+          "kind": "closing",
+          "factIds": [
+            "toshigami"
+          ],
+          "text": "そうして、新しい年の年神様をお迎えします。",
+          "visual": {
+            "footage": "shrine-night"
+          }
+        },
+        {
+          "id": "e3",
+          "kind": "closing",
+          "factIds": [],
+          "text": "あなたの家では、いつ正月飾りを飾りますか？",
+          "visual": {
+            "footage": "torii",
+            "headline": {
+              "title": "あなたの家はいつ飾る？"
+            }
+          }
+        },
+        {
+          "id": "e4",
+          "kind": "closing",
+          "factIds": [],
+          "text": "コメントで教えてくださいね。",
+          "visual": {
+            "footage": "shrine-night"
+          }
+        },
+        {
+          "id": "e5",
+          "kind": "closing",
+          "factIds": [],
+          "text": "忘れないように保存して、高評価とチャンネル登録も、よろしくお願いします。",
+          "visual": {
+            "footage": "sunrise"
+          }
+        }
+      ]
+    }
+  ],
+  "thumbnails": [
+    {
+      "id": "A",
+      "layout": "mystic",
+      "photo": "kadomatsu",
+      "ribbon": "年神様を迎える",
+      "lines": [
+        "年末の準備"
+      ],
+      "accent": "5つの日付",
+      "question": "29日と31日は避ける？"
+    },
+    {
+      "id": "B",
+      "layout": "mystic",
+      "photo": "kagami",
+      "ribbon": "年中行事の言い伝え",
+      "lines": [
+        "大掃除・正月飾り"
+      ],
+      "accent": "いつがいい？",
+      "question": "年神様を迎える5つの日付"
+    }
+  ]
+}

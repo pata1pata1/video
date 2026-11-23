@@ -1,0 +1,10 @@
+{
+  "contractVersion": "content-ops.production-request/1",
+  "campaignId": "tsugumi-year-end-prep-20261124",
+  "key": "main",
+  "requestId": "pr-tsugumi-year-end-prep-20261124-main-202611231954",
+  "requestPath": "campaigns/tsugumi-year-end-prep-20261124/production/video-main.json",
+  "productionId": "tsugumi-year-end-prep-20261124",
+  "pattern": "pattern-02",
+  "importedAt": "2026-11-23T19:54:43.884Z"
+}
