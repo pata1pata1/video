@@ -63,6 +63,7 @@
 | `npm run cut -- --project=<id> [--dry-run] [--final]` | Phase 2：承認済みカットを適用（既定は軽量プレビュー intermediate/cut-preview.mp4、`--final` で intermediate/cut.mp4）＋ timemap.json。**未決定があれば止まる。`--final` はユーザーがプレビューを確認してから** |
 | `npm run quotes -- add / list / decide / align --project=<id>` | 読み上げた投稿の本文（`input/quotes.json`）。投稿の表記が字幕の正解。違いは要確認として一覧（docs/design.md の13章） |
 | `npm run subtitles -- draft / show / edit / import / approve --project=<id>` | Phase 3：字幕案（intermediate/subtitles.draft.json）と確認画面 review/subtitles.html。修正は input/subtitles.json。**焼き込みはユーザーの承認後**（docs/design.md の14章） |
+| `npm run subtitles -- retime --project=<id> [--dry-run] [--show-all]` | **字幕の時刻を cut.mp4 の声に合わせ直す**（2026-11-23）。文字は変えない。声のかたまりごとに文字起こしし直して、字幕の始まりを声の出始め・息つぎに合わせる（Mac は whisper.cpp、Windows は faster-whisper。モデルの読み込みは1回）。声との対応が少ない字幕と「字幕に無い声」（言い直しの残りの手がかり）も出す。字幕を分けた・直した後に実行し、時刻が変わると承認は外れる。設定は `input/settings.json` の `retime`。docs/production-playbook.md の2章 |
 | `npm run subtitle-stills -- --project=<id> [--cues=…] [--variant=<name>] [--out=<folder>]` | 字幕デザインの静止画・比較（review/subtitle-design/。docs/design.md の14.1） |
 | `npm run subtitle-clip -- --project=<id> [--from=秒 --to=秒]` | 承認済み字幕を焼き込んだ 10〜15 秒の確認動画（review/subtitle-clip-*.mp4。14.2）。全編の書き出しではない |
 | `npm run render -- --project=<id> [--force]` | 最終書き出し output/final.mp4（字幕の焼き込み・-14 LUFS・検証。14.3）。**字幕の承認と確認動画のチェックの後、ユーザーの指示で** |

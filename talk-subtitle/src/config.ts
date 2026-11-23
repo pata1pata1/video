@@ -94,6 +94,29 @@ export const DEFAULT_SETTINGS = {
       beamSize: undefined as number | undefined,
     },
   },
+  /**
+   * npm run subtitles -- retime (2026-11-23, an): subtitle times from the audio of cut.mp4, not from
+   * whisper's word times. Speech chunks = 10 ms frames louder than voiceDb, joined over gaps shorter
+   * than joinGapSeconds; each chunk is transcribed on its own (its start is exact), the subtitle texts
+   * are matched to those texts, and a change inside a chunk goes to the nearest breath (a dip under
+   * breathDb) within snapSeconds.
+   */
+  retime: {
+    /** null = automatic: the loud end of the talk (95th percentile of frames) - 25 dB, kept within -55…-35 (an: -45 worked). */
+    voiceDb: null as number | null,
+    /** null = voiceDb + 7 dB (an: -38). */
+    breathDb: null as number | null,
+    joinGapSeconds: 0.2,
+    minChunkSeconds: 0.08,
+    /** Audio kept around each chunk when it is cut out for transcription. */
+    clipPaddingSeconds: 0.05,
+    snapSeconds: 0.5,
+    /** A subtitle stays until the next one when the gap is shorter than this; otherwise it ends tailSeconds after its last word. */
+    holdGapSeconds: 0.7,
+    tailSeconds: 0.3,
+    /** Texts whisper makes up from silence: chunks that read exactly like this are dropped. */
+    hallucinations: ["ご視聴ありがとうございました", "お疲れ様でした", "チャンネル登録よろしくお願いします"],
+  },
   render: {
     /**
      * Picture brightness for the burn-in / final render (1 = unchanged, 1.2 = 20% brighter).
@@ -119,6 +142,7 @@ export function loadSettings(paths: ProjectPaths): Settings {
     silence: { ...DEFAULT_SETTINGS.silence, ...override.silence },
     candidates: { ...DEFAULT_SETTINGS.candidates, ...override.candidates },
     render: { ...DEFAULT_SETTINGS.render, ...override.render },
+    retime: { ...DEFAULT_SETTINGS.retime, ...override.retime },
     transcribe: {
       ...DEFAULT_SETTINGS.transcribe,
       ...override.transcribe,

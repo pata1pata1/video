@@ -16,7 +16,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { UserError } from "./cli.ts";
 import type { Settings } from "./config.ts";
-import { getWhisperStatus, resolveSttBackend, runFasterWhisperScript, SttRunError, transcribeWithBackend, transcribeWithFasterWhisper, type FasterWhisperRuntime } from "./engine.ts";
+import { getWhisperStatus, resolveSttBackend, runFasterWhisperScript, SttRunError, transcribeClipsWithBackend, transcribeWithBackend, transcribeWithFasterWhisper, type FasterWhisperRuntime } from "./engine.ts";
 import { TOOL_ROOT } from "./paths.ts";
 import type { SttBackend, SttBackendSetting, Transcript } from "./transcript.ts";
 import { STT_BACKENDS } from "./transcript.ts";
@@ -183,6 +183,35 @@ async function runFasterWhisper(wav: string, plan: SttPlan, settings: Settings["
     throw new Error(`glossary prompt が faster-whisper に正しく渡っていません（送信「${plan.prompt}」／受信「${run.result.promptReceived}」）`);
   }
   return run.transcript;
+}
+
+/** Many short clips, each on its own, the model loaded once (subtitles retime). Text per clip, in order. */
+export async function transcribeClipWavs(wavs: string[], plan: SttPlan, settings: Settings["transcribe"], onProgress?: (ratio: number) => void): Promise<string[]> {
+  if (plan.problems.length) throw new UserError(plan.problems.join("\n"));
+  if (plan.backend === "whisper-cpp") {
+    try {
+      return await transcribeClipsWithBackend(wavs, {
+        backend: "whisper-cpp",
+        whisperCpp: { model: plan.model, language: plan.language, prompt: plan.prompt || undefined, threads: settings.whisperCpp.threads, beamSize: settings.whisperCpp.beamSize, onProgress },
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (/spawn UNKNOWN|EPERM|Application Control|アプリケーション制御/.test(msg)) {
+        throw new UserError("whisper.cpp を起動できません（Windows のアプリ制御）。Windows では faster-whisper（auto）を使ってください。");
+      }
+      throw err;
+    }
+  }
+  const fw = settings.fasterWhisper;
+  try {
+    return await transcribeClipsWithBackend(wavs, {
+      backend: "faster-whisper",
+      runtime: fasterWhisperRuntime(),
+      fasterWhisper: { model: plan.model, language: plan.language, prompt: plan.prompt, threads: fw.threads, computeType: fw.computeType, beamSize: fw.beamSize, offline: fasterWhisperModelPresent(plan.model), onProgress },
+    });
+  } catch (err) {
+    throw fasterWhisperError(err);
+  }
 }
 
 export type FasterWhisperCheck = { python: string; fasterWhisper: string; ctranslate2: string; cpuComputeTypes: string[]; pyav: string };

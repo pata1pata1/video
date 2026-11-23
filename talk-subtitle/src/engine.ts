@@ -35,6 +35,7 @@ export {
   resolveSttBackend,
   runFasterWhisperScript,
   SttRunError,
+  transcribeClipsWithBackend,
   transcribeWithBackend,
   transcribeWithFasterWhisper,
   type FasterWhisperRuntime,

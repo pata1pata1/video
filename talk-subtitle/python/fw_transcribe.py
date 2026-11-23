@@ -6,6 +6,8 @@ Called by src/stt.ts with talk-subtitle/.venv's Python:
         [--model large-v3-turbo] [--language ja] [--prompt "..."]
         [--threads 6] [--compute-type int8] [--beam-size 5]
         [--models-dir .local/models] [--offline] [--no-condition-on-previous-text]
+    python -I python/fw_transcribe.py --clips <json {"wavs": [...]}> --out <json> [same options]
+        (many short clips, the model loaded once; --out gets {"clips": [{"text": ...}]}; subtitles retime)
     python -I python/fw_transcribe.py --check            (environment report, JSON on stdout)
     python -I python/fw_transcribe.py --download-only    (fetch the model, then exit)
 
@@ -156,9 +158,34 @@ def transcribe(args):
     os.replace(tmp, args.out)
 
 
+def transcribe_clips(args):
+    """Each clip on its own (no carry-over between clips); text only, in order."""
+    with open(args.clips, encoding="utf-8") as f:
+        wavs = json.load(f)["wavs"]
+    model = load_model(args)
+    out = []
+    for i, path in enumerate(wavs):
+        segments, _ = model.transcribe(
+            read_wav(path),
+            language=None if args.language == "auto" else args.language,
+            initial_prompt=args.prompt or None,
+            beam_size=args.beam_size,
+            word_timestamps=False,
+            vad_filter=False,
+            condition_on_previous_text=False,
+        )
+        out.append({"text": "".join(s.text for s in segments).strip()})
+        print(f"progress = {int((i + 1) * 100 / max(1, len(wavs)))}%", file=sys.stderr, flush=True)
+    tmp = args.out + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump({"clips": out, "pyavPlaceholderActive": isinstance(sys.modules.get("av"), _PyAVNotUsed)}, f, ensure_ascii=False)
+    os.replace(tmp, args.out)
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("--wav")
+    p.add_argument("--clips")
     p.add_argument("--out")
     p.add_argument("--model", default="large-v3-turbo")
     p.add_argument("--language", default="ja")
@@ -186,6 +213,10 @@ def main():
     elif args.download_only:
         load_model(args)
         print(json.dumps({"model": args.model, "modelsDir": os.path.abspath(args.models_dir), "ready": True}))
+    elif args.clips:
+        if not args.out:
+            p.error("--out is required")
+        transcribe_clips(args)
     else:
         if not args.wav or not args.out:
             p.error("--wav and --out are required")

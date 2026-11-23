@@ -11,6 +11,7 @@
 //   npm run subtitles -- edit-batch --project=<id> --file=<plan.json>   （分割・削除をまとめて。[{ "cue": "s001", "split": [{ "text", "start", "end" }] } | { "cue": "s002", "delete": true }]。全部当ててから重なりを確かめ、だめなら何も書かない）
 //   npm run subtitles -- speaker --project=<id> --name=女 --cues=s002,s005-s009   （話者。色は subtitle-style.json の speakers）
 //   npm run subtitles -- speaker --project=<id> --name=男 --rest   （まだ話者の無い字幕をすべて）／ --clear --cues=…
+//   npm run subtitles -- retime --project=<id> [--dry-run] [--show-all]   （字幕の時刻を cut.mp4 の声に合わせ直す。文字は変えない。声のかたまりごとに文字起こしし直して対応づける）
 //   npm run subtitles -- import --project=<id> --file=<subtitles.html から書き出した JSON>
 //   npm run subtitles -- approve --project=<id>       （要確認がすべて確認済みのときだけ）
 
@@ -38,6 +39,8 @@ import {
 } from "../src/subtitles.ts";
 import type { CorrectedTranscript } from "../src/terms.ts";
 import type { Transcript } from "../src/transcript.ts";
+import { loadSettings } from "../src/config.ts";
+import { normalizeForMatch, retimeSubtitles } from "../src/retime.ts";
 
 await runCli(async () => {
   const args = parseArgs();
@@ -238,6 +241,78 @@ await runCli(async () => {
     return;
   }
 
+  if (cmd === "retime") {
+    const dryRun = args.has("dry-run");
+    if (!dryRun) assertWritable(project);
+    checkCutInputs(paths, json.source!.sha256);
+    const draft = loadDraft();
+    const s = loadSubtitleEdits(paths, json.id);
+    carryEdits(s, draft);
+    const live = effectiveCues(draft, s, { textRules: false });
+    const result = await retimeSubtitles(paths, live.map((c) => ({ id: c.id, text: c.text, start: c.start, end: c.end })), loadSettings(paths), (l) => console.log(l));
+    const dropped = result.chunks.filter((c) => c.dropped && c.text);
+    if (dropped.length) console.log(`捨てた文字起こし（無音から作られた文など）: ${dropped.map((c) => `${fmtTime(c.start)}「${c.text}」`).join("、")}`);
+    const moved = result.cues.filter((c) => Math.abs(c.newStart - c.start) >= 0.1 || Math.abs(c.newEnd - c.end) >= 0.1);
+    console.log(`\n字幕 ${result.cues.length} 件の文字のうち ${(result.matchedRatio * 100).toFixed(0)}% を声と対応づけました。時刻が 0.1秒以上変わる字幕 ${moved.length} 件:`);
+    for (const c of args.has("show-all") ? result.cues : moved) {
+      const d = c.newStart - c.start;
+      console.log(`  ${c.id.padEnd(8)} ${fmtTime(c.start)} → ${fmtTime(c.newStart)}（${d >= 0 ? "+" : ""}${d.toFixed(2)}秒）〜${fmtTime(c.newEnd)}${c.snapped ? " 息つぎ" : ""}${c.matched < 0.6 ? `  ！対応 ${(c.matched * 100).toFixed(0)}%` : ""}  「${c.text}」`);
+    }
+    const weak = result.cues.filter((c) => c.matched < 0.6);
+    if (weak.length) console.log(`\n！声との対応が少ない字幕 ${weak.length} 件（聞き間違い・字幕の文字が声と違う・カットの漏れの可能性。時刻は前後からの見込み）: ${weak.map((c) => c.id).join(", ")}`);
+    // Fillers and words the subtitles leave out on purpose (はい・うん・まあ・ね…) are not worth a look.
+    const st = loadSettings(paths).candidates;
+    const fillers = [...new Set([...(preset.layout?.dropWords ?? []), ...st.strongFillers, ...st.weakFillers, "ね", "はい", "うん", "まあ", "あの", "その"].map(normalizeForMatch).filter(Boolean))].sort((a, b) => b.length - a.length);
+    const fillerOnly = new RegExp(`^(?:${fillers.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})+$`);
+    const unheard = result.unheard.filter((u) => !fillerOnly.test(normalizeForMatch(u.text)));
+    if (unheard.length) {
+      console.log(`\n字幕に無い声 ${unheard.length} か所（残った言い直し・言いかけの手がかり。字幕の書き始め・終わりの表記違いのこともある。つなぎの言葉 ${result.unheard.length - unheard.length} か所は省略）:`);
+      for (const u of unheard) console.log(`  ${fmtTime(u.start)}–${fmtTime(u.end)}  「${u.text}」`);
+    }
+    const shortCues = result.cues.filter((c) => c.newEnd - c.newStart < 0.4);
+    if (shortCues.length) console.log(`\n！0.4秒未満の字幕: ${shortCues.map((c) => `${c.id}（${(c.newEnd - c.newStart).toFixed(2)}秒）`).join(", ")}`);
+    if (dryRun) {
+      console.log("\n[dry-run] 何も書いていません。");
+      return;
+    }
+    // Write the times the same way as edit / edit-batch (texts untouched).
+    const at = new Date().toISOString();
+    const t = new Map(result.cues.map((c) => [c.id, c]));
+    for (const c of draft.cues) {
+      const e = s.edits[c.id];
+      if (e?.deleted) continue;
+      const next = { ...(e ?? { origText: c.text }), by: "cli" as By, at };
+      if (e?.before) {
+        const b = t.get(`${c.id}a`);
+        if (b) next.before = { ...e.before, start: b.newStart, end: b.newEnd };
+      }
+      if (e?.split?.length) {
+        next.split = e.split.map((p, k) => {
+          const r = t.get(k === 0 ? c.id : `${c.id}.${k + 1}`);
+          return r ? { ...p, start: r.newStart, end: r.newEnd } : p;
+        });
+      } else {
+        const r = t.get(c.id);
+        if (r) {
+          next.start = r.newStart;
+          next.end = r.newEnd;
+        }
+      }
+      s.edits[c.id] = next;
+    }
+    const cues = effectiveCues(draft, s);
+    for (let i = 1; i < cues.length; i++) {
+      if (cues[i].start < cues[i - 1].end - 1e-6) throw new UserError(`重なっています: ${cues[i - 1].id}（〜${cues[i - 1].end.toFixed(2)}）と ${cues[i].id}（${cues[i].start.toFixed(2)}〜）。何も書いていません。`);
+    }
+    if (s.approved) {
+      s.approved = null;
+      console.log("時刻が変わったので、字幕の承認を外しました（確認してから approve し直してください）。");
+    }
+    console.log("\n字幕の時刻を書きました（input/subtitles.json）。");
+    refresh(draft, s);
+    return;
+  }
+
   if (cmd === "import") {
     assertWritable(project);
     const draft = loadDraft();
@@ -340,5 +415,5 @@ await runCli(async () => {
     return;
   }
 
-  throw new UserError("サブコマンド: draft | show | edit | edit-batch | speaker | import | approve");
+  throw new UserError("サブコマンド: draft | show | edit | edit-batch | retime | speaker | import | approve");
 });
