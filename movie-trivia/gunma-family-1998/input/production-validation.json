@@ -1,0 +1,14 @@
+{
+  "validatedAt": "2026-11-23T00:29:13.896Z",
+  "requestId": "pr-gunma-family-1998-20261123-main-202611230019",
+  "scriptSha256": "51167cc4fc6c7f10eff2df769a301459ef90951bff433eefdf42ec7e9c7095b6",
+  "status": "pass",
+  "proceed": true,
+  "precheck": [],
+  "contentOps": {
+    "status": "pass",
+    "problems": [],
+    "safeWarnings": [],
+    "blockingWarnings": []
+  }
+}
