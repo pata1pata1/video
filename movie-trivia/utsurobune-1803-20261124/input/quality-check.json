@@ -1,7 +1,7 @@
 {
   "maxAttempts": 3,
   "latest": {
-    "attempt": 1,
+    "attempt": 2,
     "gate": "pass",
     "overallQuality": 93,
     "scores": {
@@ -109,6 +109,102 @@
         "weakestFrame": null
       },
       "mp4Sha256": "7a330a951d8b8e860b4844f2d1762622f0a34aad8e9e4ef42c483035acbae714",
+      "escalation": null
+    },
+    {
+      "attempt": 2,
+      "checkedAt": "2026-11-23T17:28:52.751Z",
+      "rulesVersion": "long-v2",
+      "gate": "pass",
+      "overallQuality": 93,
+      "scores": {
+        "visualStrength": 86,
+        "hookQuality": 100,
+        "visualPacing": 100,
+        "onScreenTextLoad": 100,
+        "duration": 100,
+        "narrationPacing": 100,
+        "audioQuality": 100,
+        "structure": 100
+      },
+      "blocking": [],
+      "metrics": {
+        "duration": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "hookQuality": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "visualPacing": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "visualStrength": {
+          "score": 86,
+          "findings": [
+            "目視：冒頭0秒は弘賢随筆（国立公文書館蔵）の円盤のような舟の絵。題材そのものの当時の画で、2文目に女性の絵とタイトル",
+            "目視：章の中は絵図の切り抜き（舟・女性・箱・文字）を枠付きで大きく見せ、文書全体を縮小して読ませていない。梅の塵・兎園小説の別の絵も入れて同じ絵が続きすぎないようにした",
+            "目視：場所の地図・文書の年表は大きな文字で作り直した（34px 以上）。地図のピンが字幕と重なっていたのを直した",
+            "目視：海・浜・巻物・船の場面は Pexels のイメージ映像（※映像はイメージです）。漂着そのものの映像はない（江戸時代の話のため）",
+            "目視：字幕は1行・72px。全編のコマで1行に収まり、絵図の主役を隠していない",
+            "目視：サムネイル B は女性の絵の手元だけが写る切り方になったので使わない（A を使う）",
+            "目視：v2：字幕の区切りを直した（ユーザー指摘「流れ着いた。江戸時代の文書に」など、1枚の字幕に文がまたがっていた）。「。」で必ず区切り、言葉の途中で切れる5文は台本の chunks で区切りを指定。「思いますか？」。全編の字幕を1.4秒ごとに切り出して確認"
+          ],
+          "fixes": [
+            "この出来事そのものの映像・公式素材・報道写真（権利と出典を確認）を探す。イメージ映像と図だけで構成しない"
+          ],
+          "evidence": {
+            "judgmentSource": "measured+claude-review",
+            "realFootageRatio": 0.7991243265568528,
+            "eventRatio": 0.6432473805895544,
+            "movingRatio": 0.7991243265568528
+          }
+        },
+        "onScreenTextLoad": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "narrationPacing": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "audioQuality": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "structure": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        }
+      },
+      "reviewNotes": [
+        "冒頭0秒は弘賢随筆（国立公文書館蔵）の円盤のような舟の絵。題材そのものの当時の画で、2文目に女性の絵とタイトル",
+        "章の中は絵図の切り抜き（舟・女性・箱・文字）を枠付きで大きく見せ、文書全体を縮小して読ませていない。梅の塵・兎園小説の別の絵も入れて同じ絵が続きすぎないようにした",
+        "場所の地図・文書の年表は大きな文字で作り直した（34px 以上）。地図のピンが字幕と重なっていたのを直した",
+        "海・浜・巻物・船の場面は Pexels のイメージ映像（※映像はイメージです）。漂着そのものの映像はない（江戸時代の話のため）",
+        "字幕は1行・72px。全編のコマで1行に収まり、絵図の主役を隠していない",
+        "サムネイル B は女性の絵の手元だけが写る切り方になったので使わない（A を使う）",
+        "v2：字幕の区切りを直した（ユーザー指摘「流れ着いた。江戸時代の文書に」など、1枚の字幕に文がまたがっていた）。「。」で必ず区切り、言葉の途中で切れる5文は台本の chunks で区切りを指定。「思いますか？」。全編の字幕を1.4秒ごとに切り出して確認"
+      ],
+      "visualEvidence": {
+        "judgmentSource": "measured+claude-review",
+        "realFootageRatio": 0.7991243265568528,
+        "diagramRatio": null,
+        "cardRatio": null,
+        "motionEvidence": null,
+        "strongestFrame": null,
+        "weakestFrame": null
+      },
+      "mp4Sha256": "8b34a40b29a12de49d7a3a310e5cf23b7cbf3e542df34158560bacceb23bbaa6",
       "escalation": null
     }
   ]

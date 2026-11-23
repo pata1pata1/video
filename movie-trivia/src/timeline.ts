@@ -367,14 +367,14 @@ const WORD_START = /[\p{Script=Han}\p{Script=Katakana}「『（0-9０-９A-Za-z]
 /** Splits a caption into pieces of at most maxChars: at 「、」 first, then after a particle nearest the middle. */
 export function splitChunks(text: string, maxChars: number): string[] {
   const len = (p: string) => [...p.replace(/、$/u, "")].length;
-  // cut after 「、」「？」「！」, but a very short piece (2-3 characters) joins the next one when they fit together
+  // cut after 「、」「。」「？」「！」 (never one piece across a sentence end), but a very short piece (2-3 characters) joins the next one when they fit together
   const parts = text
-    .split(/(?<=[、？！])/u)
+    .split(/(?<=[、。？！])/u)
     .map((p) => p.trim())
     .filter(Boolean)
     .reduce<string[]>((acc, p) => {
       const last = acc[acc.length - 1];
-      if (last !== undefined && len(last) <= 3 && !/[？！]$/u.test(last) && len(last + p) <= maxChars) acc[acc.length - 1] = last + p;
+      if (last !== undefined && len(last) <= 3 && !/[。？！]$/u.test(last) && len(last + p) <= maxChars) acc[acc.length - 1] = last + p;
       else acc.push(p);
       return acc;
     }, []);
