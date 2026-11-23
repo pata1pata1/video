@@ -80,6 +80,9 @@
     },
     "ship": {
       "query": "old wooden sailing ship sea storm"
+    },
+    "thumb-hero": {
+      "query": "（サムネイル用：弘賢随筆の舟と女性の切り抜きを並べた合成・コモンズ PD）"
     }
   },
   "scenes": [
@@ -556,6 +559,19 @@
       ],
       "accent": "謎の舟",
       "small": "11種類の文書に残る話"
+    },
+    {
+      "id": "D",
+      "layout": "split",
+      "photo": "thumb-hero",
+      "photoWidth": 900,
+      "ribbon": "1803年 茨城",
+      "lines": [
+        "江戸時代の"
+      ],
+      "accent": "UFO？",
+      "question": "女が抱えた箱の中身は？",
+      "note": "絵：弘賢随筆（国立公文書館）"
     }
   ]
 }
