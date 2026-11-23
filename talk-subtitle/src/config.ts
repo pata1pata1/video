@@ -111,6 +111,11 @@ export const DEFAULT_SETTINGS = {
     /** Audio kept around each chunk when it is cut out for transcription. */
     clipPaddingSeconds: 0.05,
     snapSeconds: 0.5,
+    /**
+     * A breath to snap to is a dip under breathDb at least this long (2026-11-24, ua: 10–20 ms dips
+     * inside a word were taken for breaths and kept 「4800円とか」 0.2 s late).
+     */
+    breathMinSeconds: 0.06,
     /** A subtitle stays until the next one when the gap is shorter than this; otherwise it ends tailSeconds after its last word. */
     holdGapSeconds: 0.7,
     tailSeconds: 0.3,

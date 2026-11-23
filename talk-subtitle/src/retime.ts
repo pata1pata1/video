@@ -101,6 +101,37 @@ function writeWav16(file: string, pcm: Pcm, start: number, end: number) {
   fs.writeFileSync(file, buf);
 }
 
+/**
+ * About how long a (normalized) character takes to say, in morae: a digit is read as several
+ * (4800 → よんせんはっぴゃく), a kanji ≈ 2, small kana fold into the one before.
+ */
+export function spokenWeight(c: string): number {
+  if (/[0-9]/.test(c)) return 2.5;
+  if (/[ぁぃぅぇぉゃゅょゎ]/.test(c)) return 0.3;
+  if (/[ぁ-ゖ]/.test(c)) return 1;
+  if (/[一-鿿々]/.test(c)) return 2;
+  if (/[a-z]/.test(c)) return 0.8;
+  return 1;
+}
+
+/**
+ * Maps a fraction (0..1) of a chunk's speech to a time, counting only frames louder than voiceDb,
+ * so pauses and dips inside the chunk take no share of the characters.
+ */
+export function voicedClock(db: number[], start: number, end: number, voiceDb: number): (fraction: number) => number {
+  const a = Math.max(0, Math.round(start / FRAME));
+  const b = Math.min(db.length, Math.max(a + 1, Math.round(end / FRAME)));
+  const voiced: number[] = [];
+  for (let f = a; f < b; f++) if (db[f] > voiceDb) voiced.push(f);
+  if (voiced.length < 2) return (x) => start + (end - start) * x;
+  return (x) => {
+    const pos = Math.min(voiced.length - 1, Math.max(0, x * voiced.length));
+    const i = Math.floor(pos);
+    if (x >= 1) return Math.min(end, (voiced[voiced.length - 1] + 1) * FRAME);
+    return (voiced[i] + (pos - i)) * FRAME;
+  };
+}
+
 /** Longest common subsequence: for each index of a, the matched index of b (or -1). */
 export function lcsMap(a: string[], b: string[]): number[] {
   const n = a.length;
@@ -183,12 +214,22 @@ export async function retimeSubtitles(
     const junk = new Set(s.hallucinations.map(normalizeForMatch));
     const chunks: RetimeChunk[] = found.map((c, i) => ({ ...c, text: texts[i] ?? "", dropped: junk.has(normalizeForMatch(texts[i] ?? "")) || !normalizeForMatch(texts[i] ?? "") }));
 
-    // Heard characters with times (spread evenly over their chunk).
+    // Heard characters with times, spread over their chunk by how long each takes to say (spokenWeight)
+    // and over the voiced frames only (2026-11-24, ua: even spreading put 「4800円とか」 0.7 s late —
+    // 「4800」 is 4 characters but a second of speech, and dips inside a chunk counted as speech time).
     const heard: { c: string; start: number; end: number; chunk: number }[] = [];
     chunks.forEach((c, k) => {
       if (c.dropped) return;
       const chars = Array.from(normalizeForMatch(c.text));
-      chars.forEach((ch, i) => heard.push({ c: ch, start: c.start + ((c.end - c.start) * i) / chars.length, end: c.start + ((c.end - c.start) * (i + 1)) / chars.length, chunk: k }));
+      const at = voicedClock(db, c.start, c.end, voiceDb);
+      const weights = chars.map(spokenWeight);
+      const total = weights.reduce((a, b) => a + b, 0) || 1;
+      let acc = 0;
+      chars.forEach((ch, i) => {
+        const a = acc / total;
+        acc += weights[i];
+        heard.push({ c: ch, start: at(a), end: at(acc / total), chunk: k });
+      });
     });
     // Subtitle characters.
     const subChars: { c: string; cue: number }[] = [];
@@ -220,17 +261,38 @@ export async function retimeSubtitles(
     const tEnd = (i: number) => (map[i] >= 0 ? heard[map[i]].end : tStart(i));
 
     const chunkStarts = chunks.filter((c) => !c.dropped).map((c) => c.start);
+    const matchedHeard = new Set(map.filter((v) => v >= 0));
+    /**
+     * A subtitle whose first characters were heard spelled differently (けっこう / 結構, 4800 / 1800):
+     * it starts at the unmatched heard characters just before its first matched one, in the same
+     * chunk and at most leadMaxSeconds earlier — not at a point interpolated from the previous
+     * subtitle (2026-11-24, ua: that moved 「けっこう…」 2 s early and 「4800円とか」 late).
+     */
+    const leadMaxSeconds = 1.2;
+    const startOf = (from: number, to: number): number => {
+      let fm = from;
+      while (fm < to && map[fm] < 0) fm++;
+      if (fm === from || fm >= to) return tStart(from);
+      const h0 = map[fm];
+      let h = h0;
+      while (h - 1 >= 0 && !matchedHeard.has(h - 1) && heard[h - 1].chunk === heard[h0].chunk && heard[h0].start - heard[h - 1].start <= leadMaxSeconds) h--;
+      return h < h0 ? heard[h].start : tStart(from);
+    };
     const out = cues.map((cue, k) => {
       const { from, to } = spans[k];
       if (to <= from) return { ...cue, newStart: cue.start, newEnd: cue.end, matched: 0, snapped: false };
-      let start = tStart(from);
+      let start = startOf(from, to);
       let snapped = false;
       // Inside a chunk: the nearest breath (end of a dip) within snapSeconds.
       if (!chunkStarts.some((a) => Math.abs(a - start) < 0.02)) {
         const est = Math.round(start / FRAME);
         let best = -1;
+        const minDip = Math.max(1, Math.round(s.breathMinSeconds / FRAME));
         for (let f = Math.max(1, est - Math.round(s.snapSeconds / FRAME)); f < Math.min(db.length - 1, est + Math.round(s.snapSeconds / FRAME)); f++) {
-          if (db[f] < breathDb && db[f + 1] >= breathDb && (best < 0 || Math.abs(f + 1 - est) < Math.abs(best - est))) best = f + 1;
+          if (!(db[f] < breathDb && db[f + 1] >= breathDb)) continue;
+          let dip = 0;
+          while (f - dip >= 0 && db[f - dip] < breathDb) dip++;
+          if (dip >= minDip && (best < 0 || Math.abs(f + 1 - est) < Math.abs(best - est))) best = f + 1;
         }
         if (best >= 0) {
           start = best * FRAME;
@@ -243,7 +305,7 @@ export async function retimeSubtitles(
     // Order kept: a start that would pass the next one falls back to the plain estimate.
     for (let k = 1; k < out.length; k++) {
       if (out[k].newStart <= out[k - 1].newStart + 0.05) {
-        const plain = tStart(spans[k].from);
+        const plain = startOf(spans[k].from, spans[k].to);
         if (plain > out[k - 1].newStart + 0.05) {
           out[k].newStart = plain;
           out[k].snapped = false;

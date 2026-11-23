@@ -119,10 +119,9 @@ export async function burnWhole(
   output: string,
   opts: { audioFilter?: string; audioInput?: string; timeoutMs?: number; log?: (s: string) => void; loudness: { targetLufs: number; truePeakDb: number } },
 ): Promise<{ parts: number }> {
-  if (plan.cues.length <= CUES_PER_PART) {
-    await burnRange(paths, plan, 0, plan.duration, output, opts);
-    return { parts: 1 };
-  }
+  // A short video is one part but takes the same audio path (2026-11-24, ua: burning it with the
+  // audio in one pass encoded the AAC once, and its true peak came out -0.8 dBTP over the -1 check;
+  // encodeAacLoudnorm below re-encodes until the AAC is under the ceiling).
   const fadeOut = plan.preset.transition?.fadeOutSeconds ?? 0;
   const bounds: number[] = [0];
   let count = 0;
@@ -168,15 +167,30 @@ export async function burnWhole(
       await burnRange(paths, plan, seeks[k], to, file, { timeoutMs: opts.timeoutMs, audio: false });
       parts.push(file);
     }
-    const joined = path.join(work, "joined.mp4");
-    // Exact part lengths (from frame to frame): the demuxer's own per-file durations were ~0.7 ms short each (live-talk).
-    await concatMedia(parts, joined, { overwrite: true, durations: bounds.slice(1).map((b, k) => b - bounds[k]) });
-    for (const p of parts) fs.rmSync(p, { force: true });
+    // One part (a short video): it is the whole video already.
+    const joined = parts.length === 1 ? parts[0] : path.join(work, "joined.mp4");
+    if (parts.length > 1) {
+      // Exact part lengths (from frame to frame): the demuxer's own per-file durations were ~0.7 ms short each (live-talk).
+      await concatMedia(parts, joined, { overwrite: true, durations: bounds.slice(1).map((b, k) => b - bounds[k]) });
+      for (const p of parts) fs.rmSync(p, { force: true });
+    }
     const wav = path.join(work, "audio.wav");
     await extractAudio(opts.audioInput ?? paths.cutFinal, wav, { sampleRate: 48000, channels: 2, overwrite: true });
     const aac = path.join(work, "audio.m4a");
-    const r = await encodeAacLoudnorm(wav, aac, { targetLufs: opts.loudness.targetLufs, truePeakCeiling: opts.loudness.truePeakDb, overwrite: true });
+    const { targetLufs, truePeakDb } = opts.loudness;
+    let r = await encodeAacLoudnorm(wav, aac, { targetLufs, truePeakCeiling: truePeakDb, overwrite: true });
     opts.log?.(`  音声: ${r.result.integratedLufs} LUFS／true peak ${r.result.truePeakDb} dBTP（${r.attempts} 回目で上限内）`);
+    // Sharp transients (2026-11-24, ua: unboxing sounds) can rise ~1.7 dB in the AAC, and the encoder then
+    // lowers the whole track to keep the peak (-15.3 LUFS). Limit those short peaks harder instead, so the
+    // voice stays at the target: the limiter goes down by the shortfall each time.
+    let marginDb = 1;
+    for (let i = 0; i < 3 && r.result.integratedLufs < targetLufs - 0.5; i++) {
+      marginDb = Number((marginDb + (targetLufs - r.result.integratedLufs) + 0.3).toFixed(2));
+      const limited = path.join(work, `audio-limited-${i + 1}.wav`);
+      await limitPeaksTowardLoudness(wav, limited, { targetLufs, truePeakDb, marginDb, overwrite: true });
+      r = await encodeAacLoudnorm(limited, aac, { targetLufs, truePeakCeiling: truePeakDb, overwrite: true });
+      opts.log?.(`  音声（ピークを ${(truePeakDb - marginDb).toFixed(1)}dB で抑え直し）: ${r.result.integratedLufs} LUFS／true peak ${r.result.truePeakDb} dBTP（${r.attempts} 回目で上限内）`);
+    }
     // -t to the video's length (-shortest ended the copied AAC 49 ms early on live-talk).
     await muxVideoAudio(joined, aac, output, { overwrite: true, durationSeconds: plan.duration, timeoutMs: opts.timeoutMs });
     return { parts: parts.length };
