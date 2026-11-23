@@ -1,0 +1,14 @@
+{
+  "validatedAt": "2026-11-23T20:41:34.240Z",
+  "requestId": "pr-nagicho-chatgpt-updates-20261124-main-202611232041",
+  "scriptSha256": "e037da5d6284058d361f0fbf18ebb85048d891428410dc6714af487360bb3a0b",
+  "status": "pass",
+  "proceed": true,
+  "precheck": [],
+  "contentOps": {
+    "status": "pass",
+    "problems": [],
+    "safeWarnings": [],
+    "blockingWarnings": []
+  }
+}
