@@ -5,6 +5,7 @@
   "titleTop": "1998年 群馬県",
   "titleMain": "一家3人殺害事件",
   "titleSub": "容疑者は28年逃走中",
+  "subtitle": { "chunk": true, "maxRowChars": 20, "fontSize": 72 },
   "pronunciation": {
     "小暮洋史": "こぐれひろし",
     "小暮": "こぐれ",

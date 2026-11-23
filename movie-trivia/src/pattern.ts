@@ -120,4 +120,11 @@ const PATTERNS: Record<string, Pattern> = {
 const id = (script as { pattern?: string }).pattern;
 if (!id || !(id in PATTERNS)) throw new Error(`script "${(script as { id: string }).id}": unknown pattern "${id}" (add it to src/pattern.ts)`);
 
-export const PATTERN = PATTERNS[id];
+/**
+ * Per-video subtitle override in the script (2026-11-23, user: 「スマホで見ると字幕が小さい 字幕は1行がいい」):
+ * e.g. `"subtitle": { "chunk": true, "maxRowChars": 20, "fontSize": 72 }` shows one bigger row at a time
+ * (pattern-03 and the other patterns drawn by src/components.tsx). Videos without it keep the pattern's values,
+ * so existing videos and the regression fixture do not change. pattern-02 (src/news.tsx) also reads rowsPerPage.
+ */
+const SCRIPT_SUBTITLE = (script as { subtitle?: Partial<Pattern["subtitle"]> & { rowsPerPage?: number } }).subtitle;
+export const PATTERN: Pattern = SCRIPT_SUBTITLE ? { ...PATTERNS[id], subtitle: { ...PATTERNS[id].subtitle, ...SCRIPT_SUBTITLE } } : PATTERNS[id];

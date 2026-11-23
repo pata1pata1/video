@@ -5,6 +5,7 @@
   "titleTop": "（タイトル画面の小見出し。例：〇〇年 〇〇県）",
   "titleMain": "（タイトル画面の大タイトル・1行で収まる長さ。例：〇〇事件）",
   "titleSub": "（タイトル画面のサブタイトル。謎の一言）",
+  "subtitle": { "chunk": true, "maxRowChars": 20, "fontSize": 72 },
   "pronunciation": {},
   "media": {
     "hook1": { "query": "（冒頭の画：題材そのものの記録映像・現場・資料のキー。イメージ映像で始めない）" },

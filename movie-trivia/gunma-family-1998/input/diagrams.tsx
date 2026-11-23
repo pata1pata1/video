@@ -41,7 +41,6 @@ const Pin: React.FC<{ lon: number; lat: number; label: string; sub?: string; p: 
 // 逃走の足取り（FNN の報道）。step 1：出発点と走った地点、step 2：最後の目撃（刀水橋）と埼玉方面
 const Route: React.FC<{ steps: StepFrames }> = ({ steps }) => {
   const { reveal } = useSteps(steps);
-  const home = geo(139.02, 36.36);
   const bridge = geo(139.35, 36.21);
   const south = { x: bridge.x - 60, y: bridge.y + 200 };
   const p2 = reveal(2);

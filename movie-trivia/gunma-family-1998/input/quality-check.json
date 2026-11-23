@@ -1,7 +1,7 @@
 {
   "maxAttempts": 3,
   "latest": {
-    "attempt": 1,
+    "attempt": 2,
     "gate": "pass",
     "overallQuality": 92,
     "scores": {
@@ -110,6 +110,103 @@
         "weakestFrame": null
       },
       "mp4Sha256": "8428b9f94b0df683015a2f05f5b72c0bf7a8d26d8c2be33c731f6d70d3ab2449",
+      "escalation": null
+    },
+    {
+      "attempt": 2,
+      "checkedAt": "2026-11-23T01:12:12.346Z",
+      "rulesVersion": "long-v2",
+      "gate": "pass",
+      "overallQuality": 92,
+      "scores": {
+        "visualStrength": 83,
+        "hookQuality": 75,
+        "visualPacing": 100,
+        "onScreenTextLoad": 100,
+        "duration": 100,
+        "narrationPacing": 100,
+        "audioQuality": 100,
+        "structure": 100
+      },
+      "blocking": [],
+      "metrics": {
+        "duration": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "hookQuality": {
+          "score": 75,
+          "findings": [
+            "冒頭が 25 秒（pattern の目安 15 秒の 1.5 倍まで）"
+          ],
+          "fixes": [
+            "冒頭 3 秒はこの出来事の一番強い映像・写真と結論の1文。タイトル画面・イメージ映像・「今回は〜」で始めない"
+          ]
+        },
+        "visualPacing": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "visualStrength": {
+          "score": 83,
+          "findings": [
+            "この出来事そのものの素材（Pexels 以外）22%（25% で満点）",
+            "目視：冒頭0秒は警察が公開した手配写真の顔（題材そのものの画）。章の中に手配ポスターの加齢推定の顔・車・癖の絵（切り抜き・拡大、枠付き）が入り、この事件の画として成立している",
+            "目視：逃走の足取りの地図・時効の時系列・情報提供の窓口は大きな文字で作り直した（32px 以上）",
+            "目視：事件そのものの映像はなく、つきまとい・事件の夜・逃走の場面は Pexels の暗いイメージ映像（駅・夜の住宅街・電話・橋）に頼っている。現場の家・被害者は意図して映していない",
+            "目視：ポスターの画像は 650px の元画像の拡大で、顔はやや粗い",
+            "目視：v2：字幕を1行・72px にした（ユーザー指示「スマホで見ると字幕が小さい」）。全編のコマで1行に収まり、映像を隠していないことを確認"
+          ],
+          "fixes": [
+            "この出来事そのものの映像・公式素材・報道写真（権利と出典を確認）を探す。イメージ映像と図だけで構成しない"
+          ],
+          "evidence": {
+            "judgmentSource": "measured+claude-review",
+            "realFootageRatio": 0.7627118644067797,
+            "eventRatio": 0.22113551173402865,
+            "movingRatio": 0.7627118644067797
+          }
+        },
+        "onScreenTextLoad": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "narrationPacing": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "audioQuality": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "structure": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        }
+      },
+      "reviewNotes": [
+        "冒頭0秒は警察が公開した手配写真の顔（題材そのものの画）。章の中に手配ポスターの加齢推定の顔・車・癖の絵（切り抜き・拡大、枠付き）が入り、この事件の画として成立している",
+        "逃走の足取りの地図・時効の時系列・情報提供の窓口は大きな文字で作り直した（32px 以上）",
+        "事件そのものの映像はなく、つきまとい・事件の夜・逃走の場面は Pexels の暗いイメージ映像（駅・夜の住宅街・電話・橋）に頼っている。現場の家・被害者は意図して映していない",
+        "ポスターの画像は 650px の元画像の拡大で、顔はやや粗い",
+        "v2：字幕を1行・72px にした（ユーザー指示「スマホで見ると字幕が小さい」）。全編のコマで1行に収まり、映像を隠していないことを確認"
+      ],
+      "visualEvidence": {
+        "judgmentSource": "measured+claude-review",
+        "realFootageRatio": 0.7627118644067797,
+        "diagramRatio": null,
+        "cardRatio": null,
+        "motionEvidence": null,
+        "strongestFrame": null,
+        "weakestFrame": null
+      },
+      "mp4Sha256": "9c67b38bf260b6d9bf7d79f56a02d9ae5d3e8b251c7f350b710f3b982de24095",
       "escalation": null
     }
   ]

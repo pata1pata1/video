@@ -21,7 +21,7 @@ movie-trivia 全体の制作ルール（事実確認・出典・素材確認・�
 |---|---|
 | `config.json` | 構成：結末から入るオープニング → 経緯の章 × N → エンディング。尺の目安8〜12分。フェードは14コマ |
 | `design.json` | 黒に近い背景と赤。本文・字幕ともに太い明朝（Zen Old Mincho）。映像は暗くぼかした古いフィルム調（`film`）、光るキーワード（`words`）、右上の赤い筆の章見出し（`chapterTag.style: "brush"`）、赤く光るタイトル（`title.mainColor`） |
-| `subtitle.json` | 黒の地に白い明朝体、細い赤の枠線 |
+| `subtitle.json` | 黒の地に白い明朝体、細い赤の枠線（既定は 46px・2行。2026-11-23 から新しい動画は台本の `"subtitle": { "chunk": true, "maxRowChars": 20, "fontSize": 72 }` で1行ずつ大きく出す：ユーザー指示「スマホで見ると字幕が小さい 字幕は1行がいい」。雛形に入っている。既定値は回帰 fixture のため変えない） |
 | `voice.json` | 青山龍星 ノーマル（ID 13）、速さ0.95、文と章の間を長め |
 | `bgm.json` | 暗いBGM `bgm/pattern-03-dark.mp3`（ユーザーが用意する。置くまで書き出しは止まる）、ナレーションより20dB下 |
 | `render.json` | 共通の書き出し基盤に渡す設定（JPEG画質、x264、-16 LUFS / -1.5 dBTP） |
