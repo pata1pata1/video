@@ -99,6 +99,11 @@ export async function approvedBurnCues(paths: ProjectPaths, project: string): Pr
 /** Cues per part when a long video is burned in parts (each part is one ffmpeg run with this many PNG inputs). */
 const CUES_PER_PART = 40;
 
+/** The last whole millisecond strictly below t (core passes -ss / -t to ffmpeg with 3 decimals). */
+function msBelow(t: number): number {
+  return (Math.ceil(t * 1000 - 1e-6) - 1) / 1000;
+}
+
 /**
  * The whole of cut.mp4 with the cues burned in → output. A short video is one burnRange. A long one
  * (more than CUES_PER_PART cues) is burned in parts — one ffmpeg run with hundreds of PNG inputs exceeds
@@ -135,9 +140,17 @@ export async function burnWhole(
   // Each part starts on a real frame of cut.mp4 (2026-11-23, an: the frames there sit up to 8 ms off the
   // 1/60 grid, so a part starting at a whole second re-timed its frames by 3.3 ms and lost one frame).
   const frames = await frameTimestamps(paths.cutFinal);
+  // seeks[k]: what ffmpeg gets as -ss / -t. core passes them with 3 decimals, so it is the last whole
+  // millisecond strictly before the part's first frame (2026-11-23, Windows talking-test-01: the frame at
+  // 161.0066667 s became "-t 161.007", so the earlier part kept that frame too and it was there twice).
+  // bounds[k] stays the exact frame time, for the part lengths when joining.
+  const seeks = [...bounds];
   for (let k = 1; k < bounds.length - 1; k++) {
     const f = frames.find((t) => t >= bounds[k] - 1e-6);
-    if (f !== undefined && f < bounds[k + 1]) bounds[k] = Math.round(f * 1e6) / 1e6;
+    if (f !== undefined && f < bounds[k + 1]) {
+      bounds[k] = f;
+      seeks[k] = msBelow(f);
+    }
   }
   const work = path.join(paths.intermediate, "render-parts");
   fs.rmSync(work, { recursive: true, force: true });
@@ -147,7 +160,12 @@ export async function burnWhole(
     for (let k = 0; k < bounds.length - 1; k++) {
       const file = path.join(work, `part-${String(k + 1).padStart(3, "0")}.mp4`);
       opts.log?.(`  ${k + 1}/${bounds.length - 1}: ${bounds[k].toFixed(0)}–${bounds[k + 1].toFixed(0)}秒`);
-      await burnRange(paths, plan, bounds[k], bounds[k + 1], file, { timeoutMs: opts.timeoutMs, audio: false });
+      // -t is counted from the part's first frame (not from -ss), so the length too is the last whole
+      // millisecond strictly under the frame-to-frame length (Windows talking-test-01: part 2 began 0.67 ms
+      // after its -ss, and "-t 118.007" took the next part's first frame as well).
+      const last = k === bounds.length - 2;
+      const to = last ? plan.duration : seeks[k] + msBelow(bounds[k + 1] - bounds[k]);
+      await burnRange(paths, plan, seeks[k], to, file, { timeoutMs: opts.timeoutMs, audio: false });
       parts.push(file);
     }
     const joined = path.join(work, "joined.mp4");
