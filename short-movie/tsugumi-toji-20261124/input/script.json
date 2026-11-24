@@ -1,0 +1,299 @@
+{
+  "id": "tsugumi-toji-20261124",
+  "voice": {
+    "speaker": 31,
+    "name": "No.7（読み聞かせ）",
+    "speedScale": 1.6
+  },
+  "sentenceGap": 0.2,
+  "captionColor": "#6b3fa0",
+  "qualityProfile": "story-short",
+  "pronunciation": {
+    "冬至": "とうじ",
+    "湯治": "とうじ",
+    "柚子": "ゆず",
+    "融通": "ゆうずう",
+    "厄": "やく",
+    "邪気": "じゃき",
+    "運盛り": "うんもり",
+    "小豆": "あずき",
+    "いとこ煮": "いとこに",
+    "語呂合わせ": "ごろあわせ"
+  },
+  "sentences": [
+    {
+      "kind": "hook",
+      "factIds": [
+        "turning"
+      ],
+      "attribution": [],
+      "cards": [
+        {
+          "text": "実は冬至は、",
+          "image": "t01.jpg"
+        },
+        {
+          "text": "運気が上がり始める日。",
+          "image": "sunrise.mp4"
+        }
+      ]
+    },
+    {
+      "kind": "fact",
+      "factIds": [
+        "turning"
+      ],
+      "attribution": [],
+      "cards": [
+        {
+          "text": "昔の人は、"
+        },
+        {
+          "text": "そう考えてきました。"
+        }
+      ]
+    },
+    {
+      "kind": "fact",
+      "factIds": [
+        "date",
+        "shortest"
+      ],
+      "attribution": [],
+      "cards": [
+        {
+          "text": "今年の冬至は、",
+          "image": "t02.jpg"
+        },
+        {
+          "text": "12月22日。"
+        },
+        {
+          "text": "昼が一年で一番短い、",
+          "image": "shrine.mp4"
+        },
+        {
+          "text": "折り返しの日です。"
+        }
+      ]
+    },
+    {
+      "kind": "transition",
+      "factIds": [],
+      "attribution": [],
+      "cards": [
+        {
+          "text": "いくつ当てはまるか、",
+          "image": "t03.jpg"
+        },
+        {
+          "text": "チェックしてください。"
+        }
+      ]
+    },
+    {
+      "kind": "fact",
+      "factIds": [
+        "yuzu-purify"
+      ],
+      "attribution": [],
+      "cards": [
+        {
+          "text": "1つ目は、ゆず湯。",
+          "image": "t04.jpg",
+          "caption": "1つ目はゆず湯"
+        },
+        {
+          "text": "昔の人は、",
+          "image": "yuzu.mp4"
+        },
+        {
+          "text": "運を呼び込む前に、"
+        },
+        {
+          "text": "体を清めて温め、",
+          "image": "steam.mp4"
+        },
+        {
+          "text": "厄を払おうと考えました。"
+        }
+      ]
+    },
+    {
+      "kind": "fact",
+      "factIds": [
+        "yuzu-purify"
+      ],
+      "attribution": [],
+      "cards": [
+        {
+          "text": "香りの強い柚子で、",
+          "image": "t05.jpg"
+        },
+        {
+          "text": "邪気を払うとされます。"
+        }
+      ]
+    },
+    {
+      "kind": "fact",
+      "factIds": [
+        "yuzu-pun"
+      ],
+      "attribution": [],
+      "cards": [
+        {
+          "text": "冬至は湯治、",
+          "image": "t06.jpg"
+        },
+        {
+          "text": "柚子は融通。"
+        },
+        {
+          "text": "そんな語呂合わせとも、"
+        },
+        {
+          "text": "言われます。"
+        }
+      ]
+    },
+    {
+      "kind": "fact",
+      "factIds": [
+        "n-food"
+      ],
+      "attribution": [],
+      "cards": [
+        {
+          "text": "2つ目は、",
+          "image": "t07.jpg",
+          "caption": "2つ目は"
+        },
+        {
+          "text": "「ん」のつく食べ物。"
+        },
+        {
+          "text": "にんじん、だいこん、",
+          "image": "vegetables.mp4",
+          "caption": "にんじん だいこん"
+        },
+        {
+          "text": "れんこん、"
+        },
+        {
+          "text": "そして、なんきん。",
+          "image": "pumpkin.mp4",
+          "caption": "そして なんきん"
+        },
+        {
+          "text": "かぼちゃのことです。"
+        }
+      ]
+    },
+    {
+      "kind": "fact",
+      "factIds": [
+        "n-food"
+      ],
+      "attribution": [],
+      "cards": [
+        {
+          "text": "運を呼び込むと言われ、",
+          "image": "t08.jpg"
+        },
+        {
+          "text": "運盛りと呼ばれました。"
+        }
+      ]
+    },
+    {
+      "kind": "fact",
+      "factIds": [
+        "itokoni"
+      ],
+      "attribution": [],
+      "cards": [
+        {
+          "text": "3つ目は、",
+          "image": "t09.jpg"
+        },
+        {
+          "text": "小豆とかぼちゃ。"
+        },
+        {
+          "text": "一緒に煮た料理が、",
+          "image": "azuki.jpg"
+        },
+        {
+          "text": "いとこ煮です。",
+          "image": "t10.jpg"
+        },
+        {
+          "text": "食べると病気にならない、"
+        },
+        {
+          "text": "そんな言い伝えが、"
+        },
+        {
+          "text": "あります。"
+        }
+      ]
+    },
+    {
+      "kind": "closing",
+      "factIds": [],
+      "attribution": [],
+      "cards": [
+        {
+          "text": "12月22日のために、",
+          "image": "t11.jpg"
+        },
+        {
+          "text": "保存してくださいね。"
+        }
+      ]
+    },
+    {
+      "kind": "closing",
+      "factIds": [],
+      "attribution": [],
+      "cards": [
+        {
+          "text": "あなたはいくつ、",
+          "image": "shrine.mp4"
+        },
+        {
+          "text": "当てはまりましたか？"
+        }
+      ]
+    }
+  ],
+  "motion": {},
+  "footage": {
+    "sunrise": {
+      "query": "winter sunrise sun rays"
+    },
+    "yuzu": {
+      "query": "yuzu citrus fruit"
+    },
+    "steam": {
+      "query": "hot bath steam water"
+    },
+    "vegetables": {
+      "query": "lotus root carrot radish vegetables"
+    },
+    "pumpkin": {
+      "query": "kabocha squash pumpkin cut"
+    },
+    "azuki": {
+      "query": "red beans azuki"
+    },
+    "shrine": {
+      "query": "japanese shrine torii dawn"
+    }
+  },
+  "bgm": {
+    "file": "_shared/bgm/calm-pad-01.wav",
+    "gainDb": -20
+  }
+}

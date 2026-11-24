@@ -1,0 +1,9 @@
+{
+  "contractVersion": "content-ops.production-request/1",
+  "campaignId": "tsugumi-toji-20261124",
+  "key": "main",
+  "requestId": "pr-tsugumi-toji-20261124-main-202611240947",
+  "requestPath": "campaigns/tsugumi-toji-20261124/production/video-main.json",
+  "productionId": "tsugumi-toji-20261124",
+  "importedAt": "2026-11-24T09:47:02.720Z"
+}

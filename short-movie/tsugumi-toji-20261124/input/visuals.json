@@ -1,0 +1,206 @@
+{
+  "policy": "story-short/1",
+  "images": [
+    {
+      "file": "t01.jpg",
+      "category": "photo",
+      "realness": "generic-real",
+      "layout": "title-card",
+      "description": "冬至の朝日の雪原（Pexels の映像のコマ）に題名",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "冬至にしたいこと3つ",
+        "12月22日"
+      ]
+    },
+    {
+      "file": "sunrise.mp4",
+      "category": "footage",
+      "realness": "generic-real",
+      "layout": "full-bleed",
+      "description": "雪原の日の出（Pexels（Pexels ライセンス））",
+      "showsIncidentLocation": false,
+      "onScreenText": [],
+      "motion": true
+    },
+    {
+      "file": "t02.jpg",
+      "category": "photo",
+      "realness": "generic-real",
+      "layout": "full-bleed",
+      "description": "水辺の鳥居の夕景（Pexels の映像のコマ）に日付",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "2026年の冬至",
+        "12月22日"
+      ]
+    },
+    {
+      "file": "shrine.mp4",
+      "category": "footage",
+      "realness": "generic-real",
+      "layout": "full-bleed",
+      "description": "水辺の鳥居のシルエット・夕日（Pexels（Pexels ライセンス））",
+      "showsIncidentLocation": false,
+      "onScreenText": [],
+      "motion": true
+    },
+    {
+      "file": "t03.jpg",
+      "category": "photo",
+      "realness": "generic-real",
+      "layout": "full-bleed",
+      "description": "雪原の日の出（Pexels の映像のコマ）に問い",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "いくつ当てはまる？",
+        "①②③"
+      ]
+    },
+    {
+      "file": "t04.jpg",
+      "category": "photo",
+      "realness": "subject",
+      "layout": "big-number",
+      "description": "柑橘の木（Pexels の映像のコマ）に番号",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "①",
+        "ゆず湯"
+      ]
+    },
+    {
+      "file": "yuzu.mp4",
+      "category": "footage",
+      "realness": "subject",
+      "layout": "full-bleed",
+      "description": "木になる黄色い柑橘（Pexels（Pexels ライセンス））",
+      "showsIncidentLocation": false,
+      "onScreenText": [],
+      "motion": true
+    },
+    {
+      "file": "steam.mp4",
+      "category": "footage",
+      "realness": "generic-real",
+      "layout": "full-bleed",
+      "description": "湯をためる浴槽（Pexels（Pexels ライセンス））",
+      "showsIncidentLocation": false,
+      "onScreenText": [],
+      "motion": true
+    },
+    {
+      "file": "t05.jpg",
+      "category": "photo",
+      "realness": "subject",
+      "layout": "full-bleed",
+      "description": "柑橘の木（Pexels の映像のコマ）に文字",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "柚子の香りで",
+        "邪気払い"
+      ]
+    },
+    {
+      "file": "t06.jpg",
+      "category": "photo",
+      "realness": "generic-real",
+      "layout": "full-bleed",
+      "description": "湯をためる浴槽（Pexels の映像のコマ）に語呂合わせ",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "冬至＝湯治",
+        "柚子＝融通"
+      ]
+    },
+    {
+      "file": "t07.jpg",
+      "category": "photo",
+      "realness": "subject",
+      "layout": "big-number",
+      "description": "にんじん（Pexels の映像のコマ）に番号",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "②",
+        "「ん」がつくもの"
+      ]
+    },
+    {
+      "file": "vegetables.mp4",
+      "category": "footage",
+      "realness": "subject",
+      "layout": "full-bleed",
+      "description": "葉つきのにんじん（Pexels（Pexels ライセンス））",
+      "showsIncidentLocation": false,
+      "onScreenText": [],
+      "motion": true
+    },
+    {
+      "file": "pumpkin.mp4",
+      "category": "footage",
+      "realness": "subject",
+      "layout": "full-bleed",
+      "description": "かぼちゃ（Pexels（Pexels ライセンス））",
+      "showsIncidentLocation": false,
+      "onScreenText": [],
+      "motion": true
+    },
+    {
+      "file": "t08.jpg",
+      "category": "photo",
+      "realness": "subject",
+      "layout": "full-bleed",
+      "description": "かぼちゃ（Pexels の映像のコマ）に文字",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "運盛り",
+        "なんきん＝かぼちゃ"
+      ]
+    },
+    {
+      "file": "t09.jpg",
+      "category": "photo",
+      "realness": "subject",
+      "layout": "big-number",
+      "description": "かぼちゃ（Pexels の映像のコマ）に番号",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "③",
+        "小豆とかぼちゃ"
+      ]
+    },
+    {
+      "file": "azuki.jpg",
+      "category": "photo",
+      "realness": "subject",
+      "layout": "full-bleed",
+      "description": "ざるの上の小豆（Gabrielle de Souza / Pexels）",
+      "showsIncidentLocation": false,
+      "onScreenText": []
+    },
+    {
+      "file": "t10.jpg",
+      "category": "photo",
+      "realness": "subject",
+      "layout": "full-bleed",
+      "description": "小豆の写真（Pexels）に文字",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "小豆",
+        "かぼちゃと煮る"
+      ]
+    },
+    {
+      "file": "t11.jpg",
+      "category": "photo",
+      "realness": "generic-real",
+      "layout": "full-bleed",
+      "description": "水辺の鳥居の夕景（Pexels の映像のコマ）に問い",
+      "showsIncidentLocation": false,
+      "onScreenText": [
+        "いくつ",
+        "当てはまった？"
+      ]
+    }
+  ]
+}
