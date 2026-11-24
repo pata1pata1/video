@@ -1,0 +1,685 @@
+{
+  "id": "nagicho-claude-updates-20261125",
+  "pattern": "pattern-04",
+  "title": "Claudeが会議に出席？11月の新機能5つ｜使えるプランも整理",
+  "titleTop": "Claude 11月の新機能",
+  "titleMain": "Claude 11月の新機能5つ",
+  "titleSub": "会議・PC操作・コードのレビュー",
+  "program": "なぎちょAI",
+  "asOf": "2026年11月25日確認",
+  "voice": {
+    "speaker": 11,
+    "speakerName": "玄野武宏",
+    "speedScale": 1.25
+  },
+  "bgm": {
+    "file": "bgm/nagicho-calm-pad-01.wav",
+    "belowVoiceDb": 22
+  },
+  "subtitle": {
+    "rowsPerPage": 1,
+    "maxRowChars": 18
+  },
+  "pronunciation": {
+    "Claude Meetings": "クロード ミーティングズ",
+    "Claude Desktop": "クロード デスクトップ",
+    "Claude Ship": "クロード シップ",
+    "Claude Code": "クロード コード",
+    "Claude": "クロード",
+    "Anthropic": "アンソロピック",
+    "Computer use": "コンピューター ユース",
+    "Monthly recap": "マンスリー リキャップ",
+    "Google Meet": "グーグル ミート",
+    "GitHub": "ギットハブ",
+    "ToDo": "トゥードゥー",
+    "Team": "チーム",
+    "Enterprise": "エンタープライズ",
+    "Free": "フリー",
+    "Pro": "プロ",
+    "Max": "マックス",
+    "Ultra": "ウルトラ",
+    "Mac": "マック",
+    "Windows": "ウィンドウズ",
+    "8時間": "はちじかん"
+  },
+  "products": [
+    {
+      "id": "meetings",
+      "maker": "Claude",
+      "name": "Claude Meetings",
+      "short": "会議",
+      "tag": "Google Meet に参加",
+      "color": "#E8825A"
+    },
+    {
+      "id": "computer",
+      "maker": "Claude",
+      "name": "Computer use",
+      "short": "PC操作",
+      "tag": "画面を見て操作",
+      "color": "#5B9BFF"
+    },
+    {
+      "id": "ship",
+      "maker": "Claude",
+      "name": "Claude Ship",
+      "short": "Ship",
+      "tag": "コードのレビュー",
+      "color": "#19C39C"
+    },
+    {
+      "id": "apps",
+      "maker": "Claude",
+      "name": "アプリとしてインストール",
+      "short": "アプリ化",
+      "tag": "作ったものを専用の窓で",
+      "color": "#C77DFF"
+    },
+    {
+      "id": "recap",
+      "maker": "Claude",
+      "name": "Monthly recap",
+      "short": "ふり返り",
+      "tag": "1か月の使い方",
+      "color": "#F2C14E"
+    }
+  ],
+  "media": {
+    "meeting": {
+      "query": "video conference meeting laptop team"
+    },
+    "office": {
+      "query": "modern office working computer"
+    },
+    "typing": {
+      "query": "typing on laptop keyboard closeup"
+    },
+    "desktop": {
+      "query": "person working on desktop computer screen"
+    },
+    "code": {
+      "query": "programmer code on screen"
+    },
+    "calendar": {
+      "query": "person checking calendar on laptop"
+    },
+    "city": {
+      "query": "city night skyline timelapse"
+    }
+  },
+  "scenes": [
+    {
+      "id": "opening",
+      "kind": "opening",
+      "lines": [
+        {
+          "id": "o1",
+          "kind": "hook",
+          "factIds": [
+            "m-release"
+          ],
+          "text": "Claudeが、会議に出席するようになりました。",
+          "visual": {
+            "footage": "meeting",
+            "headline": {
+              "title": "Claude が会議に出席"
+            }
+          }
+        },
+        {
+          "id": "o2",
+          "kind": "transition",
+          "factIds": [],
+          "text": "11月に発表された、Claudeの新機能を5つ、まとめてお伝えします。",
+          "visual": {
+            "footage": "office",
+            "headline": {
+              "title": "Claude 11月の新機能5つ"
+            }
+          },
+          "caption": "11月に発表された\nClaude の新機能を5つ\nまとめてお伝えします。"
+        },
+        {
+          "id": "o3",
+          "kind": "transition",
+          "notice": true,
+          "factIds": [],
+          "text": "内容はAnthropicの公式の発表で、確認したのは11月25日です。",
+          "visual": {
+            "footage": "typing",
+            "headline": {
+              "title": "Anthropic の公式発表",
+              "sub": "11月25日に確認"
+            }
+          }
+        },
+        {
+          "id": "o4",
+          "kind": "transition",
+          "notice": true,
+          "factIds": [],
+          "text": "私たちはまだ使っていないので、公式の説明だけをお伝えします。",
+          "visual": {
+            "footage": "typing"
+          }
+        }
+      ]
+    },
+    {
+      "id": "c1",
+      "kind": "chapter",
+      "number": 1,
+      "heading": "Claude Meetings",
+      "lines": [
+        {
+          "id": "c1a",
+          "kind": "fact",
+          "factIds": [
+            "m-release"
+          ],
+          "text": "1つ目は、Claude Meetingsです。",
+          "visual": {
+            "footage": "meeting",
+            "product": "meetings",
+            "focus": "meetings"
+          }
+        },
+        {
+          "id": "c1b",
+          "kind": "fact",
+          "factIds": [
+            "m-release",
+            "m-limit"
+          ],
+          "text": "Google Meetの会議に、Claudeを参加者として加えられます。",
+          "visual": {
+            "footage": "meeting",
+            "headline": {
+              "title": "Google Meet に参加"
+            }
+          },
+          "caption": "Google Meet の会議に\nClaude を参加者として\n加えられます。"
+        },
+        {
+          "id": "c1c",
+          "kind": "fact",
+          "factIds": [
+            "m-do"
+          ],
+          "text": "会議中はチャットに文字で答え、頼むとドキュメントやホワイトボードを作ります。",
+          "visual": {
+            "footage": "calendar"
+          },
+          "caption": "会議中はチャットに文字で答え\n頼むとドキュメントや\nホワイトボードを作ります。"
+        },
+        {
+          "id": "c1d",
+          "kind": "fact",
+          "factIds": [
+            "m-do"
+          ],
+          "text": "終わった後は、要約とToDoのメモ、文字起こしが残ります。音声は保存しません。",
+          "visual": {
+            "footage": "typing",
+            "headline": {
+              "title": "要約・ToDo・文字起こし"
+            }
+          },
+          "caption": "終わった後は\n要約と ToDo のメモ\n文字起こしが残ります。\n音声は保存しません。"
+        },
+        {
+          "id": "c1e",
+          "kind": "fact",
+          "factIds": [
+            "m-limit"
+          ],
+          "text": "参加できるのは、最長8時間です。",
+          "visual": {
+            "spec": {
+              "label": "会議に参加できる時間",
+              "value": "8",
+              "unit": "時間",
+              "note": "最長・Google Meet だけ",
+              "product": "meetings"
+            }
+          }
+        },
+        {
+          "id": "c1f",
+          "kind": "fact",
+          "factIds": [
+            "m-notice"
+          ],
+          "text": "加える前に、参加者全員が文字起こしに同意しているか、確かめるよう案内されています。",
+          "visual": {
+            "footage": "meeting",
+            "headline": {
+              "title": "全員の同意を確かめる"
+            }
+          },
+          "caption": "加える前に\n参加者全員が文字起こしに\n同意しているか\n確かめるよう案内されています。"
+        },
+        {
+          "id": "c1g",
+          "kind": "fact",
+          "factIds": [
+            "m-release"
+          ],
+          "text": "対象は、会社向けのTeamとEnterpriseのプランで、ベータ版です。",
+          "visual": {
+            "footage": "office",
+            "headline": {
+              "title": "Team・Enterprise（ベータ）"
+            }
+          },
+          "caption": "対象は会社向けの\nTeam と Enterprise の\nプランで、ベータ版です。"
+        }
+      ]
+    },
+    {
+      "id": "c2",
+      "kind": "chapter",
+      "number": 2,
+      "heading": "Computer use",
+      "lines": [
+        {
+          "id": "c2a",
+          "kind": "fact",
+          "factIds": [
+            "c-release"
+          ],
+          "text": "2つ目は、Computer useです。",
+          "visual": {
+            "footage": "desktop",
+            "product": "computer",
+            "focus": "computer"
+          }
+        },
+        {
+          "id": "c2b",
+          "kind": "fact",
+          "factIds": [
+            "c-release"
+          ],
+          "text": "Claudeがパソコンの画面を見て、許可したアプリで、クリックや入力をします。",
+          "visual": {
+            "footage": "desktop",
+            "headline": {
+              "title": "画面を見て操作"
+            }
+          },
+          "caption": "Claude がパソコンの画面を見て\n許可したアプリで\nクリックや入力をします。"
+        },
+        {
+          "id": "c2c",
+          "kind": "fact",
+          "factIds": [
+            "c-release",
+            "c-setup"
+          ],
+          "text": "11月20日から、TeamとEnterpriseのプランに順次提供され、最初はオフになっています。",
+          "visual": {
+            "spec": {
+              "label": "Computer use（ベータ）",
+              "value": "11月20日",
+              "unit": "から順次",
+              "note": "Team・Enterprise・最初はオフ",
+              "product": "computer"
+            }
+          },
+          "caption": "11月20日から\nTeam と Enterprise に順次\n最初はオフになっています。"
+        },
+        {
+          "id": "c2d",
+          "kind": "fact",
+          "factIds": [
+            "c-setup"
+          ],
+          "text": "組織の管理者がオンにして、使うアプリは、利用者が1つずつ許可します。",
+          "visual": {
+            "footage": "typing"
+          },
+          "caption": "組織の管理者がオンにして\n使うアプリは利用者が\n1つずつ許可します。"
+        },
+        {
+          "id": "c2e",
+          "kind": "fact",
+          "factIds": [
+            "c-caution"
+          ],
+          "text": "公式のヘルプは、画面の内容で意図しない操作をすることがあると、注意しています。",
+          "visual": {
+            "footage": "desktop",
+            "headline": {
+              "title": "意図しない操作に注意"
+            }
+          },
+          "caption": "公式のヘルプは\n画面の内容で意図しない操作を\nすることがあると注意しています。"
+        }
+      ]
+    },
+    {
+      "id": "c3",
+      "kind": "chapter",
+      "number": 3,
+      "heading": "Claude Ship",
+      "lines": [
+        {
+          "id": "c3a",
+          "kind": "fact",
+          "factIds": [
+            "s-release"
+          ],
+          "text": "3つ目は、11月23日に発表された、Claude Shipです。",
+          "visual": {
+            "footage": "code",
+            "product": "ship",
+            "focus": "ship"
+          },
+          "caption": "3つ目は\n11月23日に発表された\nClaude Ship です。"
+        },
+        {
+          "id": "c3b",
+          "kind": "fact",
+          "factIds": [
+            "s-release"
+          ],
+          "text": "プログラムの変更をClaudeがレビューして直し、チームのルールで許されたものは承認します。",
+          "visual": {
+            "footage": "code",
+            "headline": {
+              "title": "レビュー・修正・承認"
+            }
+          },
+          "caption": "プログラムの変更を\nClaude がレビューして直し\nチームのルールで許されたものは\n承認します。"
+        },
+        {
+          "id": "c3c",
+          "kind": "fact",
+          "factIds": [
+            "s-limit"
+          ],
+          "text": "対象はTeamとEnterpriseで、GitHubのリポジトリです。",
+          "visual": {
+            "footage": "typing",
+            "headline": {
+              "title": "GitHub のリポジトリ"
+            }
+          },
+          "caption": "対象は Team と Enterprise で\nGitHub のリポジトリです。"
+        },
+        {
+          "id": "c3d",
+          "kind": "fact",
+          "factIds": [
+            "s-limit"
+          ],
+          "text": "料金は、プランの利用枠とは別の、従量課金です。",
+          "visual": {
+            "spec": {
+              "label": "Claude Ship の料金",
+              "value": "従量課金",
+              "note": "プランの利用枠とは別",
+              "product": "ship"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "c4",
+      "kind": "chapter",
+      "number": 4,
+      "heading": "アプリとしてインストール",
+      "lines": [
+        {
+          "id": "c4a",
+          "kind": "fact",
+          "factIds": [
+            "a-release"
+          ],
+          "text": "4つ目は、Claudeで作ったアーティファクトを、アプリとしてインストールする機能です。",
+          "visual": {
+            "footage": "desktop",
+            "product": "apps",
+            "focus": "apps"
+          },
+          "caption": "4つ目は\nClaude で作ったアーティファクトを\nアプリとして\nインストールする機能です。"
+        },
+        {
+          "id": "c4b",
+          "kind": "fact",
+          "factIds": [
+            "a-release"
+          ],
+          "text": "専用のウィンドウとアイコンで、ほかのアプリと同じように開けます。",
+          "visual": {
+            "footage": "office",
+            "headline": {
+              "title": "専用のウィンドウとアイコン"
+            }
+          },
+          "caption": "専用のウィンドウとアイコンで\nほかのアプリと同じように\n開けます。"
+        },
+        {
+          "id": "c4c",
+          "kind": "fact",
+          "factIds": [
+            "a-release"
+          ],
+          "text": "MacとWindowsのClaudeのアプリで、Freeを含む全プランのベータ版です。",
+          "visual": {
+            "spec": {
+              "label": "アプリとしてインストール",
+              "value": "全プラン",
+              "note": "ベータ・Mac と Windows",
+              "product": "apps"
+            }
+          },
+          "caption": "Mac と Windows の\nClaude のアプリで\nFree を含む全プランのベータ版です。"
+        },
+        {
+          "id": "c4d",
+          "kind": "fact",
+          "factIds": [
+            "a-caution"
+          ],
+          "text": "ただし、パソコン全体へのアクセスを許可すると、ファイルを書き換えたり、消したりできます。",
+          "visual": {
+            "footage": "typing",
+            "headline": {
+              "title": "全体へのアクセスに注意"
+            }
+          },
+          "caption": "ただし\nパソコン全体へのアクセスを許可すると\nファイルを書き換えたり\n消したりできます。"
+        },
+        {
+          "id": "c4e",
+          "kind": "fact",
+          "factIds": [
+            "a-caution"
+          ],
+          "text": "Anthropicは、インストールの前にアプリを審査していません。",
+          "visual": {
+            "footage": "desktop"
+          }
+        }
+      ]
+    },
+    {
+      "id": "c5",
+      "kind": "chapter",
+      "number": 5,
+      "heading": "Monthly recap",
+      "lines": [
+        {
+          "id": "c5a",
+          "kind": "fact",
+          "factIds": [
+            "r-release"
+          ],
+          "text": "5つ目は、Monthly recapです。11月24日に、ベータ版が終わりました。",
+          "visual": {
+            "footage": "calendar",
+            "product": "recap",
+            "focus": "recap"
+          },
+          "caption": "5つ目は Monthly recap です。\n11月24日に\nベータ版が終わりました。"
+        },
+        {
+          "id": "c5b",
+          "kind": "fact",
+          "factIds": [
+            "r-release"
+          ],
+          "text": "よく話した話題や、よく使う曜日と時間、次に試すことを、1か月ごとに見せてくれます。",
+          "visual": {
+            "footage": "calendar",
+            "headline": {
+              "title": "1か月の使い方をふり返る"
+            }
+          },
+          "caption": "よく話した話題や\nよく使う曜日と時間\n次に試すことを\n1か月ごとに見せてくれます。"
+        },
+        {
+          "id": "c5c",
+          "kind": "fact",
+          "factIds": [
+            "r-release"
+          ],
+          "text": "個人向けのFree、Pro、Max、Ultraが対象で、TeamとEnterpriseは対象外です。",
+          "visual": {
+            "footage": "office",
+            "headline": {
+              "title": "個人のプランだけ"
+            }
+          },
+          "caption": "個人向けの\nFree、Pro、Max、Ultra が対象で\nTeam と Enterprise は対象外です。"
+        }
+      ]
+    },
+    {
+      "id": "ending",
+      "kind": "ending",
+      "lines": [
+        {
+          "id": "e1",
+          "kind": "closing",
+          "factIds": [
+            "m-release",
+            "c-release",
+            "s-limit",
+            "a-release",
+            "r-release"
+          ],
+          "text": "まとめると、会議とパソコン操作とShipは会社向けのプラン、アプリ化は全プラン、ふり返りは個人向けです。",
+          "visual": {
+            "focus": "",
+            "compare": {
+              "title": "11月の新機能5つ",
+              "columns": [
+                "meetings",
+                "computer",
+                "ship",
+                "apps",
+                "recap"
+              ],
+              "rows": [
+                {
+                  "label": "対象",
+                  "cells": [
+                    "Team・Ent",
+                    "Team・Ent",
+                    "Team・Ent",
+                    "全プラン",
+                    "個人向け"
+                  ]
+                },
+                {
+                  "label": "状態",
+                  "cells": [
+                    "ベータ",
+                    "ベータ",
+                    "ベータ",
+                    "ベータ",
+                    "提供中"
+                  ]
+                }
+              ],
+              "note": "Anthropic の公式発表（11月25日確認）"
+            }
+          },
+          "caption": "まとめると\n会議とパソコン操作と Ship は\n会社向けのプラン\nアプリ化は全プラン\nふり返りは個人向けです。"
+        },
+        {
+          "id": "e2",
+          "kind": "closing",
+          "factIds": [],
+          "text": "順次の提供なので、すぐに使えるとは限りません。",
+          "visual": {
+            "footage": "city"
+          }
+        },
+        {
+          "id": "e3",
+          "kind": "closing",
+          "factIds": [],
+          "text": "あなたが一番使いたいのは、どれですか？",
+          "visual": {
+            "footage": "city",
+            "headline": {
+              "title": "一番使いたいのは？"
+            }
+          }
+        },
+        {
+          "id": "e4",
+          "kind": "closing",
+          "factIds": [],
+          "text": "コメントで教えてください。",
+          "visual": {
+            "footage": "city"
+          }
+        },
+        {
+          "id": "e5",
+          "kind": "closing",
+          "factIds": [],
+          "text": "高評価とチャンネル登録も、よろしくお願いします。",
+          "visual": {
+            "footage": "city"
+          }
+        }
+      ]
+    }
+  ],
+  "thumbnails": [
+    {
+      "id": "A",
+      "layout": "versus",
+      "photo": "meeting",
+      "products": [
+        "meetings",
+        "computer",
+        "ship"
+      ],
+      "ribbon": "Claude 11月の新機能",
+      "lines": [
+        "会議・PC操作・コードのレビュー ほか"
+      ],
+      "accent": "Claude が会議に出席",
+      "question": "あなたはどれを使う？"
+    },
+    {
+      "id": "B",
+      "layout": "split",
+      "photo": "meeting",
+      "ribbon": "Claude",
+      "lines": [
+        "会議に出席して"
+      ],
+      "accent": "ToDo まで残す",
+      "question": "11月の新機能5つ"
+    }
+  ]
+}

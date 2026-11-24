@@ -1,0 +1,10 @@
+{
+  "contractVersion": "content-ops.production-request/1",
+  "campaignId": "nagicho-claude-updates-20261125",
+  "key": "main",
+  "requestId": "pr-nagicho-claude-updates-20261125-main-202611242222",
+  "requestPath": "campaigns/nagicho-claude-updates-20261125/production/video-main.json",
+  "productionId": "nagicho-claude-updates-20261125",
+  "pattern": "pattern-04",
+  "importedAt": "2026-11-24T22:23:20.106Z"
+}
