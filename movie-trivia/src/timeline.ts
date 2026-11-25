@@ -170,7 +170,7 @@ export const SCRIPT = script as unknown as {
   endingTitle?: string;
   pattern: string;
   /** Overrides the pattern's voice (patterns/<pattern>/voice.json). */
-  voice?: { speakerName?: string };
+  voice?: { speakerName?: string; engine?: string; model?: string; length?: number; credit?: string };
   /** pattern-04: the products compared (nav, cards, table columns, versus thumbnail). */
   products?: ProductEntry[];
   /** pattern-01: background footage for the whole video (scenes and lines may change it). */
@@ -342,6 +342,13 @@ export const CHAPTERS = SCRIPT.scenes.filter((s) => s.kind === "chapter");
 
 /** The VOICEVOX speaker credited on the ending (the script may override the pattern). */
 export const SPEAKER_NAME = SCRIPT.voice?.speakerName ?? PATTERN.voice.speakerName;
+
+/**
+ * The voice credit drawn on the ending. script.voice.credit (Style-Bert-VITS2, 2026-11-25) replaces the
+ * pattern's "VOICEVOX:{speakerName}" line; "" draws nothing (a voice that needs no credit).
+ */
+export const voiceCreditLine = (patternLine: string): string =>
+  SCRIPT.voice?.credit !== undefined ? SCRIPT.voice.credit : patternLine.replace("{speakerName}", SPEAKER_NAME);
 
 // ---------------------------------------------------------------- short subtitles (pattern-01)
 

@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, Audio, Img, interpolate, Sequence, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { usePop } from "./components";
 import { type News, PATTERN, type Tech } from "./pattern";
-import { AUDIO_SRC, captionCues, lineStart, mediaFor, type MediaSource, NARRATION, type ProductEntry, type RosterEntry, SCRIPT, SPEAKER_NAME, type Visual, videoFrameFile } from "./timeline";
+import { AUDIO_SRC, captionCues, lineStart, mediaFor, type MediaSource, NARRATION, type ProductEntry, type RosterEntry, SCRIPT, type Visual, videoFrameFile, voiceCreditLine } from "./timeline";
 import { color, font } from "./theme";
 
 /**
@@ -415,10 +415,11 @@ const VoiceCredit: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = interpolate(frame / fps, [endingFrom, endingFrom + 0.5], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  if (p <= 0) return null;
+  const line = voiceCreditLine(PATTERN.design.ending.voiceCredit);
+  if (p <= 0 || !line) return null;
   return (
     <div style={{ position: "absolute", left: 40, bottom: 20, opacity: p, fontFamily: font.body, fontWeight: 700, fontSize: 22, color: "#FFFFFF", textShadow: outline(2, "rgba(0,0,0,0.8)") }}>
-      {PATTERN.design.ending.voiceCredit.replace("{speakerName}", SPEAKER_NAME)}
+      {line}
     </div>
   );
 };

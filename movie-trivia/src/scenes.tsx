@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, Img, interpolate, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { StatValue, usePop, useRamp } from "./components";
 import { PATTERN } from "./pattern";
-import { CHAPTERS, mediaFor, Points as PointsDef, SCRIPT, SceneDef, SPEAKER_NAME, Stat, videoFrameFile } from "./timeline";
+import { CHAPTERS, mediaFor, Points as PointsDef, SCRIPT, SceneDef, Stat, videoFrameFile, voiceCreditLine } from "./timeline";
 import { Box, Brackets, Rings, ScanLine, TitleRings } from "./hud";
 import { FilmOverlay } from "./film";
 import { color, font, neon, onAccent, paper, rankColor, SUBTITLE_AREA } from "./theme";
@@ -443,7 +443,7 @@ export const Ending: React.FC<{ lineFrames: number[] }> = ({ lineFrames }) => {
         </div>
       </Stage>
       <div style={{ position: "absolute", right: 72, bottom: SUBTITLE_AREA + 10, fontFamily: font.body, fontWeight: 500, fontSize: 24, color: color.inkSoft }}>
-        {D.ending.voiceCredit.replace("{speakerName}", SPEAKER_NAME)}
+        {voiceCreditLine(D.ending.voiceCredit)}
       </div>
     </Paper>
   );
