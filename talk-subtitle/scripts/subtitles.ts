@@ -7,6 +7,7 @@
 //   npm run subtitles -- edit   --project=<id> --cue=s001 --before="文" --before-start=0.28 --before-end=1.6   （前に字幕を1つ追加）
 //   npm run subtitles -- edit   --project=<id> --cue=s001 --split="今日はね|動物虐待問題で|なんかもっと" [--times=1.24-2.1,2.1-4.8,4.8-5.77]
 //                                （何分割でも。--times が無ければ字幕の表示時間を文字数で按分）
+//   npm run subtitles -- edit   --project=<id> --cue=s001.2 --start=3.1 [--end=…] [--text=…] [--delete]   （分けた字幕の2つ目。s001 は1つ目）
 //   npm run subtitles -- edit   --project=<id> --cue=s012 --delete | --ok | --reset
 //   npm run subtitles -- edit-batch --project=<id> --file=<plan.json>   （分割・削除をまとめて。[{ "cue": "s001", "split": [{ "text", "start", "end" }] } | { "cue": "s002", "delete": true }]。全部当ててから重なりを確かめ、だめなら何も書かない）
 //   npm run subtitles -- speaker --project=<id> --name=女 --cues=s002,s005-s009   （話者。色は subtitle-style.json の speakers）
@@ -125,13 +126,54 @@ await runCli(async () => {
     const draft = loadDraft();
     const s = loadSubtitleEdits(paths, json.id);
     carryEdits(s, draft);
-    const id = requireOpt(args, "cue");
+    const asked = requireOpt(args, "cue");
+    // A part of a split cue is shown as <id>.2, <id>.3 …: edit that part of <id>.
+    const partMatch = /^(.+)\.(\d+)$/.exec(asked);
+    const id = !draft.cues.some((c) => c.id === asked) && partMatch && draft.cues.some((c) => c.id === partMatch[1]) ? partMatch[1] : asked;
     const cue = draft.cues.find((c) => c.id === id);
-    if (!cue) throw new UserError(`${id} がありません（npm run subtitles -- show で確認）。`);
+    if (!cue) throw new UserError(`${asked} がありません（npm run subtitles -- show で確認）。`);
     const by: By = "chat";
     const prev = s.edits[id] ?? { origText: cue.text, by, at: "" };
     const e = { ...prev, by, at: new Date().toISOString() };
-    if (args.has("reset")) {
+    const partNo = id === asked ? 1 : Number(partMatch![2]);
+    if (id !== asked && !(prev.split?.length && partNo >= 1 && partNo <= prev.split.length)) throw new UserError(`${asked} がありません（${id} は${prev.split?.length ? ` ${prev.split.length} つに分けた字幕です` : "分けられていません"}。npm run subtitles -- show で確認）。`);
+    const partEdit = !!prev.split?.length && args.get("split") === undefined && !args.has("reset") && (args.get("start") !== undefined || args.get("end") !== undefined || args.get("text") !== undefined || (id !== asked && args.has("delete")));
+    if (id !== asked && !partEdit) throw new UserError(`${asked}（分けた字幕の${partNo}つ目）に使えるのは --start／--end／--text／--delete です。ほかは --cue=${id} で指定してください。`);
+    if (partEdit) {
+      // Edit one part of a split cue (time / text / delete). Parts never overlap each other or the neighbouring cues.
+      const k = partNo - 1;
+      const parts = prev.split!.map((p) => ({ ...p }));
+      const i = draft.cues.indexOf(cue);
+      const pc = draft.cues.slice(0, i).filter((c) => !s.edits[c.id]?.deleted).at(-1);
+      const nc = draft.cues.slice(i + 1).find((c) => !s.edits[c.id]?.deleted);
+      const lo = k > 0 ? parts[k - 1].end : Math.max(pc ? effEnd(pc, s) : 0, prev.before?.end ?? 0);
+      const hi = k < parts.length - 1 ? parts[k + 1].start : nc ? effStart(nc, s) : Infinity;
+      const r3 = (x: number) => Math.round(x * 1000) / 1000;
+      if (args.has("delete")) {
+        if (parts.length === 1) throw new UserError(`${asked} は最後の1つです。字幕ごと消すときは --cue=${id} --delete を使ってください。`);
+        parts.splice(k, 1);
+      } else {
+        const p = parts[k];
+        if (args.get("text") !== undefined) {
+          const t = args.get("text")!.replace(/\\n/g, "\n").trim();
+          if (!t) throw new UserError("--text が空です（消すときは --delete）。");
+          p.text = t;
+        }
+        if (args.get("start") !== undefined) {
+          const t = Number(args.get("start"));
+          if (!Number.isFinite(t) || t < lo - 1e-6 || t >= p.end) throw new UserError(`--start は ${lo.toFixed(2)}〜${p.end.toFixed(2)} 秒の間で指定してください（前の字幕と重ねない）。`);
+          p.start = r3(t);
+        }
+        if (args.get("end") !== undefined) {
+          const t = Number(args.get("end"));
+          if (!Number.isFinite(t) || t <= p.start || t > hi + 1e-6) throw new UserError(`--end は ${p.start.toFixed(2)}〜${hi === Infinity ? "最後" : hi.toFixed(2)} 秒の間で指定してください（次の字幕と重ねない）。`);
+          p.end = r3(t);
+        }
+      }
+      e.split = parts;
+      s.edits[id] = e;
+      console.log(`${asked}: ${args.has("delete") ? "この部分を削除" : `${parts[k].start.toFixed(2)}–${parts[k].end.toFixed(2)}「${parts[k].text}」`}（${id} は ${parts.map((p) => `${p.start.toFixed(2)}–${p.end.toFixed(2)}「${p.text}」`).join(" ")}）`);
+    } else if (args.has("reset")) {
       delete s.edits[id];
       // The speaker is not part of the text edit: keep it.
       if (prev.speaker || prev.before?.speaker) s.edits[id] = { origText: cue.text, ...(prev.speaker ? { speaker: prev.speaker } : {}), by, at: e.at };
@@ -144,7 +186,8 @@ await runCli(async () => {
         const i = draft.cues.indexOf(cue);
         const pc = draft.cues.slice(0, i).filter((c) => !s.edits[c.id]?.deleted).at(-1);
         const prevEnd = pc ? effEnd(pc, s) : 0;
-        if (!Number.isFinite(t) || t < prevEnd || t >= cue.end) throw new UserError(`--start は ${prevEnd.toFixed(2)}〜${cue.end.toFixed(2)} 秒の間で指定してください（前の字幕と重ねない）。`);
+        const end = args.get("end") !== undefined ? Number(args.get("end")) : (e.end ?? cue.end);
+        if (!Number.isFinite(t) || t < prevEnd || t >= end) throw new UserError(`--start は ${prevEnd.toFixed(2)}〜${end.toFixed(2)} 秒の間で指定してください（前の字幕と重ねない）。`);
         e.start = Math.round(t * 1000) / 1000;
       }
       if (args.get("end") !== undefined) {
