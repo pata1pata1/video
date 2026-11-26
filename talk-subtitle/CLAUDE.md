@@ -39,7 +39,7 @@
 ## 公開後のcleanup（全動画プロジェクト共通、2026-10-30）
 
 - video配下を完成動画の保存庫にしない。アップロードと再生確認が終わったら、その動画固有の制作物（`projects/<id>/` の元動画・音声・中間生成物・確認用動画・完成MP4・その案件の承認ファイルや固有名詞辞書など）を毎回削除する
-- 手順（2026-11-20 改定）：公開と再生の確認・`video:cleanup` の安全確認が済んだら、人の追加指示を待たずに自動で削除する（条件の詳細は `../CLAUDE.md` の cleanup。1つでも満たさなければ消さずに報告）
+- 手順（2026-11-26 改定、ユーザー指示）：**ユーザーが完成動画をフォルダから受け取った時点、または完成動画をアップロードした時点で、確認せずに `projects/<id>/` を削除する**（先に `style observe`。公開済みは `video:cleanup`、未公開は手で削除して `method: manual`。どちらも `../.cleanup-log.jsonl` に記録して報告。詳細は `../CLAUDE.md` の cleanup）
 - コマンド（remotion で実行。2026-11-05〜）：`npm run video:mark-completed -- --type=talk-subtitle --project=<id>` → アップロードと再生確認の後 `npm run video:mark-published -- --type=talk-subtitle --project=<id> --url=<公開URL>` → `npm run video:cleanup -- --type=talk-subtitle --project=<id> --dry-run`（①一覧・②残るもの・fingerprint・`DELETABLE: YES`）→ `--confirm-delete=<id> --expect-fingerprint=<fingerprint>`。`projects/<id>/` ごと削除する。mark-completed で `locked: true` になり、talk-subtitle のコマンドは書き込まなくなる
 - 残すもの：コード・`docs/`・`python/`・`remotion/`・共通辞書（`_shared/glossary.json`）・字幕プリセット（`_shared/subtitle-presets`）・学習データ（`style-data/`）・CLAUDE.md。学習に使う案件は、`npm run style -- observe` や reference の結果を `style-data/` に記録してから消す
 - 共通の対象一覧は `../../remotion/docs/video-migration-plan.md` の「cleanupの対象」
