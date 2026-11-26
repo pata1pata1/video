@@ -1,0 +1,117 @@
+{
+  "maxAttempts": 3,
+  "latest": {
+    "attempt": 1,
+    "gate": "pass",
+    "overallQuality": 85,
+    "scores": {
+      "visualStrength": 86,
+      "hookQuality": 75,
+      "visualPacing": 80,
+      "onScreenTextLoad": 100,
+      "duration": 100,
+      "narrationPacing": 100,
+      "audioQuality": 100,
+      "structure": 50
+    },
+    "escalation": null
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "checkedAt": "2026-11-26T09:51:22.125Z",
+      "rulesVersion": "long-v2",
+      "gate": "pass",
+      "overallQuality": 85,
+      "scores": {
+        "visualStrength": 86,
+        "hookQuality": 75,
+        "visualPacing": 80,
+        "onScreenTextLoad": 100,
+        "duration": 100,
+        "narrationPacing": 100,
+        "audioQuality": 100,
+        "structure": 50
+      },
+      "blocking": [],
+      "metrics": {
+        "duration": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "hookQuality": {
+          "score": 75,
+          "findings": [
+            "冒頭が 27 秒（pattern の目安 15 秒の 1.5 倍まで）"
+          ],
+          "fixes": [
+            "冒頭 3 秒はこの出来事の一番強い映像・写真と結論の1文。タイトル画面・イメージ映像・「今回は〜」で始めない"
+          ]
+        },
+        "visualPacing": {
+          "score": 80,
+          "findings": [
+            "画を変える間隔の平均 11.9 秒（10 秒以内）",
+            "同じ画が最長 22.8 秒（20 秒まで）"
+          ],
+          "fixes": [
+            "1〜3文ごとに映像・写真・図を切り替える（同じ素材は別の場面から）"
+          ]
+        },
+        "visualStrength": {
+          "score": 86,
+          "findings": [
+            "動く映像 13%"
+          ],
+          "fixes": [
+            "この出来事そのものの映像・公式素材・報道写真（権利と出典を確認）を探す。イメージ映像と図だけで構成しない"
+          ],
+          "evidence": {
+            "judgmentSource": "measured",
+            "realFootageRatio": 1,
+            "eventRatio": 0.8675376933236442,
+            "movingRatio": 0.1324623066763557
+          }
+        },
+        "onScreenTextLoad": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "narrationPacing": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "audioQuality": {
+          "score": 100,
+          "findings": [],
+          "fixes": []
+        },
+        "structure": {
+          "score": 50,
+          "findings": [
+            "サムネイルがない（mt.mjs thumbnails）",
+            "事件の動画に注意書きの文（notice: true）がない（容疑段階・判決の確定の有無などを言う）"
+          ],
+          "fixes": [
+            "pattern の構成（opening・chapter × N・ending）・注意書きの位置・タイトルの長さ・サムネイルをそろえる"
+          ]
+        }
+      },
+      "reviewNotes": [],
+      "visualEvidence": {
+        "judgmentSource": "measured",
+        "realFootageRatio": 1,
+        "diagramRatio": null,
+        "cardRatio": null,
+        "motionEvidence": null,
+        "strongestFrame": null,
+        "weakestFrame": null
+      },
+      "mp4Sha256": "0d427e712d4d506a902b528eb8e1f530d5c09781fd402c162ea8a5454e34e34f",
+      "escalation": null
+    }
+  ]
+}

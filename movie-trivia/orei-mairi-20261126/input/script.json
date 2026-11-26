@@ -1,0 +1,327 @@
+{
+  "id": "orei-mairi-20261126",
+  "pattern": "pattern-02",
+  "title": "「お礼参り」が怖すぎる｜出所後の仕返しを止める法律",
+  "titleTop": "刑法105条の2 証人威迫",
+  "titleMain": "お礼参りの本当の意味",
+  "titleSub": "証言した人への仕返し",
+  "program": "ニュースMT",
+  "asOf": "2026年11月26日時点",
+  "voice": {
+    "speaker": 13,
+    "speakerName": "霧咲 縁",
+    "engine": "sbv2",
+    "model": "Yukari-Kirisaki-SBV2",
+    "length": 0.88,
+    "credit": ""
+  },
+  "bgm": {
+    "file": "bgm/pattern-03-dark.mp3",
+    "belowVoiceDb": 22
+  },
+  "subtitle": {
+    "rowsPerPage": 1,
+    "maxRowChars": 18
+  },
+  "pronunciation": {
+    "証人威迫": "しょうにんいはく",
+    "強談威迫": "ごうだんいはく",
+    "お礼参り": "おれいまいり",
+    "105条の2": "ひゃくごじょうのに",
+    "拘禁刑": "こうきんけい",
+    "傍聴席": "ぼうちょうせき",
+    "暴対法": "ぼうたいほう",
+    "準構成員": "じゅんこうせいいん",
+    "上旬": "じょうじゅん",
+    "中旬": "ちゅうじゅん",
+    "下旬": "げじゅん",
+    "詰め寄り": "つめより",
+    "検察庁": "けんさつちょう"
+  },
+  "media": {
+    "courtroom": { "query": "（Commons：模擬法廷・イメージ）" },
+    "supreme": { "query": "（Commons：最高裁判所）" },
+    "fukuoka": { "query": "（Commons：福岡の裁判所庁舎・イメージ）" },
+    "moj": { "query": "（Commons：法務省）" },
+    "fuchu": { "query": "（Commons：府中刑務所）" },
+    "card_article": { "query": "（自作：刑法105条の2）" },
+    "card_notify": { "query": "（自作：被害者等通知制度）" },
+    "card_yakuza": { "query": "（自作：暴力団の人数）" },
+    "card_designated": { "query": "（自作：指定暴力団24団体）" },
+    "dark-street": { "query": "dark alley night street" },
+    "gavel": { "query": "judge gavel courtroom" },
+    "prison-hall": { "query": "prison corridor bars" },
+    "city-night": { "query": "japan city night street" },
+    "phone-worry": { "query": "worried person dark room" }
+  },
+  "roster": [],
+  "scenes": [
+    {
+      "id": "opening",
+      "kind": "opening",
+      "lines": [
+        {
+          "id": "o1",
+          "kind": "hook",
+          "factIds": ["meaning"],
+          "visual": { "footage": "courtroom", "headline": { "title": "「お礼参り」の本当の意味" } },
+          "text": "「お礼参り」。お礼という言葉が付いていますが、意味はまったく逆。仕返しのことなんです。"
+        },
+        {
+          "id": "o2",
+          "kind": "fact",
+          "factIds": ["meaning"],
+          "text": "事件の捜査や裁判に協力した人に、あとから押しかけて脅す。これが、お礼参りです。"
+        },
+        {
+          "id": "o3",
+          "kind": "fact",
+          "factIds": ["law1958"],
+          "visual": { "footage": "supreme" },
+          "text": "実はこの行為、専用の罪が作られるほど、恐れられてきました。"
+        },
+        {
+          "id": "o4",
+          "kind": "transition",
+          "factIds": [],
+          "text": "法律の中身、実際の裁判、そして証言した人を守る今の仕組みまで、順に見ていきます。"
+        }
+      ]
+    },
+    {
+      "id": "c1",
+      "kind": "chapter",
+      "number": 1,
+      "heading": "専用の罪ができた",
+      "lines": [
+        {
+          "id": "c1a",
+          "kind": "fact",
+          "factIds": ["meaning"],
+          "visual": { "footage": "moj", "headline": { "title": "① 専用の罪ができた" } },
+          "text": "お礼参りは、法律の世界では、証人威迫と呼ばれます。"
+        },
+        {
+          "id": "c1b",
+          "kind": "fact",
+          "factIds": ["law1958"],
+          "text": "この罪ができたのは、1958年の刑法改正です。"
+        },
+        {
+          "id": "c1c",
+          "kind": "fact",
+          "factIds": ["law1958"],
+          "visual": { "footage": "gavel" },
+          "text": "いわゆるお礼参りを取り締まり、裁判で証言する人を守るために、新しく作られました。"
+        },
+        {
+          "id": "c1d",
+          "kind": "fact",
+          "factIds": ["article"],
+          "visual": { "footage": "card_article" },
+          "text": "刑法105条の2。事件の捜査や裁判に必要なことを知っている人や、その家族が対象です。"
+        },
+        {
+          "id": "c1e",
+          "kind": "fact",
+          "factIds": ["article"],
+          "text": "その人たちに、正当な理由なく面会を強要したり、強談威迫をしたりすると、罪になります。"
+        },
+        {
+          "id": "c1f",
+          "kind": "fact",
+          "factIds": ["article"],
+          "text": "罰は、2年以下の拘禁刑、または30万円以下の罰金です。"
+        }
+      ]
+    },
+    {
+      "id": "c2",
+      "kind": "chapter",
+      "number": 2,
+      "heading": "裁判所の玄関で",
+      "lines": [
+        {
+          "id": "c2a",
+          "kind": "fact",
+          "factIds": ["case"],
+          "visual": { "footage": "fukuoka", "headline": { "title": "② 裁判所の玄関で" } },
+          "text": "実際に、この罪に当たるとされた事件があります。"
+        },
+        {
+          "id": "c2b",
+          "kind": "fact",
+          "factIds": ["case"],
+          "text": "1964年8月3日、福岡簡易裁判所で開かれた、窃盗事件の裁判です。"
+        },
+        {
+          "id": "c2c",
+          "kind": "fact",
+          "factIds": ["case"],
+          "visual": { "footage": "courtroom" },
+          "text": "証人は法廷で、傍聴席にいた男の名前を、すり仲間として挙げました。"
+        },
+        {
+          "id": "c2d",
+          "kind": "fact",
+          "factIds": ["case"],
+          "text": "怒った男ら3人は、証言を終えた証人を、裁判所の正面玄関の近くで呼び止めます。"
+        },
+        {
+          "id": "c2e",
+          "kind": "fact",
+          "factIds": ["case"],
+          "visual": { "footage": "dark-street" },
+          "text": "そして取り囲み、「どんな気持であんな証言をしたのか」などと詰め寄り、シャツの袖をつかみました。"
+        },
+        {
+          "id": "c2f",
+          "kind": "fact",
+          "factIds": ["ruling"],
+          "visual": { "footage": "supreme" },
+          "text": "最高裁は1965年11月26日、この行為が証人威迫に当たるとした判断を、正当としました。"
+        },
+        {
+          "id": "c2g",
+          "kind": "fact",
+          "factIds": ["ruling", "case"],
+          "text": "殴ったわけではありません。取り囲んで詰め寄り、袖をつかむ。それでも罪に当たるとされたのです。"
+        }
+      ]
+    },
+    {
+      "id": "c3",
+      "kind": "chapter",
+      "number": 3,
+      "heading": "出所を知らせる仕組み",
+      "lines": [
+        {
+          "id": "c3a",
+          "kind": "fact",
+          "factIds": ["worry"],
+          "visual": { "footage": "phone-worry", "headline": { "title": "③ 出所を知らせる仕組み" } },
+          "text": "証言した人が仕返しを心配するのは、今も同じです。"
+        },
+        {
+          "id": "c3b",
+          "kind": "fact",
+          "factIds": ["worry"],
+          "visual": { "footage": "moj" },
+          "text": "法務省の被害者向けの案内にも、法廷で証言して、加害者から仕返しされないか心配、という質問があります。"
+        },
+        {
+          "id": "c3c",
+          "kind": "fact",
+          "factIds": ["worry"],
+          "text": "法務省は、再被害を防ぐため、法律の制度を使い、警察とも連携するとしています。"
+        },
+        {
+          "id": "c3d",
+          "kind": "fact",
+          "factIds": ["notify"],
+          "visual": { "footage": "fuchu" },
+          "text": "その仕組みの1つが、被害者等通知制度です。"
+        },
+        {
+          "id": "c3e",
+          "kind": "fact",
+          "factIds": ["notify"],
+          "text": "被害者は、加害者が刑務所から出る予定の時期や、釈放された日などの通知を受けられます。"
+        },
+        {
+          "id": "c3f",
+          "kind": "fact",
+          "factIds": ["notify2"],
+          "visual": { "footage": "card_notify" },
+          "text": "さらに、仕返しのおそれがあるときは、検察官の判断で、釈放の直前に予定の時期が知らされます。"
+        },
+        {
+          "id": "c3g",
+          "kind": "fact",
+          "factIds": ["notify2"],
+          "text": "時期は、月の上旬、中旬、下旬という形で伝えられます。"
+        },
+        {
+          "id": "c3h",
+          "kind": "fact",
+          "factIds": ["notify2"],
+          "text": "判断の材料は、犯罪の動機や、組織的な背景、加害者の言動などです。"
+        },
+        {
+          "id": "c3i",
+          "kind": "fact",
+          "factIds": ["notify2"],
+          "visual": { "footage": "prison-hall" },
+          "text": "特に必要なときは、釈放されたあとの住所地まで、通知されます。"
+        }
+      ]
+    },
+    {
+      "id": "c4",
+      "kind": "chapter",
+      "number": 4,
+      "heading": "暴力団の今",
+      "lines": [
+        {
+          "id": "c4a",
+          "kind": "transition",
+          "factIds": [],
+          "visual": { "footage": "city-night", "headline": { "title": "④ 暴力団の今" } },
+          "text": "では、組織的な背景として考えられる暴力団は、今どうなっているのでしょうか。"
+        },
+        {
+          "id": "c4b",
+          "kind": "fact",
+          "factIds": ["yakuza"],
+          "visual": { "footage": "card_yakuza" },
+          "text": "警察庁によると、暴力団の構成員と準構成員などは、2025年末で1万7600人。"
+        },
+        {
+          "id": "c4c",
+          "kind": "fact",
+          "factIds": ["yakuza"],
+          "text": "10年前の2016年末は、3万9100人でした。暴対法の施行以来、最も少なくなっています。"
+        },
+        {
+          "id": "c4d",
+          "kind": "fact",
+          "factIds": ["yakuza"],
+          "text": "構成員だけで見ると、9400人です。"
+        },
+        {
+          "id": "c4e",
+          "kind": "fact",
+          "factIds": ["designated"],
+          "visual": { "footage": "card_designated" },
+          "text": "そして2026年6月1日の時点で、指定暴力団は24団体あります。"
+        }
+      ]
+    },
+    {
+      "id": "ending",
+      "kind": "ending",
+      "lines": [
+        {
+          "id": "e1",
+          "kind": "closing",
+          "factIds": ["law1958", "notify"],
+          "visual": { "footage": "supreme" },
+          "text": "お礼という名前の、仕返し。証言した人を守るために、専用の罪と、出所を知らせる仕組みが作られてきました。"
+        },
+        {
+          "id": "e2",
+          "kind": "closing",
+          "factIds": ["worry"],
+          "text": "証言のあとで不安があるときは、ひとりで抱えず、警察や検察庁に相談してください。"
+        },
+        {
+          "id": "e3",
+          "kind": "closing",
+          "factIds": [],
+          "text": "他にも知りたい言葉や事件があれば、コメントで教えてください。チャンネル登録も、よろしくお願いします。"
+        }
+      ]
+    }
+  ],
+  "thumbnails": []
+}

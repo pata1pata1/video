@@ -1,0 +1,10 @@
+{
+  "contractVersion": "content-ops.production-request/1",
+  "campaignId": "orei-mairi-20261126",
+  "key": "main",
+  "requestId": "pr-orei-mairi-20261126-main-202611260326",
+  "requestPath": "campaigns/orei-mairi-20261126/production/video-main.json",
+  "productionId": "orei-mairi-20261126",
+  "pattern": "pattern-02",
+  "importedAt": "2026-11-26T03:26:44.780Z"
+}

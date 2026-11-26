@@ -1,0 +1,14 @@
+{
+  "validatedAt": "2026-11-26T07:38:36.564Z",
+  "requestId": "pr-orei-mairi-20261126-main-202611260326",
+  "scriptSha256": "e43c56647ecac1e6a61d6ef924b5e9b87df60966a3087c34dd5eb0af766e6743",
+  "status": "pass",
+  "proceed": true,
+  "precheck": [],
+  "contentOps": {
+    "status": "pass",
+    "problems": [],
+    "safeWarnings": [],
+    "blockingWarnings": []
+  }
+}
